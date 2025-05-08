@@ -21,7 +21,7 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false
     },
-    email_verified_at: {
+    email_verified: {
       type: DataTypes.BOOLEAN,
       defaultValue: false // Email is initially not verified
     }
