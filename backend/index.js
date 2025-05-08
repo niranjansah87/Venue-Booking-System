@@ -1,16 +1,25 @@
-// index.js
-
 const express = require('express');
 const cors = require('cors');
-const db = require('./config/db'); // Import db.js to set up Sequelize
-const { User, Admin, Event, Venue, Shift, Package, Menu, Booking } = require('./models'); // Import all models
+const session = require('express-session');
+const db = require('./config/db');
+const { User, Admin, Event, Venue, Shift, Package, Menu, Booking } = require('./models');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
-app.use(express.json()); // Parse JSON bodies
-app.use(cors()); // Enable CORS for all routes
+app.use(express.json());
+app.use(cors());
+
+// Session setup
+app.use(session({
+  secret: process.env.SESSION_SECRET, // Secret key for the session
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: process.env.SESSION_MAX_AGE || 30 * 60 * 1000, // Session timeout in milliseconds (default 30 minutes)
+    secure: process.env.NODE_ENV === 'production', // Use secure cookies only in production
+  }
+}));
 
 // Test the database connection
 db.authenticate()
@@ -30,9 +39,18 @@ db.sync()
     console.error('Error syncing models:', error);
   });
 
-// Routes (Add your route handlers here)
+// Routes
 app.get('/', (req, res) => {
   res.send('Welcome to the API!');
+});
+
+// Example route for session management
+app.get('/session', (req, res) => {
+  if (req.session.user) {
+    res.send('Session is active!');
+  } else {
+    res.send('No active session.');
+  }
 });
 
 // Start the server
