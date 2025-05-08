@@ -20,10 +20,7 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false
     },
-    remember_token: {
-      type: DataTypes.STRING,
-      allowNull: true
-    }
+   
   }, {
     tableName: 'admins',
     timestamps: true
