@@ -6,7 +6,6 @@ const { body } = require('express-validator');
 const AuthController = require('../controllers/Admin/adminAuthController');
 const eventController = require('../controllers/Admin/eventController');
 const venueController = require('../controllers/Admin/venueController');
-
 const AdminProfileController = require('../controllers/Admin/adminProfileController');
 const bookingController = require('../controllers/Admin/bookingController');
 
