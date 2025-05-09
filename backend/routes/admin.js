@@ -8,6 +8,10 @@ const eventController = require('../controllers/Admin/eventController');
 const venueController = require('../controllers/Admin/venueController');
 const AdminProfileController = require('../controllers/Admin/adminProfileController');
 const bookingController = require('../controllers/Admin/bookingController');
+const menuController = require('../controllers/Admin/menuController');
+const packageController = require('../controllers/Admin/packageController');
+const shiftController = require('../controllers/Admin/shiftController');
+
 
 // Authentication Routes
 router.post('/signup', AuthController.signup);
@@ -52,6 +56,33 @@ router.get('/bookings', bookingController.index); // List all bookings
 router.get('/bookings/edit/:id', bookingController.edit); // Show booking edit form
 router.put('/bookings/update/:id', bookingController.update); // Update booking
 router.delete('/bookings/delete/:id', bookingController.destroy); // Delete booking
+
+
+
+// Routes
+router.get('/menu/', menuController.displayMenus);
+router.post('/menu/create', menuController.createMenu);
+router.put('/menu/update/:id', menuController.updateMenu);
+router.delete('/menu/delete/:id', menuController.deleteMenu);
+
+
+
+
+ //packages
+router.get('/package', packageController.listPackages);
+router.post('/package/create', packageController.createPackage);
+router.put('/package/update/:id', packageController.updatePackage);
+router.delete('/package/delete/:id', packageController.deletePackage);
+router.get('/package/:id/menus', packageController.getPackageMenus);
+
+
+
+//shift
+
+router.get('/shift', shiftController.listShifts);
+router.post('/shift/create', shiftController.createShift);
+router.put('/shift/update/:id', shiftController.updateShift);
+router.delete('/shift/delete/:id', shiftController.deleteShift);
 
 
 module.exports = router;
