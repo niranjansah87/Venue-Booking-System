@@ -5,7 +5,7 @@ const router = express.Router();
 const AuthController = require('../controllers/Admin/adminAuthController');
 const dashboardController = require('../controllers/Admin/DashboardController');
 const eventController = require('../controllers/Admin/eventController');
-const VenueController = require('../controllers/Admin/venueController');
+const venueController = require('../controllers/Admin/venueController');
 const ShiftController = require('../controllers/Admin/shiftController');
 const BookingController = require('../controllers/Admin/bookingController');
 const PackageController = require('../controllers/Admin/packageController');
@@ -28,6 +28,11 @@ router.post('/events/create', eventController.store);    // Show create form
 router.put('/events/edit/:id', eventController.update);    // Show edit form
 router.delete('/events/delete/:id', eventController.destroy); // Update event
 
+// Venue routes
+router.get('/venues', venueController.getAllVenues); // Display all venues
+router.post('/venues/create', venueController.createVenue);  // Create a new venue
+router.put('/venues/update/:id', venueController.updateVenue); // Update a venue
+router.delete('/venues/delete/:id', venueController.deleteVenue); // Delete a venue
 
 // router.use('/venues', VenueController);
 // router.use('/shifts', ShiftController);

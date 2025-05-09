@@ -19,6 +19,7 @@ app.use(cookieParser());
 // Middleware for JSON request parsing
 app.use(express.json());
 // Middlewares
+app.use('/public', express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // CORS configuration
