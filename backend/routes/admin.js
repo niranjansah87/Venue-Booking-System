@@ -11,7 +11,10 @@ const bookingController = require('../controllers/Admin/bookingController');
 const menuController = require('../controllers/Admin/menuController');
 const packageController = require('../controllers/Admin/packageController');
 const shiftController = require('../controllers/Admin/shiftController');
+const dashboardController = require('../controllers/Admin/DashboardController');
 
+// Get dashboard data
+router.get('/dashboard/', dashboardController.getDashboardData);
 
 // Authentication Routes
 router.post('/signup', AuthController.signup);
@@ -22,10 +25,10 @@ router.post('/logout', AuthController.logout);
 router.post('/update', AdminProfileController.updateProfile);
 
 // Event Routes
-router.get('/events', eventController.index);
-router.post('/events/create', eventController.store);
-router.put('/events/edit/:id', eventController.update);
-router.delete('/events/delete/:id', eventController.destroy);
+router.get('/events', eventController.listEvents);
+router.post('/events/create', eventController.createEvent);
+router.put('/events/edit/:id', eventController.updateEvent);
+router.delete('/events/delete/:id', eventController.deleteEvent);
 
 // Venue Routes
 router.get('/venues', venueController.getAllVenues);
