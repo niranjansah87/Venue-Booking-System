@@ -14,9 +14,9 @@ const UserController = require('../controllers/Admin/userController');
 const AdminProfileController = require('../controllers/Admin/adminProfileController');
 
 // Authentication Routes
-// router.get('/signup', AuthController.signup); 
-// router.post('/login', AuthController.login);
-// router.post('/logout', AuthController.logout);
+router.post('/signup', AuthController.signup);
+router.post('/login', AuthController.login);
+router.post('/logout', AuthController.logout);
 
 // Admin Routes (Requires Authentication Middleware)
 // router.use('/dashboard', AuthController.authMiddleware, DashboardController.index);
@@ -49,7 +49,6 @@ router.delete('/events/delete/:id', eventController.destroy); // Update event
 // router.get('/bookings/user-info', BookingController.userInfo);
 
 // // Admin Profile Routes
-// router.get('/profile', AdminProfileController.edit);
-// router.put('/profile', AdminProfileController.update);
+router.post('/update', AdminProfileController.updateProfile);
 
 module.exports = router;

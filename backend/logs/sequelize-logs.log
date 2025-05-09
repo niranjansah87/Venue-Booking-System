@@ -1,0 +1,402 @@
+[2025-05-08T21:31:01.610Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-08T21:31:01.614Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:31:01.617Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-08T21:31:09.061Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-08T21:31:10.854Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-08T21:31:11.408Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-08T21:31:11.628Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-08T21:31:11.832Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-08T21:32:34.158Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-08T21:32:34.162Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:32:34.167Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-08T21:32:38.581Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-08T21:32:38.585Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:32:38.588Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-08T21:33:20.000Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-08T21:33:20.004Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:33:20.008Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-08T21:35:30.519Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-08T21:35:30.525Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:35:30.529Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-08T21:35:35.770Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-08T21:35:35.774Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:35:35.777Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-08T21:38:32.779Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-08T21:38:32.783Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:38:32.786Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-08T21:38:55.552Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-08T21:38:55.556Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:38:55.560Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-08T21:45:22.258Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-08T21:45:22.260Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:45:22.264Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-08T21:46:02.092Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-08T21:46:02.096Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:46:02.098Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-08T21:47:04.689Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-08T21:47:04.692Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:47:04.695Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-08T21:58:14.920Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-08T21:58:14.926Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'users' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:14.933Z] info: Executing (default): SHOW INDEX FROM `users`
+[2025-05-08T21:58:14.945Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'admins' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:14.948Z] info: Executing (default): SHOW INDEX FROM `admins`
+[2025-05-08T21:58:14.954Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:14.957Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-08T21:58:14.962Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'venues' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:14.965Z] info: Executing (default): SHOW INDEX FROM `venues`
+[2025-05-08T21:58:14.971Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'shifts' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:14.974Z] info: Executing (default): SHOW INDEX FROM `shifts`
+[2025-05-08T21:58:14.978Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'packages' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:14.983Z] info: Executing (default): SHOW INDEX FROM `packages`
+[2025-05-08T21:58:14.986Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'menus' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:14.989Z] info: Executing (default): SHOW INDEX FROM `menus`
+[2025-05-08T21:58:14.993Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:14.996Z] info: Executing (default): SHOW INDEX FROM `bookings`
+[2025-05-08T21:58:16.796Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-08T21:58:16.803Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'users' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:16.808Z] info: Executing (default): SHOW INDEX FROM `users`
+[2025-05-08T21:58:16.816Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'admins' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:16.819Z] info: Executing (default): SHOW INDEX FROM `admins`
+[2025-05-08T21:58:16.824Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:16.828Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-08T21:58:16.832Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'venues' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:16.836Z] info: Executing (default): SHOW INDEX FROM `venues`
+[2025-05-08T21:58:16.840Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'shifts' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:16.843Z] info: Executing (default): SHOW INDEX FROM `shifts`
+[2025-05-08T21:58:16.846Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'packages' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:16.850Z] info: Executing (default): SHOW INDEX FROM `packages`
+[2025-05-08T21:58:16.855Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'menus' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:16.857Z] info: Executing (default): SHOW INDEX FROM `menus`
+[2025-05-08T21:58:16.860Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:16.863Z] info: Executing (default): SHOW INDEX FROM `bookings`
+[2025-05-08T21:58:17.921Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-08T21:58:17.926Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'users' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:17.928Z] info: Executing (default): SHOW INDEX FROM `users`
+[2025-05-08T21:58:17.932Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'admins' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:17.934Z] info: Executing (default): SHOW INDEX FROM `admins`
+[2025-05-08T21:58:17.936Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:17.938Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-08T21:58:17.941Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'venues' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:17.943Z] info: Executing (default): SHOW INDEX FROM `venues`
+[2025-05-08T21:58:17.946Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'shifts' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:17.947Z] info: Executing (default): SHOW INDEX FROM `shifts`
+[2025-05-08T21:58:17.949Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'packages' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:17.952Z] info: Executing (default): SHOW INDEX FROM `packages`
+[2025-05-08T21:58:17.954Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'menus' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:17.956Z] info: Executing (default): SHOW INDEX FROM `menus`
+[2025-05-08T21:58:17.958Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:17.959Z] info: Executing (default): SHOW INDEX FROM `bookings`
+[2025-05-08T21:58:22.707Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-08T21:58:22.713Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'users' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:22.716Z] info: Executing (default): SHOW INDEX FROM `users`
+[2025-05-08T21:58:22.721Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'admins' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:22.723Z] info: Executing (default): SHOW INDEX FROM `admins`
+[2025-05-08T21:58:22.726Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:22.728Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-08T21:58:22.731Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'venues' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:22.735Z] info: Executing (default): SHOW INDEX FROM `venues`
+[2025-05-08T21:58:22.738Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'shifts' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:22.741Z] info: Executing (default): SHOW INDEX FROM `shifts`
+[2025-05-08T21:58:22.746Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'packages' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:22.749Z] info: Executing (default): SHOW INDEX FROM `packages`
+[2025-05-08T21:58:22.753Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'menus' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:22.755Z] info: Executing (default): SHOW INDEX FROM `menus`
+[2025-05-08T21:58:22.759Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:22.762Z] info: Executing (default): SHOW INDEX FROM `bookings`
+[2025-05-08T21:58:23.838Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-08T21:58:23.842Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'users' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:23.845Z] info: Executing (default): SHOW INDEX FROM `users`
+[2025-05-08T21:58:23.849Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'admins' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:23.850Z] info: Executing (default): SHOW INDEX FROM `admins`
+[2025-05-08T21:58:23.853Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:23.855Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-08T21:58:23.858Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'venues' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:23.860Z] info: Executing (default): SHOW INDEX FROM `venues`
+[2025-05-08T21:58:23.862Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'shifts' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:23.864Z] info: Executing (default): SHOW INDEX FROM `shifts`
+[2025-05-08T21:58:23.867Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'packages' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:23.868Z] info: Executing (default): SHOW INDEX FROM `packages`
+[2025-05-08T21:58:23.870Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'menus' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:23.871Z] info: Executing (default): SHOW INDEX FROM `menus`
+[2025-05-08T21:58:23.873Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:58:23.875Z] info: Executing (default): SHOW INDEX FROM `bookings`
+[2025-05-08T21:59:42.136Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-08T21:59:42.140Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'users' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:59:42.142Z] info: Executing (default): SHOW INDEX FROM `users`
+[2025-05-08T21:59:42.146Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Admins' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:59:42.148Z] info: Executing (default): SHOW INDEX FROM `Admins`
+[2025-05-08T21:59:42.150Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:59:42.152Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-08T21:59:42.154Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'venues' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:59:42.156Z] info: Executing (default): SHOW INDEX FROM `venues`
+[2025-05-08T21:59:42.159Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'shifts' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:59:42.160Z] info: Executing (default): SHOW INDEX FROM `shifts`
+[2025-05-08T21:59:42.162Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'packages' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:59:42.164Z] info: Executing (default): SHOW INDEX FROM `packages`
+[2025-05-08T21:59:42.166Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'menus' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:59:42.168Z] info: Executing (default): SHOW INDEX FROM `menus`
+[2025-05-08T21:59:42.170Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:59:42.171Z] info: Executing (default): SHOW INDEX FROM `bookings`
+[2025-05-08T21:59:47.917Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-08T21:59:47.920Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'users' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:59:47.923Z] info: Executing (default): SHOW INDEX FROM `users`
+[2025-05-08T21:59:47.927Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'admins' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:59:47.928Z] info: Executing (default): SHOW INDEX FROM `admins`
+[2025-05-08T21:59:47.930Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:59:47.932Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-08T21:59:47.934Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'venues' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:59:47.936Z] info: Executing (default): SHOW INDEX FROM `venues`
+[2025-05-08T21:59:47.938Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'shifts' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:59:47.940Z] info: Executing (default): SHOW INDEX FROM `shifts`
+[2025-05-08T21:59:47.943Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'packages' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:59:47.946Z] info: Executing (default): SHOW INDEX FROM `packages`
+[2025-05-08T21:59:47.948Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'menus' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:59:47.949Z] info: Executing (default): SHOW INDEX FROM `menus`
+[2025-05-08T21:59:47.951Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T21:59:47.953Z] info: Executing (default): SHOW INDEX FROM `bookings`
+[2025-05-08T22:01:24.783Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-08T22:01:24.787Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'users' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T22:01:24.790Z] info: Executing (default): SHOW INDEX FROM `users`
+[2025-05-08T22:01:24.794Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'admins' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T22:01:24.796Z] info: Executing (default): SHOW INDEX FROM `admins`
+[2025-05-08T22:01:24.798Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T22:01:24.800Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-08T22:01:24.802Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'venues' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T22:01:24.804Z] info: Executing (default): SHOW INDEX FROM `venues`
+[2025-05-08T22:01:24.807Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'shifts' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T22:01:24.808Z] info: Executing (default): SHOW INDEX FROM `shifts`
+[2025-05-08T22:01:24.810Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'packages' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T22:01:24.812Z] info: Executing (default): SHOW INDEX FROM `packages`
+[2025-05-08T22:01:24.814Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'menus' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T22:01:24.815Z] info: Executing (default): SHOW INDEX FROM `menus`
+[2025-05-08T22:01:24.819Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T22:01:24.820Z] info: Executing (default): SHOW INDEX FROM `bookings`
+[2025-05-08T22:01:28.056Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `remember_token`, `createdAt`, `updatedAt` FROM `admins` AS `Admin` WHERE `Admin`.`email` = 'sahn0075@gmail.com';
+[2025-05-08T22:03:13.345Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-08T22:03:13.349Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'users' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T22:03:13.353Z] info: Executing (default): SHOW INDEX FROM `users`
+[2025-05-08T22:03:13.357Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'admins' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T22:03:13.359Z] info: Executing (default): SHOW INDEX FROM `admins`
+[2025-05-08T22:03:13.362Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T22:03:13.363Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-08T22:03:13.366Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'venues' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T22:03:13.368Z] info: Executing (default): SHOW INDEX FROM `venues`
+[2025-05-08T22:03:13.371Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'shifts' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T22:03:13.373Z] info: Executing (default): SHOW INDEX FROM `shifts`
+[2025-05-08T22:03:13.375Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'packages' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T22:03:13.378Z] info: Executing (default): SHOW INDEX FROM `packages`
+[2025-05-08T22:03:13.380Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'menus' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T22:03:13.382Z] info: Executing (default): SHOW INDEX FROM `menus`
+[2025-05-08T22:03:13.384Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-08T22:03:13.386Z] info: Executing (default): SHOW INDEX FROM `bookings`
+[2025-05-08T22:03:17.185Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `admins` AS `Admin` WHERE `Admin`.`email` = 'sahn0075@gmail.com';
+[2025-05-08T22:03:17.316Z] info: Executing (default): INSERT INTO `admins` (`id`,`name`,`email`,`password`,`createdAt`,`updatedAt`) VALUES (DEFAULT,?,?,?,?,?);
+[2025-05-08T22:03:48.406Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `admins` AS `Admin` WHERE `Admin`.`email` = 'sahn0075@gmail.com';
+[2025-05-09T04:13:43.269Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-09T04:13:43.273Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'users' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:13:43.304Z] info: Executing (default): SHOW INDEX FROM `users`
+[2025-05-09T04:13:43.316Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'admins' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:13:43.318Z] info: Executing (default): SHOW INDEX FROM `admins`
+[2025-05-09T04:13:43.321Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:13:43.324Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-09T04:13:43.327Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'venues' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:13:43.330Z] info: Executing (default): SHOW INDEX FROM `venues`
+[2025-05-09T04:13:43.333Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'shifts' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:13:43.335Z] info: Executing (default): SHOW INDEX FROM `shifts`
+[2025-05-09T04:13:43.339Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'packages' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:13:43.341Z] info: Executing (default): SHOW INDEX FROM `packages`
+[2025-05-09T04:13:43.345Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'menus' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:13:43.346Z] info: Executing (default): SHOW INDEX FROM `menus`
+[2025-05-09T04:13:43.349Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:13:43.351Z] info: Executing (default): SHOW INDEX FROM `bookings`
+[2025-05-09T04:15:19.092Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-09T04:15:19.095Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'users' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:15:19.098Z] info: Executing (default): SHOW INDEX FROM `users`
+[2025-05-09T04:15:19.102Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'admins' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:15:19.103Z] info: Executing (default): SHOW INDEX FROM `admins`
+[2025-05-09T04:15:19.105Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:15:19.107Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-09T04:15:19.110Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'venues' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:15:19.112Z] info: Executing (default): SHOW INDEX FROM `venues`
+[2025-05-09T04:15:19.114Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'shifts' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:15:19.115Z] info: Executing (default): SHOW INDEX FROM `shifts`
+[2025-05-09T04:15:19.117Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'packages' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:15:19.118Z] info: Executing (default): SHOW INDEX FROM `packages`
+[2025-05-09T04:15:19.121Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'menus' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:15:19.123Z] info: Executing (default): SHOW INDEX FROM `menus`
+[2025-05-09T04:15:19.125Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:15:19.127Z] info: Executing (default): SHOW INDEX FROM `bookings`
+[2025-05-09T04:15:48.092Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-09T04:15:48.095Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'users' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:15:48.098Z] info: Executing (default): SHOW INDEX FROM `users`
+[2025-05-09T04:15:48.103Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'admins' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:15:48.105Z] info: Executing (default): SHOW INDEX FROM `admins`
+[2025-05-09T04:15:48.107Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:15:48.108Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-09T04:15:48.112Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'venues' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:15:48.114Z] info: Executing (default): SHOW INDEX FROM `venues`
+[2025-05-09T04:15:48.116Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'shifts' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:15:48.118Z] info: Executing (default): SHOW INDEX FROM `shifts`
+[2025-05-09T04:15:48.120Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'packages' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:15:48.121Z] info: Executing (default): SHOW INDEX FROM `packages`
+[2025-05-09T04:15:48.123Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'menus' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:15:48.127Z] info: Executing (default): SHOW INDEX FROM `menus`
+[2025-05-09T04:15:48.129Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:15:48.131Z] info: Executing (default): SHOW INDEX FROM `bookings`
+[2025-05-09T04:18:11.672Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-09T04:18:11.678Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'users' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:11.684Z] info: Executing (default): SHOW INDEX FROM `users`
+[2025-05-09T04:18:11.692Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'admins' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:11.695Z] info: Executing (default): SHOW INDEX FROM `admins`
+[2025-05-09T04:18:11.699Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:11.702Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-09T04:18:11.706Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'venues' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:11.709Z] info: Executing (default): SHOW INDEX FROM `venues`
+[2025-05-09T04:18:11.713Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'shifts' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:11.716Z] info: Executing (default): SHOW INDEX FROM `shifts`
+[2025-05-09T04:18:11.719Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'packages' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:11.721Z] info: Executing (default): SHOW INDEX FROM `packages`
+[2025-05-09T04:18:11.725Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'menus' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:11.728Z] info: Executing (default): SHOW INDEX FROM `menus`
+[2025-05-09T04:18:11.731Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:11.733Z] info: Executing (default): SHOW INDEX FROM `bookings`
+[2025-05-09T04:18:14.433Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-09T04:18:14.437Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'users' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:14.440Z] info: Executing (default): SHOW INDEX FROM `users`
+[2025-05-09T04:18:14.445Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'admins' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:14.447Z] info: Executing (default): SHOW INDEX FROM `admins`
+[2025-05-09T04:18:14.450Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:14.452Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-09T04:18:14.455Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'venues' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:14.457Z] info: Executing (default): SHOW INDEX FROM `venues`
+[2025-05-09T04:18:14.460Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'shifts' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:14.462Z] info: Executing (default): SHOW INDEX FROM `shifts`
+[2025-05-09T04:18:14.464Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'packages' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:14.465Z] info: Executing (default): SHOW INDEX FROM `packages`
+[2025-05-09T04:18:14.467Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'menus' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:14.471Z] info: Executing (default): SHOW INDEX FROM `menus`
+[2025-05-09T04:18:14.474Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:14.476Z] info: Executing (default): SHOW INDEX FROM `bookings`
+[2025-05-09T04:18:16.093Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-09T04:18:16.096Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'users' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:16.099Z] info: Executing (default): SHOW INDEX FROM `users`
+[2025-05-09T04:18:16.104Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'admins' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:16.106Z] info: Executing (default): SHOW INDEX FROM `admins`
+[2025-05-09T04:18:16.108Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:16.110Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-09T04:18:16.112Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'venues' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:16.114Z] info: Executing (default): SHOW INDEX FROM `venues`
+[2025-05-09T04:18:16.116Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'shifts' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:16.118Z] info: Executing (default): SHOW INDEX FROM `shifts`
+[2025-05-09T04:18:16.120Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'packages' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:16.121Z] info: Executing (default): SHOW INDEX FROM `packages`
+[2025-05-09T04:18:16.124Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'menus' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:16.126Z] info: Executing (default): SHOW INDEX FROM `menus`
+[2025-05-09T04:18:16.128Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:16.130Z] info: Executing (default): SHOW INDEX FROM `bookings`
+[2025-05-09T04:18:21.971Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-09T04:18:21.974Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'users' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:21.978Z] info: Executing (default): SHOW INDEX FROM `users`
+[2025-05-09T04:18:21.983Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'admins' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:21.985Z] info: Executing (default): SHOW INDEX FROM `admins`
+[2025-05-09T04:18:21.987Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:21.989Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-09T04:18:21.991Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'venues' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:21.994Z] info: Executing (default): SHOW INDEX FROM `venues`
+[2025-05-09T04:18:21.997Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'shifts' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:21.999Z] info: Executing (default): SHOW INDEX FROM `shifts`
+[2025-05-09T04:18:22.007Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'packages' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:22.009Z] info: Executing (default): SHOW INDEX FROM `packages`
+[2025-05-09T04:18:22.012Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'menus' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:22.033Z] info: Executing (default): SHOW INDEX FROM `menus`
+[2025-05-09T04:18:22.037Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:18:22.039Z] info: Executing (default): SHOW INDEX FROM `bookings`
+[2025-05-09T04:21:48.802Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-09T04:21:48.806Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'users' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:21:48.810Z] info: Executing (default): SHOW INDEX FROM `users`
+[2025-05-09T04:21:48.814Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'admins' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:21:48.816Z] info: Executing (default): SHOW INDEX FROM `admins`
+[2025-05-09T04:21:48.819Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:21:48.821Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-09T04:21:48.823Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'venues' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:21:48.826Z] info: Executing (default): SHOW INDEX FROM `venues`
+[2025-05-09T04:21:48.828Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'shifts' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:21:48.830Z] info: Executing (default): SHOW INDEX FROM `shifts`
+[2025-05-09T04:21:48.832Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'packages' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:21:48.836Z] info: Executing (default): SHOW INDEX FROM `packages`
+[2025-05-09T04:21:48.839Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'menus' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:21:48.840Z] info: Executing (default): SHOW INDEX FROM `menus`
+[2025-05-09T04:21:48.843Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:21:48.844Z] info: Executing (default): SHOW INDEX FROM `bookings`
+[2025-05-09T04:22:38.235Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `admins` AS `Admin` WHERE `Admin`.`email` = 'sahn0075@gmail.com';
+[2025-05-09T04:22:43.541Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `admins` AS `Admin` WHERE `Admin`.`email` = 'sahn0075@gmail.com';
+[2025-05-09T04:23:30.172Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `admins` AS `Admin` WHERE `Admin`.`id` = 1;
+[2025-05-09T04:23:30.180Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `admins` AS `Admin` WHERE `Admin`.`email` = 'sahn0075@gmail.com' AND `Admin`.`id` != 1;
+[2025-05-09T04:23:30.336Z] info: Executing (default): UPDATE `admins` SET `name`=?,`password`=?,`updatedAt`=? WHERE `id` = ?
+[2025-05-09T04:23:43.634Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `admins` AS `Admin` WHERE `Admin`.`id` = 1;
+[2025-05-09T04:23:43.640Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `admins` AS `Admin` WHERE `Admin`.`email` = 'sahn007@gmail.com' AND `Admin`.`id` != 1;
+[2025-05-09T04:23:43.780Z] info: Executing (default): UPDATE `admins` SET `email`=?,`password`=?,`updatedAt`=? WHERE `id` = ?
+[2025-05-09T04:25:38.232Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-09T04:25:38.236Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'users' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:25:38.239Z] info: Executing (default): SHOW INDEX FROM `users`
+[2025-05-09T04:25:38.244Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'admins' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:25:38.247Z] info: Executing (default): SHOW INDEX FROM `admins`
+[2025-05-09T04:25:38.250Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:25:38.253Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-09T04:25:38.256Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'venues' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:25:38.260Z] info: Executing (default): SHOW INDEX FROM `venues`
+[2025-05-09T04:25:38.263Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'shifts' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:25:38.268Z] info: Executing (default): SHOW INDEX FROM `shifts`
+[2025-05-09T04:25:38.271Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'packages' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:25:38.273Z] info: Executing (default): SHOW INDEX FROM `packages`
+[2025-05-09T04:25:38.276Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'menus' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:25:38.278Z] info: Executing (default): SHOW INDEX FROM `menus`
+[2025-05-09T04:25:38.281Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:25:38.284Z] info: Executing (default): SHOW INDEX FROM `bookings`
+[2025-05-09T04:25:54.270Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `admins` AS `Admin` WHERE `Admin`.`email` = 'sahn007@gmail.com';
+[2025-05-09T04:26:21.778Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `admins` AS `Admin` WHERE `Admin`.`email` = 'sahn007@gmail.com';
+[2025-05-09T04:26:41.621Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `admins` AS `Admin` WHERE `Admin`.`id` = 1;
+[2025-05-09T04:26:41.770Z] info: Executing (default): UPDATE `admins` SET `name`=?,`password`=?,`updatedAt`=? WHERE `id` = ?
+[2025-05-09T04:26:49.724Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `admins` AS `Admin` WHERE `Admin`.`id` = 1;
+[2025-05-09T04:26:49.866Z] info: Executing (default): UPDATE `admins` SET `password`=?,`updatedAt`=? WHERE `id` = ?
+[2025-05-09T04:27:05.393Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `admins` AS `Admin` WHERE `Admin`.`id` = 1;
+[2025-05-09T04:27:05.400Z] info: Executing (default): UPDATE `admins` SET `name`=?,`updatedAt`=? WHERE `id` = ?
+[2025-05-09T04:27:53.629Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-09T04:27:53.633Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'users' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:27:53.635Z] info: Executing (default): SHOW INDEX FROM `users`
+[2025-05-09T04:27:53.639Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'admins' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:27:53.641Z] info: Executing (default): SHOW INDEX FROM `admins`
+[2025-05-09T04:27:53.643Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:27:53.647Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-09T04:27:53.649Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'venues' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:27:53.651Z] info: Executing (default): SHOW INDEX FROM `venues`
+[2025-05-09T04:27:53.653Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'shifts' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:27:53.655Z] info: Executing (default): SHOW INDEX FROM `shifts`
+[2025-05-09T04:27:53.657Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'packages' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:27:53.658Z] info: Executing (default): SHOW INDEX FROM `packages`
+[2025-05-09T04:27:53.660Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'menus' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:27:53.661Z] info: Executing (default): SHOW INDEX FROM `menus`
+[2025-05-09T04:27:53.664Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:27:53.666Z] info: Executing (default): SHOW INDEX FROM `bookings`
+[2025-05-09T04:28:14.358Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `admins` AS `Admin` WHERE `Admin`.`email` = 'sahn007@gmail.com';
+[2025-05-09T04:28:36.853Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `admins` AS `Admin` WHERE `Admin`.`id` = 1;
+[2025-05-09T04:28:36.862Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `admins` AS `Admin` WHERE `Admin`.`email` = 'sahn0075@gmail.com' AND `Admin`.`id` != 1;
+[2025-05-09T04:28:36.896Z] info: Executing (default): UPDATE `admins` SET `email`=?,`updatedAt`=? WHERE `id` = ?
+[2025-05-09T04:28:50.845Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-09T04:28:50.849Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'users' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:28:50.853Z] info: Executing (default): SHOW INDEX FROM `users`
+[2025-05-09T04:28:50.858Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'admins' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:28:50.860Z] info: Executing (default): SHOW INDEX FROM `admins`
+[2025-05-09T04:28:50.862Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:28:50.864Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-09T04:28:50.866Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'venues' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:28:50.869Z] info: Executing (default): SHOW INDEX FROM `venues`
+[2025-05-09T04:28:50.872Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'shifts' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:28:50.873Z] info: Executing (default): SHOW INDEX FROM `shifts`
+[2025-05-09T04:28:50.875Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'packages' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:28:50.877Z] info: Executing (default): SHOW INDEX FROM `packages`
+[2025-05-09T04:28:50.881Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'menus' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:28:50.883Z] info: Executing (default): SHOW INDEX FROM `menus`
+[2025-05-09T04:28:50.887Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-09T04:28:50.889Z] info: Executing (default): SHOW INDEX FROM `bookings`
