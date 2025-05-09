@@ -1,22 +1,24 @@
 const { User } = require('../models');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
-const nodemailer = require('nodemailer');
 const { generateToken } = require('../utils/token');
-
-const transporter = nodemailer.createTransport({
-  service: 'Gmail',
-  auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
-});
+const sendEmail = require('../utils/sendEmail');
 
 exports.signup = async (req, res) => {
-  const { name, email, password } = req.body;
   try {
+    const { name, email, password } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: 'Name, email, and password are required.' });
+    }
+
     const existing = await User.findOne({ where: { email } });
-    if (existing) return res.status(400).json({ message: 'Email already registered' });
+    if (existing) {
+      return res.status(400).json({ message: 'Email already registered' });
+    }
 
     const { raw, hash } = generateToken();
-    const expires = Date.now() + 1000 * 60 * 60;
+    const expires = new Date(Date.now() + 1000 * 60 * 60);
 
     const user = await User.create({
       name,
@@ -26,17 +28,17 @@ exports.signup = async (req, res) => {
       verification_token_expires: expires
     });
 
-    const link = `${req.protocol}://${req.get('host')}/api/auth/verify-email?token=${raw}&email=${email}`;
-    await transporter.sendMail({
-      from: 'noreply@venue.com',
+    const link = `${req.protocol}://${req.get('host')}/api/verify-email?token=${raw}&email=${encodeURIComponent(email)}`;
+    await sendEmail({
       to: email,
       subject: 'Verify your email',
-      html: `Click to verify: <a href="${link}">${link}</a>`
+      html: `<p>Click to verify your email:</p><a href="${link}">${link}</a>`
     });
 
-    res.status(201).json({ message: 'Signup successful, please verify your email.' });
+    res.status(201).json({ message: 'Signup successful. Please check your email to verify your account.' });
   } catch (err) {
-    res.status(500).json({ message: 'Error during signup' });
+    console.error('Signup error:', err);
+    res.status(500).json({ message: 'Internal server error during signup.' });
   }
 };
 
@@ -61,14 +63,19 @@ exports.login = async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ where: { email } });
-    if (!user || !user.email_verified) return res.status(403).json({ message: 'Email not verified or user not found' });
+    if (!user || !user.email_verified) {
+      return res.status(403).json({ message: 'Email not verified or user not found' });
+    }
 
     const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(401).json({ message: 'Invalid credentials' });
+    if (!match) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
 
     req.session.userId = user.id;
     res.json({ message: 'Login successful', user: { id: user.id, name: user.name, email: user.email } });
   } catch (err) {
+    console.error('Login error:', err);
     res.status(500).json({ message: 'Error during login' });
   }
 };
@@ -104,6 +111,14 @@ exports.updateEmail = async (req, res) => {
     user.email = email;
     user.email_verified = false;
     await user.save();
+    const link = `${req.protocol}://${req.get('host')}/api/verify-email?token=${raw}&email=${encodeURIComponent(email)}`;
+    await sendEmail({
+      to: email,
+      subject: 'Verify your email',
+      html: `<p>Click to verify your email:</p><a href="${link}">${link}</a>`
+    });
+
+    
     res.json({ message: 'Email updated. Please verify again.' });
   } catch (err) {
     res.status(500).json({ message: 'Error updating email' });
@@ -137,8 +152,8 @@ exports.requestReset = async (req, res) => {
   user.reset_password_expires = Date.now() + 30 * 60 * 1000;
   await user.save();
 
-  const link = `${req.protocol}://${req.get('host')}/api/auth/reset-password?token=${raw}&email=${email}`;
-  await transporter.sendMail({
+  const link = `${req.protocol}://${req.get('host')}/api/reset-password?token=${raw}&email=${email}`;
+  await sendEmail({
     to: email,
     subject: 'Password Reset',
     html: `Click here to reset your password: <a href="${link}">${link}</a>`

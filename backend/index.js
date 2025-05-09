@@ -62,10 +62,11 @@ app.get('/session', (req, res) => {
   res.send(req.session.user ? '✅ Session active' : '⚠️ No active session');
 });
 
-const userRoutes = require('./routes/adminUsersRoutes');
-app.use('/admin/users', userRoutes); 
+const adminuserRoutes = require('./routes/adminUsersRoutes');
+app.use('/admin/users', adminuserRoutes); 
 
-
+const userRoutes = require('./routes/users');
+app.use('/api', userRoutes); 
 // 404 fallback
 app.use((req, res) => {
   res.status(404).send('🚫 Page not found');

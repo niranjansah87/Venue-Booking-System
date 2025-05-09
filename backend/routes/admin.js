@@ -37,7 +37,7 @@ router.put('/venues/update/:id', venueController.updateVenue);
 router.delete('/venues/delete/:id', venueController.deleteVenue);
 
 // Booking Flow Routes (multi-step booking)
-router.get('/bookings/create', bookingController.create);
+router.get('/bookings/create', bookingController.initiateBooking);
 router.post(
   '/bookings/check-availability',
   [
@@ -47,18 +47,18 @@ router.post(
     body('event_date').notEmpty().withMessage('Event date is required'),
     body('guest_count').isInt({ min: 1 }).withMessage('Guest count must be a number')
   ],
-  bookingController.checkAvailability
+  bookingController.checkBookingAvailability
 );
-router.get('/bookings/select-package', bookingController.selectPackage);
-router.post('/bookings/calculate-fare', bookingController.calculateFare);
-router.get('/bookings/user-info', bookingController.userInfo);
-router.post('/bookings/store', bookingController.store);
-router.get('/bookings/menus/:packageId', bookingController.getPackageMenus);
-// Admin CRUD for managing bookings
-router.get('/bookings', bookingController.index); // List all bookings
-router.get('/bookings/edit/:id', bookingController.edit); // Show booking edit form
-router.put('/bookings/update/:id', bookingController.update); // Update booking
-router.delete('/bookings/delete/:id', bookingController.destroy); // Delete booking
+// router.get('/bookings/select-package', bookingController.selectPackage);
+// router.post('/bookings/calculate-fare', bookingController.calculateFare);
+// router.get('/bookings/user-info', bookingController.enterUserInfo);
+// router.post('/bookings/store', bookingController.saveBooking);
+// router.get('/bookings/menus/:packageId', bookingController.fetchPackageMenus);
+// // Admin CRUD for managing bookings
+router.get('/bookings', bookingController.listBookings); // List all bookings
+// router.get('/bookings/edit/:id', bookingController.editBooking); // Show booking edit form
+// router.put('/bookings/update/:id', bookingController.updateBooking); // Update booking
+// router.delete('/bookings/delete/:id', bookingController.deleteBooking); // Delete booking
 
 
 
