@@ -14,7 +14,7 @@ const shiftController = require('../controllers/Admin/shiftController');
 const dashboardController = require('../controllers/Admin/DashboardController');
 
 // Get dashboard data
-router.get('/dashboard/', dashboardController.getDashboardData);
+router.get('/dashboard', dashboardController.getDashboardData);
 
 // Authentication Routes
 router.post('/signup', AuthController.signup);
