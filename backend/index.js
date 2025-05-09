@@ -63,7 +63,7 @@ app.get('/session', (req, res) => {
 });
 
 const adminuserRoutes = require('./routes/adminUsersRoutes');
-app.use('/admin/users', adminuserRoutes); 
+app.use('/admin/auth', adminuserRoutes); 
 
 const userRoutes = require('./routes/users');
 app.use('/api', userRoutes); 
