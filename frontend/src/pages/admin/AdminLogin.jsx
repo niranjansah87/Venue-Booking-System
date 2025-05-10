@@ -15,16 +15,17 @@ function AdminLogin() {
     setError('');
 
     try {
+      // Call to your API for login
       const response = await api.post('/api/admin/login', { email, password }, {
         withCredentials: true,
       });
 
-           const { admin } = response.data;
+      // Storing the admin info in localStorage
+      const { admin } = response.data;
       localStorage.setItem('user', JSON.stringify(admin));
-    //   console.log('Stored in localStorage:', localStorage.getItem('user'));
 
       console.log('Navigating to /admin/dashboard');
-      navigate('/admin/dashboard');
+      navigate('/admin/dashboard'); // Redirect to admin dashboard after successful login
     } catch (err) {
       console.error('Login error:', err);
       setError(err.response?.data?.message || 'Login failed. Please try again.');

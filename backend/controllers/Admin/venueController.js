@@ -22,8 +22,21 @@ const upload = multer({
 // controllers/adminController.js
 exports.getAllVenues = async (req, res) => {
   try {
-    const venues = await Venue.findAll(); // or your Sequelize query
-    res.json({ venues });
+    const { page = 1, limit = 10 } = req.query;
+    const offset = (page - 1) * limit;
+
+    const { count, rows: venues } = await Venue.findAndCountAll({
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+    });
+
+    res.json({
+      venues,
+      total: count,
+      page: parseInt(page),
+      limit: parseInt(limit),
+      totalPages: Math.ceil(count / limit),
+    });
   } catch (error) {
     console.error('Error fetching venues:', error);
     res.status(500).json({ message: 'Internal Server Error' });

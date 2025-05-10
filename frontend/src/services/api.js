@@ -2,17 +2,17 @@ import axios from 'axios';
 
 // Create axios instance with base URL
 const api = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL,
+  baseURL: import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000',
   timeout: 10000,
+  withCredentials: true, // Add globally to send cookies
   headers: {
     'Content-Type': 'application/json'
   }
 });
 
-// Request interceptor (optional — keep it only if you want to add tokens, etc.)
+// Request interceptor
 api.interceptors.request.use(
   (config) => {
-    // You can add authorization headers or logging here if needed
     return config;
   },
   (error) => {
@@ -20,7 +20,7 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor for handling errors
+// Response interceptor
 api.interceptors.response.use(
   (response) => {
     return response;

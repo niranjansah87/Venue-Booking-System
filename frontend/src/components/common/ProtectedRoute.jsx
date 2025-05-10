@@ -1,39 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Navigate } from 'react-router-dom';
-import api from '../../services/api';
 
-const ProtectedRoute = ({ children, adminOnly = false }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
-  const [userRole, setUserRole] = useState(null);
+function ProtectedRoute({ children, adminOnly = false }) {
+  const user = JSON.parse(localStorage.getItem('user')); // Get user from localStorage
 
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const response = await api.get('/api/check-session');
-        setIsAuthenticated(true);
-        setUserRole(response.data.user.role);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-      } catch (err) {
-        setIsAuthenticated(false);
-        localStorage.removeItem('user');
-      }
-    };
-    checkSession();
-  }, []);
-
-  if (isAuthenticated === null) {
-    return <div>Loading...</div>;
+  // Check if the user is authenticated and if the route requires admin only
+  if (!user || (adminOnly && user.role !== 'admin')) {
+    return <Navigate to="/admin/login" replace />; // Redirect to login if not authenticated
   }
 
-  if (!isAuthenticated) {
-    return <Navigate to={adminOnly ? '/admin/login' : '/login'} state={{ from: window.location.pathname }} replace />;
-  }
-
-  if (adminOnly && userRole !== 'admin') {
-    return <Navigate to="/" replace />;
-  }
-
-  return children;
-};
+  return children; // Return the protected content if authenticated
+}
 
 export default ProtectedRoute;

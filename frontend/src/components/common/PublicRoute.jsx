@@ -1,16 +1,15 @@
-import { Navigate, useLocation } from 'react-router-dom';
+import React from 'react';
+import { Navigate } from 'react-router-dom';
 
-const PublicRoute = ({ children }) => {
-  const location = useLocation();
-  const adminData = localStorage.getItem('admin');
-  const isAuthenticated = !!adminData;
+function PublicRoute({ children }) {
+  const user = JSON.parse(localStorage.getItem('user')); // Get user from localStorage
 
-  if (isAuthenticated) {
-    const from = location.state?.from?.pathname || '/';
-    return <Navigate to={from} replace />;
+  // Check if the user is already logged in, and redirect to the dashboard if logged in
+  if (user) {
+    return <Navigate to="/admin/dashboard" replace />; // Redirect to dashboard if user is logged in
   }
 
-  return children;
-};
+  return children; // Return the public content if user is not logged in
+}
 
 export default PublicRoute;

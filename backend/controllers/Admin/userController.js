@@ -7,11 +7,13 @@ const sendEmail = require('../../utils/sendEmail');
 
 exports.getAllUsers = async (req, res) => {
     try {
-        const users = await User.findAll();
+        const users = await User.findAll({
+            attributes: ['id', 'name', 'email'], // Select specific fields for security
+        });
         res.status(200).json(users);
-        // res.render('admin/users/index', { users });
     } catch (err) {
-        res.status(500).send('Error fetching users');
+        console.error('Error fetching users:', err);
+        res.status(500).json({ error: 'Error fetching users' });
     }
 };
 

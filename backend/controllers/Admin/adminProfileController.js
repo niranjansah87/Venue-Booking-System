@@ -3,21 +3,26 @@ const { Op } = require('sequelize');
 
 // GET /api/user/:id - Fetch user data by ID
 exports.getUserById = async (req, res) => {
-  const userId = req.params.id;
-
   try {
-    const user = await Admin.findByPk(userId, {
-      attributes: ['id', 'name', 'email', 'role'],
+    const { id } = req.params;
+
+    // Validate the ID
+    if (!id || isNaN(id)) {
+      return res.status(400).json({ message: 'Invalid user ID' });
+    }
+
+    const user = await Admin.findByPk(id, {
+      attributes: ['id', 'name', 'email'], // Explicitly select only defined columns
     });
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    return res.json({ user });
+    res.json({ user });
   } catch (error) {
-    console.error('Fetch user error:', error);
-    return res.status(500).json({ message: 'Server error' });
+    console.error('Error fetching user:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 

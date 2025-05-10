@@ -17,6 +17,9 @@ const HomePage = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [featuredVenues, setFeaturedVenues] = useState([]);
   
+  // Define backend URL from environment variable
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+
   // Handle scroll for header background
   useEffect(() => {
     const handleScroll = () => {
@@ -82,9 +85,9 @@ const HomePage = () => {
             return {
               id: venue.id || String(Math.random()),
               name: venue.name,
-              image: venue.image || 'https://images.pexels.com/photos/169193/pexels-photo-169193.jpeg',
+              image: venue.image ? `${BACKEND_URL}/${venue.image}` : 'https://images.pexels.com/photos/169193/pexels-photo-169193.jpeg',
               capacity: typeof venue.capacity === 'number' ? venue.capacity : 0,
-              location: ((venue.location || 'Location TBD')).toString(),
+              location: venue.location || 'Location TBD',
               rating: typeof venue.rating === 'number' ? venue.rating : 0,
               description: venue.description || 'Description coming soon'
             };
@@ -99,7 +102,7 @@ const HomePage = () => {
           }
         }
       } catch (error) {
-        console.error('Error fetching venues:', error);
+        console.error('Error fetching venues:', error.message, error.response?.data);
         
         // Fallback mock data for development/preview
         setFeaturedVenues([

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext'; // Import AuthProvider
 import ProtectedRoute from './components/common/ProtectedRoute';
 import PublicRoute from './components/common/PublicRoute';
 
@@ -26,7 +27,7 @@ import ShiftsManagement from './pages/admin/ShiftsManagement';
 import PackagesManagement from './pages/admin/PackagesManagement';
 import MenusManagement from './pages/admin/MenusManagement';
 import UsersManagement from './pages/admin/UsersManagement';
-import AdminProfilePage from './pages/public/AdminProfilePage';
+import AdminProfilePage from './pages/Admin/AdminProfilePage';
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component {
@@ -59,71 +60,73 @@ class ErrorBoundary extends React.Component {
 
 function App() {
   return (
-    <ErrorBoundary>
-      <Routes>
-        {/* ---------------- Public Routes ---------------- */}
-        <Route element={<PublicLayout />}>
-          <Route index element={<HomePage />} />
-          <Route path="booking" element={<BookingPage />} />
-          <Route path="about" element={<AboutPage />} />
-          <Route path="contact" element={<ContactPage />} />
-          <Route
-            path="login"
-            element={
-              <PublicRoute>
-                <LoginPage />
-              </PublicRoute>
-            }
-          />
-          <Route
-            path="register"
-            element={
-              <PublicRoute>
-                <RegisterPage />
-              </PublicRoute>
-            }
-          />
-        </Route>
+    <AuthProvider> {/* Wrap the app in AuthProvider */}
+      <ErrorBoundary>
+        <Routes>
+          {/* ---------------- Public Routes ---------------- */}
+          <Route element={<PublicLayout />}>
+            <Route index element={<HomePage />} />
+            <Route path="booking" element={<BookingPage />} />
+            <Route path="about" element={<AboutPage />} />
+            <Route path="contact" element={<ContactPage />} />
+            <Route
+              path="login"
+              element={
+                <PublicRoute>
+                  <LoginPage />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="register"
+              element={
+                <PublicRoute>
+                  <RegisterPage />
+                </PublicRoute>
+              }
+            />
+          </Route>
 
-        {/* ---------------- Protected User Routes ---------------- */}
-        <Route element={<ProtectedLayout />}>
+          {/* ---------------- Protected User Routes ---------------- */}
+          <Route element={<ProtectedLayout />}>
+            <Route
+              path="profile"
+              element={
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
+          </Route>
+
+          {/* ---------------- Admin Login Route (Unprotected) ---------------- */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+
+          {/* ---------------- Admin Routes (Protected) ---------------- */}
           <Route
-            path="profile"
+            path="/admin"
             element={
               <ProtectedRoute>
-                <ProfilePage />
+                <AdminLayout />
               </ProtectedRoute>
             }
-          />
-        </Route>
+          >
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="/admin/dashboard" element={<Dashboard />} />
+            <Route path="bookings" element={<BookingsManagement />} />
+            <Route path="venues" element={<VenuesManagement />} />
+            <Route path="shifts" element={<ShiftsManagement />} />
+            <Route path="packages" element={<PackagesManagement />} />
+            <Route path="menus" element={<MenusManagement />} />
+            <Route path="users" element={<UsersManagement />} />
+            <Route path="profile" element={<AdminProfilePage />} />
+          </Route>
 
-        {/* ---------------- Admin Login Route (Unprotected) ---------------- */}
-        <Route path="/admin/login" element={<AdminLogin />} />
-
-        {/* ---------------- Admin Routes (Protected) ---------------- */}
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute adminOnly>
-              <AdminLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<Navigate to="dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="bookings" element={<BookingsManagement />} />
-          <Route path="venues" element={<VenuesManagement />} />
-          <Route path="shifts" element={<ShiftsManagement />} />
-          <Route path="packages" element={<PackagesManagement />} />
-          <Route path="menus" element={<MenusManagement />} />
-          <Route path="users" element={<UsersManagement />} />
-          <Route path="profile" element={<AdminProfilePage />} />
-        </Route>
-
-        {/* ---------------- Catch-all Route ---------------- */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </ErrorBoundary>
+          {/* ---------------- Catch-all Route ---------------- */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </ErrorBoundary>
+    </AuthProvider>
   );
 }
 

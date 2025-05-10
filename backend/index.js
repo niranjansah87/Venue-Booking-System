@@ -55,7 +55,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/admin', adminRoutes);
-app.use('/api/book', welcomeRoutes); // Updated path for consistency (see note below)
+app.use('/api/admin/book', welcomeRoutes); // Updated path for consistency (see note below)
 
 // Session test route
 app.get('/session', (req, res) => {

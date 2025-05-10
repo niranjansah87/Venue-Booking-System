@@ -12,81 +12,101 @@ const menuController = require('../controllers/Admin/menuController');
 const packageController = require('../controllers/Admin/packageController');
 const shiftController = require('../controllers/Admin/shiftController');
 const dashboardController = require('../controllers/Admin/DashboardController');
-
+const userontroller = require('../controllers/Admin/userController');
 // Get dashboard data
 router.get('/dashboard', dashboardController.getDashboardData);
-
-// Authentication Routes
-router.post('/signup', AuthController.signup);
-router.post('/login', AuthController.login);
-router.post('/logout', AuthController.logout);
-
-// Admin Profile Routes
-router.post('/update/:id', AdminProfileController.updateProfile);
-// GET /api/user/:id - Fetch user data by ID
-router.get('/:id', AdminProfileController.getUserById);
-// Event Routes
-router.get('/events', eventController.listEvents);
-router.post('/events/create', eventController.createEvent);
-router.put('/events/edit/:id', eventController.updateEvent);
-router.delete('/events/delete/:id', eventController.deleteEvent);
 
 // Venue Routes
 router.get('/venues', venueController.getAllVenues);
 router.post('/venues/create', venueController.createVenue);
 router.put('/venues/update/:id', venueController.updateVenue);
 router.delete('/venues/delete/:id', venueController.deleteVenue);
+// router.get('/venues/:id', bookingController.getVenueDetails);
 
-// Booking Flow Routes (multi-step booking)
-router.get('/bookings/create', bookingController.initiateBooking);
+// Event Routes
+router.get('/events', eventController.listEvents);
+// router.get('/events/:id', eventController.getEventById);
+router.post('/events/create', eventController.createEvent);
+router.put('/events/edit/:id', eventController.updateEvent);
+router.delete('/events/delete/:id', eventController.deleteEvent);
+
+// Booking Flow Routes (Admin API)
+router.get('/bookings/initiate', bookingController.initiateBooking);
+router.post(
+  '/bookings/check-date',
+  [
+    body('event_date').isDate().withMessage('Invalid date'),
+    
+  ],
+  bookingController.checkDate
+);
 router.post(
   '/bookings/check-availability',
   [
     body('event_id').notEmpty().withMessage('Event is required'),
     body('venue_id').notEmpty().withMessage('Venue is required'),
     body('shift_id').notEmpty().withMessage('Shift is required'),
-    body('event_date').notEmpty().withMessage('Event date is required'),
-    body('guest_count').isInt({ min: 1 }).withMessage('Guest count must be a number')
+    body('event_date').isDate().withMessage('Event date is required'),
+    body('guest_count').isInt({ min: 1 }).withMessage('Guest count must be a number'),
+   
   ],
   bookingController.checkBookingAvailability
 );
-// router.get('/bookings/select-package', bookingController.selectPackage);
-// router.post('/bookings/calculate-fare', bookingController.calculateFare);
-// router.get('/bookings/user-info', bookingController.enterUserInfo);
-// router.post('/bookings/store', bookingController.saveBooking);
-// router.get('/bookings/menus/:packageId', bookingController.fetchPackageMenus);
-// // Admin CRUD for managing bookings
-router.get('/bookings', bookingController.listBookings); // List all bookings
-// router.get('/bookings/edit/:id', bookingController.editBooking); // Show booking edit form
-// router.put('/bookings/update/:id', bookingController.updateBooking); // Update booking
-// router.delete('/bookings/delete/:id', bookingController.deleteBooking); // Delete booking
+router.get('/bookings/select-package', bookingController.selectPackage);
+router.get('/bookings/package/:packageId/menus', bookingController.getPackageMenus);
+router.post(
+  '/bookings/calculate-fare',
+  [
+    body('package_id').isInt().withMessage('Invalid package ID'),
+    body('guest_count').isInt({ min: 10 }).withMessage('Invalid guest count'),
+    body('selected_menus').isObject().withMessage('Invalid menu selections'),
+    
+  ],
+  bookingController.calculateFare
+);
+router.post('/bookings/store', bookingController.storeBooking);
+router.post('/bookings/send-confirmation', bookingController.sendConfirmation);
+router.get('/bookings/shift/:id', bookingController.getShiftDetails);
+router.get('/bookings/package/:id', bookingController.getPackageDetails);
+router.get('/bookings', bookingController.listBookings);
+router.patch(
+  '/bookings/:bookingId/status',
+  [body('status').notEmpty().withMessage('Status is required')],
+  bookingController.updateBookingStatus
+);
+router.delete('/bookings/:bookingId', bookingController.deleteBooking);
 
-
-
-// Routes
-router.get('/menu/', menuController.displayMenus);
+// Menu Routes
+router.get('/menu', menuController.displayMenus);
+// router.get('/menu/:id', menuController.getMenuById);
 router.post('/menu/create', menuController.createMenu);
 router.put('/menu/update/:id', menuController.updateMenu);
 router.delete('/menu/delete/:id', menuController.deleteMenu);
 
-
-
-
- //packages
+// Package Routes
 router.get('/package', packageController.listPackages);
 router.post('/package/create', packageController.createPackage);
 router.put('/package/update/:id', packageController.updatePackage);
 router.delete('/package/delete/:id', packageController.deletePackage);
 router.get('/package/:id/menus', packageController.getPackageMenus);
 
-
-
-//shift
-
+// Shift Routes
 router.get('/shift', shiftController.listShifts);
 router.post('/shift/create', shiftController.createShift);
 router.put('/shift/update/:id', shiftController.updateShift);
 router.delete('/shift/delete/:id', shiftController.deleteShift);
 
+// User Routes
+router.get('/users', userontroller.getAllUsers);
+router.post('/users/create', userontroller.createUser);
+router.get('/:id', AdminProfileController.getUserById);
+router.put('/users/:id', AdminProfileController.updateProfile);
+// router.delete('/users/:id', AdminProfileController.deleteUser);
 
+
+// Authentication Routes
+router.post('/signup', AuthController.signup);
+router.post('/login', AuthController.login);
+router.post('/logout', AuthController.logout);
+// router.get('/users', userontroller.getAllUsers);
 module.exports = router;

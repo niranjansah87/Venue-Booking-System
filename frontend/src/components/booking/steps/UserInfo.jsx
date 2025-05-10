@@ -1,22 +1,23 @@
-import React from 'react';
-import { User, Phone, Mail, AlertTriangle } from 'lucide-react';
+import React, { useState } from 'react';
+import { User, Mail } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 
-const UserInfo = ({ name, phone, updateBookingData, sendOtp }) => {
-  const { 
-    register, 
-    handleSubmit, 
+const UserInfo = ({ name, email, otp, otpSent, updateBookingData, sendOtp }) => {
+  const {
+    register,
+    handleSubmit,
     formState: { errors },
-    watch
+    watch,
   } = useForm({
     defaultValues: {
       name: name || '',
-      phone: phone || '',
-      email: '',
-      agreeToTerms: false
-    }
+      email: email || '',
+      otp: otp || '',
+    },
   });
+
+  const [localOtpSent, setLocalOtpSent] = useState(otpSent);
 
   // Watch form values for real-time updates
   const watchedValues = watch();
@@ -26,26 +27,34 @@ const UserInfo = ({ name, phone, updateBookingData, sendOtp }) => {
     if (watchedValues.name) {
       updateBookingData('name', watchedValues.name);
     }
-    if (watchedValues.phone) {
-      updateBookingData('phone', watchedValues.phone);
+    if (watchedValues.otp) {
+      updateBookingData('otp', watchedValues.otp);
     }
-  }, [watchedValues.name, watchedValues.phone, updateBookingData]);
+  }, [watchedValues.name, watchedValues.otp, updateBookingData]);
+
+  const onSendOtp = async () => {
+    try {
+      await sendOtp();
+      setLocalOtpSent(true);
+    } catch (error) {
+      console.error('Error sending OTP:', error);
+    }
+  };
 
   const onSubmit = (data) => {
     updateBookingData('name', data.name);
-    updateBookingData('phone', data.phone);
     updateBookingData('email', data.email);
-    
-    sendOtp();
+    updateBookingData('otp', data.otp);
+    // Submission is handled by BookingWizard's nextStep
   };
 
   return (
     <div>
       <h2 className="text-2xl font-heading font-semibold text-gray-800 mb-6">Your Information</h2>
       <p className="text-gray-600 mb-8">
-        Please provide your contact details. We'll send a verification code to your phone.
+        Please verify your details. We'll send a verification code to your email.
       </p>
-      
+
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-6">
           {/* Name Field */}
@@ -60,23 +69,23 @@ const UserInfo = ({ name, phone, updateBookingData, sendOtp }) => {
               <input
                 id="name"
                 type="text"
-                {...register('name', { 
+                {...register('name', {
                   required: 'Name is required',
                   minLength: {
                     value: 2,
-                    message: 'Name should be at least 2 characters'
-                  }
+                    message: 'Name should be at least 2 characters',
+                  },
                 })}
                 className={`pl-10 w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
-                  errors.name 
-                    ? 'border-error-300 focus:border-error-500 focus:ring-error-200' 
+                  errors.name
+                    ? 'border-error-300 focus:border-error-500 focus:ring-error-200'
                     : 'border-gray-300 focus:border-primary-500 focus:ring-primary-200'
                 }`}
                 placeholder="Enter your full name"
               />
             </div>
             {errors.name && (
-              <motion.p 
+              <motion.p
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="mt-1 text-sm text-error-600"
@@ -85,52 +94,11 @@ const UserInfo = ({ name, phone, updateBookingData, sendOtp }) => {
               </motion.p>
             )}
           </div>
-          
-          {/* Phone Field */}
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-              Phone Number
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Phone className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                id="phone"
-                type="tel"
-                {...register('phone', { 
-                  required: 'Phone number is required',
-                  pattern: {
-                    value: /^[0-9]{10}$/,
-                    message: 'Please enter a valid 10-digit phone number'
-                  }
-                })}
-                className={`pl-10 w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
-                  errors.phone 
-                    ? 'border-error-300 focus:border-error-500 focus:ring-error-200' 
-                    : 'border-gray-300 focus:border-primary-500 focus:ring-primary-200'
-                }`}
-                placeholder="Enter your 10-digit phone number"
-              />
-            </div>
-            {errors.phone && (
-              <motion.p 
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-1 text-sm text-error-600"
-              >
-                {errors.phone.message}
-              </motion.p>
-            )}
-            <p className="mt-1 text-xs text-gray-500">
-              We'll send a verification code to this number
-            </p>
-          </div>
-          
-          {/* Email Field (Optional) */}
+
+          {/* Email Field (Disabled) */}
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email Address (Optional)
+              Email Address
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -139,83 +107,66 @@ const UserInfo = ({ name, phone, updateBookingData, sendOtp }) => {
               <input
                 id="email"
                 type="email"
-                {...register('email', { 
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: 'Please enter a valid email address'
-                  }
-                })}
-                className={`pl-10 w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
-                  errors.email 
-                    ? 'border-error-300 focus:border-error-500 focus:ring-error-200' 
-                    : 'border-gray-300 focus:border-primary-500 focus:ring-primary-200'
-                }`}
-                placeholder="Enter your email address (optional)"
+                value={email}
+                disabled
+                className="pl-10 w-full p-3 border rounded-lg bg-gray-100"
               />
             </div>
-            {errors.email && (
-              <motion.p 
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-1 text-sm text-error-600"
-              >
-                {errors.email.message}
-              </motion.p>
-            )}
             <p className="mt-1 text-xs text-gray-500">
-              For booking confirmation and updates
+              We'll send a verification code to this email
             </p>
           </div>
-          
-          {/* Terms and Conditions */}
+
+          {/* OTP Button */}
           <div>
-            <div className="flex items-start">
-              <div className="flex items-center h-5">
-                <input
-                  id="agreeToTerms"
-                  type="checkbox"
-                  {...register('agreeToTerms', { 
-                    required: 'You must agree to the terms and conditions'
-                  })}
-                  className="h-4 w-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
-                />
-              </div>
-              <div className="ml-3 text-sm">
-                <label htmlFor="agreeToTerms" className="text-gray-700">
-                  I agree to the <a href="#" className="text-primary-600 hover:text-primary-800">Terms and Conditions</a> and <a href="#" className="text-primary-600 hover:text-primary-800">Privacy Policy</a>
-                </label>
-                {errors.agreeToTerms && (
-                  <motion.p 
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mt-1 text-sm text-error-600"
-                  >
-                    {errors.agreeToTerms.message}
-                  </motion.p>
-                )}
-              </div>
-            </div>
-          </div>
-          
-          {/* Disclaimer */}
-          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <div className="flex">
-              <AlertTriangle className="h-5 w-5 text-warning-500 mr-3 flex-shrink-0 mt-0.5" />
-              <div className="text-sm text-gray-600">
-                <p className="font-medium text-gray-700 mb-1">Important Information</p>
-                <p>By proceeding, you'll receive an OTP on your phone for verification. Your booking is not confirmed until verification is complete and approved by our team.</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex justify-end">
             <button
-              type="submit"
-              className="px-6 py-3 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors"
+              type="button"
+              onClick={onSendOtp}
+              disabled={localOtpSent}
+              className={`px-6 py-3 rounded-md ${
+                localOtpSent
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-primary-600 text-white hover:bg-primary-700'
+              }`}
             >
-              Proceed to Verification
+              {localOtpSent ? 'OTP Sent' : 'Send OTP'}
             </button>
           </div>
+
+          {/* OTP Field (Shown after OTP sent) */}
+          {localOtpSent && (
+            <div>
+              <label htmlFor="otp" className="block text-sm font-medium text-gray-700 mb-1">
+                OTP
+              </label>
+              <input
+                id="otp"
+                type="text"
+                {...register('otp', {
+                  required: 'OTP is required',
+                  pattern: {
+                    value: /^[0-9]{6}$/,
+                    message: 'Please enter a valid 6-digit OTP',
+                  },
+                })}
+                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
+                  errors.otp
+                    ? 'border-error-300 focus:border-error-500 focus:ring-error-200'
+                    : 'border-gray-300 focus:border-primary-500 focus:ring-primary-200'
+                }`}
+                placeholder="Enter 6-digit OTP"
+              />
+              {errors.otp && (
+                <motion.p
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-1 text-sm text-error-600"
+                >
+                  {errors.otp.message}
+                </motion.p>
+              )}
+            </div>
+          )}
         </div>
       </form>
     </div>

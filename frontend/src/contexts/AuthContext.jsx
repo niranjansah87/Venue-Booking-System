@@ -1,52 +1,61 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { toast } from 'react-toastify';
 
-const AuthContext = createContext(null);
-
-export const useAuth = () => useContext(AuthContext);
+const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const userData = sessionStorage.getItem('userData');
-    if (userData) {
-      const parsedUser = JSON.parse(userData);
-      setUser(parsedUser);
-      setIsAdmin(parsedUser.role === 'admin');
-      api.defaults.headers.common['Authorization'] = `Bearer ${parsedUser.token}`;
-    }
+    const fetchUser = async () => {
+      try {
+        const response = await api.get('/api/admin/users');
+        setUser(response.data.user);
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUser();
   }, []);
 
-  const login = async (email, password) => {
+  const sendOtp = async (email) => {
     try {
-      const response = await api.post('/api/admin/login', { email, password }, { withCredentials: true });
-      const { admin } = response.data;
-      setUser(admin);
-      setIsAdmin(true);
-      sessionStorage.setItem('userData', JSON.stringify(admin));
-      api.defaults.headers.common['Authorization'] = `Bearer ${admin.token}`;
-      navigate('/admin/dashboard');
+      await api.post('/api/admin/book/send-otp', { email: user.email });
     } catch (error) {
-      console.error('Login error:', error);
-      throw new Error(error.response?.data?.message || 'Login failed. Please try again.');
+      console.error('Error sending OTP:', error);
+      toast.error('Failed to send OTP.');
+      throw error;
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    setIsAdmin(false);
-    sessionStorage.removeItem('userData');
-    delete api.defaults.headers.common['Authorization'];
-    navigate('/admin/login');
+  const verifyOtp = async (otp) => {
+    try {
+      await api.post('/api/admin/book/step3', { otp, sessionId });
+    } catch (error) {
+      console.error('Error verifying OTP:', error);
+      toast.error('Invalid OTP.');
+      throw error;
+    }
+  };
+
+  const sendBookingConfirmationEmail = async (bookingId, email) => {
+    try {
+      await api.post('/api/admin/bookings/send-confirmation', { bookingId, email });
+    } catch (error) {
+      console.error('Error sending confirmation email:', error);
+      toast.error('Failed to send confirmation email.');
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAdmin, login, logout }}>
+    <AuthContext.Provider value={{ user, sendOtp, verifyOtp, sendBookingConfirmationEmail, loading }}>
       {children}
     </AuthContext.Provider>
   );
 };
+
+export const useAuth = () => useContext(AuthContext);

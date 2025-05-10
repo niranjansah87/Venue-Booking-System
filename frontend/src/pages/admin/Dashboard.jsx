@@ -10,7 +10,10 @@ import {
   Clock,
   CheckCircle,
   XCircle,
-  AlertCircle
+  AlertCircle,
+  MapPin,
+  Package
+  
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { getAllBookings } from '../../services/bookingService';

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
-import PublicHeader from '../components/common/PublicHeader';
+import PublicHeader from '../components/layout/PublicHeader';
 
 const PublicLayout = () => {
   const [isScrolled, setIsScrolled] = useState(false);

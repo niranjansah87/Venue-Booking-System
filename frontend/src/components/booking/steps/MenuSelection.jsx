@@ -2,203 +2,66 @@ import React, { useState, useEffect } from 'react';
 import { Utensils, PlusCircle, MinusCircle, Check, AlertCircle, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getMenusByPackageId } from '../../../services/menuService';
+import { toast } from 'react-toastify';
 
-const MenuSelection = ({ selectedPackage, selectedMenus, updateBookingData }) => {
+const MenuSelection = ({ selectedPackage, selectedMenus, updateBookingData, sessionId }) => {
   const [menus, setMenus] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeMenu, setActiveMenu] = useState(null);
 
-  // Fetch menus based on selected package
   useEffect(() => {
     const fetchMenus = async () => {
       if (!selectedPackage) return;
-      
       try {
         setLoading(true);
-        const data = await getMenusByPackageId(selectedPackage);
-        
-        // For development/preview - mock data if API fails or returns empty
-        if (!data.menus || data.menus.length === 0) {
-          const mockMenus = [
-            {
-              id: '1',
-              name: 'Appetizers',
-              package_id: selectedPackage,
-              free_limit: 3,
-              items: [
-                { id: 'a1', name: 'Spring Rolls', price: 120 },
-                { id: 'a2', name: 'Bruschetta', price: 150 },
-                { id: 'a3', name: 'Chicken Satay', price: 180 },
-                { id: 'a4', name: 'Stuffed Mushrooms', price: 160 },
-                { id: 'a5', name: 'Cheese Platter', price: 200 },
-                { id: 'a6', name: 'Hummus & Pita', price: 140 }
-              ]
-            },
-            {
-              id: '2',
-              name: 'Main Course',
-              package_id: selectedPackage,
-              free_limit: 4,
-              items: [
-                { id: 'm1', name: 'Grilled Chicken', price: 250 },
-                { id: 'm2', name: 'Pasta Primavera', price: 220 },
-                { id: 'm3', name: 'Beef Stroganoff', price: 300 },
-                { id: 'm4', name: 'Vegetable Curry', price: 200 },
-                { id: 'm5', name: 'Salmon Fillet', price: 350 },
-                { id: 'm6', name: 'Mushroom Risotto', price: 240 },
-                { id: 'm7', name: 'Lamb Chops', price: 380 }
-              ]
-            },
-            {
-              id: '3',
-              name: 'Desserts',
-              package_id: selectedPackage,
-              free_limit: 2,
-              items: [
-                { id: 'd1', name: 'Chocolate Cake', price: 150 },
-                { id: 'd2', name: 'Cheesecake', price: 180 },
-                { id: 'd3', name: 'Fruit Tart', price: 160 },
-                { id: 'd4', name: 'Ice Cream', price: 120 },
-                { id: 'd5', name: 'Tiramisu', price: 190 }
-              ]
-            },
-            {
-              id: '4',
-              name: 'Beverages',
-              package_id: selectedPackage,
-              free_limit: 3,
-              items: [
-                { id: 'b1', name: 'Fresh Juices', price: 100 },
-                { id: 'b2', name: 'Iced Tea', price: 80 },
-                { id: 'b3', name: 'Lemonade', price: 90 },
-                { id: 'b4', name: 'Soft Drinks', price: 70 },
-                { id: 'b5', name: 'Coffee', price: 110 },
-                { id: 'b6', name: 'Specialty Mocktails', price: 150 }
-              ]
-            }
-          ];
-          setMenus(mockMenus);
-          setActiveMenu(mockMenus[0]?.id || null);
-        } else {
-          setMenus(data.menus);
-          setActiveMenu(data.menus[0]?.id || null);
-        }
+        const data = await getMenusByPackageId(selectedPackage, sessionId);
+        setMenus(data);
+        setActiveMenu(data[0]?.id || null);
       } catch (error) {
         console.error('Error fetching menus:', error);
         setError('Failed to load menu options. Please try again.');
-        
-        // Fallback mock data for development/preview
-        const mockMenus = [
-          {
-            id: '1',
-            name: 'Appetizers',
-            package_id: selectedPackage,
-            free_limit: 3,
-            items: [
-              { id: 'a1', name: 'Spring Rolls', price: 120 },
-              { id: 'a2', name: 'Bruschetta', price: 150 },
-              { id: 'a3', name: 'Chicken Satay', price: 180 },
-              { id: 'a4', name: 'Stuffed Mushrooms', price: 160 },
-              { id: 'a5', name: 'Cheese Platter', price: 200 },
-              { id: 'a6', name: 'Hummus & Pita', price: 140 }
-            ]
-          },
-          {
-            id: '2',
-            name: 'Main Course',
-            package_id: selectedPackage,
-            free_limit: 4,
-            items: [
-              { id: 'm1', name: 'Grilled Chicken', price: 250 },
-              { id: 'm2', name: 'Pasta Primavera', price: 220 },
-              { id: 'm3', name: 'Beef Stroganoff', price: 300 },
-              { id: 'm4', name: 'Vegetable Curry', price: 200 },
-              { id: 'm5', name: 'Salmon Fillet', price: 350 },
-              { id: 'm6', name: 'Mushroom Risotto', price: 240 },
-              { id: 'm7', name: 'Lamb Chops', price: 380 }
-            ]
-          },
-          {
-            id: '3',
-            name: 'Desserts',
-            package_id: selectedPackage,
-            free_limit: 2,
-            items: [
-              { id: 'd1', name: 'Chocolate Cake', price: 150 },
-              { id: 'd2', name: 'Cheesecake', price: 180 },
-              { id: 'd3', name: 'Fruit Tart', price: 160 },
-              { id: 'd4', name: 'Ice Cream', price: 120 },
-              { id: 'd5', name: 'Tiramisu', price: 190 }
-            ]
-          },
-          {
-            id: '4',
-            name: 'Beverages',
-            package_id: selectedPackage,
-            free_limit: 3,
-            items: [
-              { id: 'b1', name: 'Fresh Juices', price: 100 },
-              { id: 'b2', name: 'Iced Tea', price: 80 },
-              { id: 'b3', name: 'Lemonade', price: 90 },
-              { id: 'b4', name: 'Soft Drinks', price: 70 },
-              { id: 'b5', name: 'Coffee', price: 110 },
-              { id: 'b6', name: 'Specialty Mocktails', price: 150 }
-            ]
-          }
-        ];
-        setMenus(mockMenus);
-        setActiveMenu(mockMenus[0]?.id || null);
+        toast.error('Failed to load menu options.');
       } finally {
         setLoading(false);
       }
     };
-
     fetchMenus();
-  }, [selectedPackage]);
+  }, [selectedPackage, sessionId]);
 
-  // Handle menu item selection
-  const handleMenuItemToggle = (menuId, itemId) => {
+  const handleMenuItemToggle = (menuId, itemIndex) => {
     const currentMenuItems = selectedMenus[menuId] || [];
     let updatedMenuItems;
-    
-    if (currentMenuItems.includes(itemId)) {
-      // Remove item if already selected
-      updatedMenuItems = currentMenuItems.filter(id => id !== itemId);
+
+    if (currentMenuItems.includes(itemIndex)) {
+      updatedMenuItems = currentMenuItems.filter((index) => index !== itemIndex);
     } else {
-      // Add item if not selected
-      updatedMenuItems = [...currentMenuItems, itemId];
+      updatedMenuItems = [...currentMenuItems, itemIndex];
     }
-    
+
     updateBookingData('selectedMenus', {
       ...selectedMenus,
-      [menuId]: updatedMenuItems
+      [menuId]: updatedMenuItems,
     });
   };
 
-  // Get selected items count for a menu
   const getSelectedItemsCount = (menuId) => {
     return selectedMenus[menuId]?.length || 0;
   };
 
-  // Check if a menu item is selected
-  const isItemSelected = (menuId, itemId) => {
-    return selectedMenus[menuId]?.includes(itemId) || false;
+  const isItemSelected = (menuId, itemIndex) => {
+    return selectedMenus[menuId]?.includes(itemIndex) || false;
   };
 
-  // Get menu details by ID
   const getMenuById = (menuId) => {
-    return menus.find(menu => menu.id === menuId);
+    return menus.find((menu) => menu.id === menuId);
   };
 
-  // Get free limit message for a menu
   const getFreeLimitMessage = (menuId) => {
     const menu = getMenuById(menuId);
     if (!menu) return '';
-    
     const selectedCount = getSelectedItemsCount(menuId);
     const freeLimit = menu.free_limit || 0;
-    
     if (selectedCount <= freeLimit) {
       return `Select up to ${freeLimit} items at no extra charge (${selectedCount}/${freeLimit} selected)`;
     } else {
@@ -218,7 +81,7 @@ const MenuSelection = ({ selectedPackage, selectedMenus, updateBookingData }) =>
     return (
       <div className="py-8 text-center">
         <p className="text-error-500 mb-4">{error}</p>
-        <button 
+        <button
           className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
           onClick={() => window.location.reload()}
         >
@@ -232,7 +95,7 @@ const MenuSelection = ({ selectedPackage, selectedMenus, updateBookingData }) =>
     return (
       <div className="py-8 text-center">
         <p className="text-warning-600 mb-4">Please select a package first</p>
-        <button 
+        <button
           className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
           onClick={() => window.history.back()}
         >
@@ -258,9 +121,8 @@ const MenuSelection = ({ selectedPackage, selectedMenus, updateBookingData }) =>
       <p className="text-gray-600 mb-8">
         Choose your preferred items from each menu category. Each category has a free selection limit.
       </p>
-      
+
       <div className="flex flex-col lg:flex-row gap-6">
-        {/* Menu Categories */}
         <div className="lg:w-1/3">
           <div className="bg-gray-50 rounded-lg p-4">
             <h3 className="text-lg font-medium text-gray-800 mb-4">Menu Categories</h3>
@@ -268,29 +130,21 @@ const MenuSelection = ({ selectedPackage, selectedMenus, updateBookingData }) =>
               {menus.map((menu) => {
                 const selectedCount = getSelectedItemsCount(menu.id);
                 const isOverLimit = selectedCount > (menu.free_limit || 0);
-                
                 return (
                   <li key={menu.id}>
                     <button
                       onClick={() => setActiveMenu(menu.id)}
                       className={`w-full text-left px-4 py-3 rounded-md flex items-center justify-between transition-colors ${
-                        activeMenu === menu.id
-                          ? 'bg-primary-100 text-primary-800'
-                          : 'hover:bg-gray-100'
+                        activeMenu === menu.id ? 'bg-primary-100 text-primary-800' : 'hover:bg-gray-100'
                       }`}
                     >
                       <div className="flex items-center">
                         <Utensils className={`h-5 w-5 mr-3 ${activeMenu === menu.id ? 'text-primary-600' : 'text-gray-400'}`} />
                         <span className="font-medium">{menu.name}</span>
                       </div>
-                      
-                      <div className={`flex items-center text-sm ${
-                        isOverLimit ? 'text-warning-600' : 'text-success-600'
-                      }`}>
+                      <div className={`flex items-center text-sm ${isOverLimit ? 'text-warning-600' : 'text-success-600'}`}>
                         {selectedCount > 0 && (
-                          <div className={`flex items-center justify-center w-6 h-6 rounded-full mr-1 ${
-                            isOverLimit ? 'bg-warning-100' : 'bg-success-100'
-                          }`}>
+                          <div className={`flex items-center justify-center w-6 h-6 rounded-full mr-1 ${isOverLimit ? 'bg-warning-100' : 'bg-success-100'}`}>
                             {selectedCount}
                           </div>
                         )}
@@ -300,7 +154,6 @@ const MenuSelection = ({ selectedPackage, selectedMenus, updateBookingData }) =>
                 );
               })}
             </ul>
-            
             <div className="mt-6 p-3 bg-primary-50 border border-primary-100 rounded-md">
               <div className="flex items-start">
                 <Info className="h-5 w-5 text-primary-600 mt-0.5 mr-2 flex-shrink-0" />
@@ -311,8 +164,7 @@ const MenuSelection = ({ selectedPackage, selectedMenus, updateBookingData }) =>
             </div>
           </div>
         </div>
-        
-        {/* Menu Items */}
+
         <div className="lg:w-2/3">
           <AnimatePresence mode="wait">
             <motion.div
@@ -328,27 +180,22 @@ const MenuSelection = ({ selectedPackage, selectedMenus, updateBookingData }) =>
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-xl font-medium text-gray-800">{activeMenuData.name}</h3>
                     <div className={`text-sm px-3 py-1 rounded-full ${
-                      getSelectedItemsCount(activeMenu) > activeMenuData.free_limit
-                        ? 'bg-warning-50 text-warning-700'
-                        : 'bg-success-50 text-success-700'
+                      getSelectedItemsCount(activeMenu) > activeMenuData.free_limit ? 'bg-warning-50 text-warning-700' : 'bg-success-50 text-success-700'
                     }`}>
                       {getFreeLimitMessage(activeMenu)}
                     </div>
                   </div>
-                  
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {activeMenuData.items?.map((item) => {
-                      const isSelected = isItemSelected(activeMenu, item.id);
+                    {activeMenuData.items?.map((item, index) => {
+                      const isSelected = isItemSelected(activeMenu, index);
                       return (
                         <motion.div
-                          key={item.id}
+                          key={index}
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
-                          onClick={() => handleMenuItemToggle(activeMenu, item.id)}
+                          onClick={() => handleMenuItemToggle(activeMenu, index)}
                           className={`p-3 rounded-md border cursor-pointer flex items-center justify-between ${
-                            isSelected
-                              ? 'border-primary-300 bg-primary-50'
-                              : 'border-gray-200 hover:border-primary-200 hover:bg-gray-50'
+                            isSelected ? 'border-primary-300 bg-primary-50' : 'border-gray-200 hover:border-primary-200 hover:bg-gray-50'
                           }`}
                         >
                           <div className="flex items-center">
@@ -363,9 +210,8 @@ const MenuSelection = ({ selectedPackage, selectedMenus, updateBookingData }) =>
                               {item.name}
                             </span>
                           </div>
-                          
                           <span className={`text-sm ${isSelected ? 'text-primary-700' : 'text-gray-500'}`}>
-                            ₹{item.price}
+                            ${item.price}
                           </span>
                         </motion.div>
                       );
@@ -375,34 +221,31 @@ const MenuSelection = ({ selectedPackage, selectedMenus, updateBookingData }) =>
               )}
             </motion.div>
           </AnimatePresence>
-          
-          {/* Summary */}
+
           <div className="mt-6 p-4 bg-gray-50 rounded-lg">
             <h4 className="text-lg font-medium text-gray-800 mb-3">Your Selections</h4>
             {Object.keys(selectedMenus).length === 0 ? (
               <p className="text-gray-500">You haven't selected any menu items yet.</p>
             ) : (
               <div className="space-y-3">
-                {Object.entries(selectedMenus).map(([menuId, itemIds]) => {
-                  if (itemIds.length === 0) return null;
+                {Object.entries(selectedMenus).map(([menuId, itemIndexes]) => {
+                  if (itemIndexes.length === 0) return null;
                   const menu = getMenuById(menuId);
                   if (!menu) return null;
-                  
                   return (
                     <div key={menuId} className="border-b border-gray-200 pb-3 last:border-0">
                       <p className="font-medium text-gray-800">{menu.name}</p>
                       <div className="mt-1 flex flex-wrap gap-2">
-                        {itemIds.map((itemId) => {
-                          const item = menu.items.find(i => i.id === itemId);
+                        {itemIndexes.map((itemIndex) => {
+                          const item = menu.items[itemIndex];
                           if (!item) return null;
-                          
                           return (
-                            <div key={itemId} className="text-sm bg-white px-2 py-1 rounded border border-gray-200 flex items-center">
+                            <div key={itemIndex} className="text-sm bg-white px-2 py-1 rounded border border-gray-200 flex items-center">
                               <span>{item.name}</span>
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleMenuItemToggle(menuId, itemId);
+                                  handleMenuItemToggle(menuId, itemIndex);
                                 }}
                                 className="ml-2 text-gray-400 hover:text-error-500 transition-colors"
                               >
@@ -415,7 +258,6 @@ const MenuSelection = ({ selectedPackage, selectedMenus, updateBookingData }) =>
                     </div>
                   );
                 })}
-                
                 <div className="mt-3">
                   <p className="text-sm text-primary-600">
                     Additional charges may apply for selections exceeding the free limit.
