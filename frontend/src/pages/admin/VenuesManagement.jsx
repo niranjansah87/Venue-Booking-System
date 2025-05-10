@@ -1,9 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Plus, Edit, Trash2, XCircle, CheckCircle, AlertCircle, Image as ImageIcon } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { getAllVenues, createVenue, updateVenue, deleteVenue } from '../../services/venueService';
- 
+
 const VenuesManagement = () => {
   const [venues, setVenues] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,20 +14,15 @@ const VenuesManagement = () => {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
 
-  // Base URL for venue images
-  
   const IMAGE_BASE_URL = 'http://localhost:5000/';
-  // Default image from frontend public folder
   const DEFAULT_IMAGE = '/default_venue.jpg';
 
-  // Mock data for preview
   const mockVenues = [
     { id: 1, name: 'Royal Garden Hall', image: DEFAULT_IMAGE, capacity: 200 },
     { id: 2, name: 'Lakeview Terrace', image: DEFAULT_IMAGE, capacity: 150 },
     { id: 3, name: 'Grand Ballroom', image: DEFAULT_IMAGE, capacity: 300 },
   ];
 
-  // Fetch venues
   useEffect(() => {
     const fetchVenues = async () => {
       try {
@@ -36,12 +31,12 @@ const VenuesManagement = () => {
         if (!data.venues || data.venues.length === 0) {
           setVenues(mockVenues);
         } else {
-          // Prepend base URL to image filenames and use default if no image
-          setVenues(data.venues.map(venue => ({
-          ...venue,
-           image: venue.image ? `${IMAGE_BASE_URL}${venue.image}` : DEFAULT_IMAGE,
-        })));
-
+          setVenues(
+            data.venues.map((venue) => ({
+              ...venue,
+              image: venue.image ? `${IMAGE_BASE_URL}${venue.image}` : DEFAULT_IMAGE,
+            }))
+          );
         }
       } catch (error) {
         console.error('Error fetching venues:', error);
@@ -54,7 +49,6 @@ const VenuesManagement = () => {
     fetchVenues();
   }, []);
 
-  // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
     if (files) {
@@ -66,7 +60,6 @@ const VenuesManagement = () => {
     setFormErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
-  // Validate form
   const validateForm = () => {
     const errors = {};
     if (!formData.name.trim()) errors.name = 'Venue name is required';
@@ -76,7 +69,6 @@ const VenuesManagement = () => {
     return Object.keys(errors).length === 0;
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -85,29 +77,31 @@ const VenuesManagement = () => {
     try {
       const venueData = new FormData();
       venueData.append('name', formData.name);
-      venueData.append('capacity', parseInt(formData.capacity));
+      venueData.append('capacity', formData.capacity);
       if (formData.image) {
         venueData.append('image', formData.image);
+      } else if (formData.id && imagePreview) {
+        venueData.append('image', imagePreview.replace(IMAGE_BASE_URL, '')); // Send existing image path
       }
 
+      let response;
       if (formData.id) {
-        // Update venue
-        const response = await updateVenue(formData.id, venueData);
+        response = await updateVenue(formData.id, venueData);
         setVenues((prev) =>
           prev.map((venue) =>
             venue.id === formData.id
               ? {
-                ...venue,
-                name: formData.name,
-                capacity: parseInt(formData.capacity),
-                image: response.image ? `${IMAGE_BASE_URL}${response.image}` : venue.image,
-              }
+                  ...venue,
+                  name: response.name,
+                  capacity: parseInt(response.capacity),
+                  image: response.image ? `${IMAGE_BASE_URL}${response.image}` : venue.image,
+                }
               : venue
           )
         );
+        toast.success('Venue updated successfully');
       } else {
-        // Create venue
-        const response = await createVenue(venueData);
+        response = await createVenue(venueData);
         setVenues((prev) => [
           ...prev,
           {
@@ -115,17 +109,19 @@ const VenuesManagement = () => {
             image: response.image ? `${IMAGE_BASE_URL}${response.image}` : DEFAULT_IMAGE,
           },
         ]);
+        toast.success('Venue created successfully');
       }
 
       resetForm();
     } catch (error) {
-      setError('Failed to save venue');
+      console.error('Error saving venue:', error.message, error.response?.data);
+      setError(error.message || 'Failed to save venue');
+      toast.error(error.message || 'Failed to save venue');
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle edit venue
   const handleEdit = (venue) => {
     setFormData({
       id: venue.id,
@@ -137,21 +133,22 @@ const VenuesManagement = () => {
     setShowForm(true);
   };
 
-  // Handle delete venue
   const handleDelete = async (id) => {
     setLoading(true);
     try {
       await deleteVenue(id);
       setVenues((prev) => prev.filter((venue) => venue.id !== id));
       setDeleteConfirm(null);
+      toast.success('Venue deleted successfully');
     } catch (error) {
-      setError('Failed to delete venue');
+      console.error('Error deleting venue:', error.message);
+      setError(error.message || 'Failed to delete venue');
+      toast.error(error.message || 'Failed to delete venue');
     } finally {
       setLoading(false);
     }
   };
 
-  // Reset form
   const resetForm = () => {
     setFormData({ id: null, name: '', capacity: '', image: null });
     setFormErrors({});
@@ -272,8 +269,9 @@ const VenuesManagement = () => {
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-600 focus:ring-primary-600 sm:text-sm transition-all duration-300 ${formErrors.name ? 'border-error-500' : ''
-                      }`}
+                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-600 focus:ring-primary-600 sm:text-sm transition-all duration-300 ${
+                      formErrors.name ? 'border-error-500' : ''
+                    }`}
                   />
                   <motion.p
                     initial={{ opacity: 0 }}
@@ -290,8 +288,9 @@ const VenuesManagement = () => {
                     name="capacity"
                     value={formData.capacity}
                     onChange={handleInputChange}
-                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-600 focus:ring-primary-600 sm:text-sm transition-all duration-300 ${formErrors.capacity ? 'border-error-500' : ''
-                      }`}
+                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-600 focus:ring-primary-600 sm:text-sm transition-all duration-300 ${
+                      formErrors.capacity ? 'border-error-500' : ''
+                    }`}
                     min="1"
                   />
                   <motion.p
@@ -310,8 +309,9 @@ const VenuesManagement = () => {
                       name="image"
                       accept="image/*"
                       onChange={handleInputChange}
-                      className={`block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-600 hover:file:bg-primary-100 ${formErrors.image ? 'border-error-500' : ''
-                        }`}
+                      className={`block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-600 hover:file:bg-primary-100 ${
+                        formErrors.image ? 'border-error-500' : ''
+                      }`}
                     />
                     {imagePreview ? (
                       <img

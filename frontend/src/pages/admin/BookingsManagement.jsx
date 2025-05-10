@@ -143,12 +143,7 @@ const BookingsManagement = () => {
           getAllShifts(),
           getAllPackages(),
         ]);
-        console.log('User Data:', userData);
-        console.log('Booking Data:', bookingData);
-        console.log('Event Data:', eventData);
-        console.log('Venue Data:', venueData);
-        console.log('Shift Data:', shiftData);
-        console.log('Package Data:', packageData);
+
 
         // Normalize booking data
         const normalizedBookings = Array.isArray(bookingData)

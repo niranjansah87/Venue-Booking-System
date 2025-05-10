@@ -18,56 +18,29 @@ export const getAllVenues = async (page = 1, limit = 10) => {
 // Create a new venue
 export const createVenue = async (venueData) => {
   try {
-    const formData = new FormData();
-
-    // Append all venue data
-    Object.entries(venueData).forEach(([key, value]) => {
-      if (key === 'image' && value instanceof File) {
-        // Ensure image is appended correctly
-        formData.append('image', value);
-      } else {
-        formData.append(key, value);
-      }
+    const response = await api.post('/api/admin/venues/create', venueData, {
+      withCredentials: true,
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
-
-    // Post the data to the backend API
-    const response = await api.post('/api/admin/venues/create', formData, {
-      withCredentials: true, // Send cookies (if needed)
-      headers: { 'Content-Type': 'multipart/form-data' }, // This header ensures proper encoding
-    });
-
     return response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || 'Failed to create venue';
-    console.error('Error creating venue:', errorMessage, error);
+    console.error('Error creating venue:', errorMessage, error.response?.data);
     throw new Error(errorMessage);
   }
 };
 
-
-
 // Update a venue
 export const updateVenue = async (id, venueData) => {
   try {
-    const formData = new FormData();
-    // Append all venue data
-    Object.entries(venueData).forEach(([key, value]) => {
-      if (key === 'image' && value instanceof File) {
-        // Ensure image is appended correctly
-        formData.append('image', value);
-      } else {
-        formData.append(key, value);
-      }
-    });
-
-    const response = await api.put(`/api/admin/venues/update/${id}`, formData, {
+    const response = await api.put(`/api/admin/venues/update/${id}`, venueData, {
       withCredentials: true,
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || `Failed to update venue with ID ${id}`;
-    console.error(`Error updating venue with ID ${id}:`, errorMessage, error);
+    console.error(`Error updating venue with ID ${id}:`, errorMessage, error.response?.data);
     throw new Error(errorMessage);
   }
 };
@@ -79,7 +52,7 @@ export const deleteVenue = async (id) => {
     return response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || `Failed to delete venue with ID ${id}`;
-    console.error(`Error deleting venue with ID ${id}:`, errorMessage, error);
+    console.error(`Error deleting venue with ID ${id}:`, errorMessage, error.response?.data);
     throw new Error(errorMessage);
   }
 };
