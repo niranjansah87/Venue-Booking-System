@@ -264,20 +264,82 @@ exports.sendConfirmation = async (req, res) => {
     }
 
     // console.log(booking);
-    const html = `
-  <h1>Booking Confirmation</h1>
-  <p>Dear ${booking.user?.dataValues?.name || 'Customer'},</p>
-  <p>Your booking has been successfully submitted.</p>
-  <p><strong>Booking ID:</strong> ${booking.id}</p>
-  <p><strong>Event:</strong> ${booking.event?.dataValues?.name || 'N/A'}</p>
-  <p><strong>Date:</strong> ${booking.event_date}</p>
-  <p><strong>Venue:</strong> ${booking.venue?.dataValues?.name || 'N/A'}</p>
-  <p><strong>Shift:</strong> ${booking.shift?.dataValues?.name || 'N/A'}</p>
-  <p><strong>Guests:</strong> ${booking.guest_count}</p>
-  <p><strong>Package:</strong> ${booking.package?.dataValues?.name || 'N/A'}</p>
-  <p><strong>Total Fare:</strong> $${booking.total_fare}</p>
-  <p>We'll contact you soon to confirm availability.</p>
-`;
+        const html = `
+      <html>
+        <head>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              background-color: #f4f4f9;
+              margin: 0;
+              padding: 0;
+              color: #333;
+            }
+            .container {
+              max-width: 600px;
+              margin: 20px auto;
+              padding: 20px;
+              background-color: #ffffff;
+              border-radius: 8px;
+              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+            h1 {
+              text-align: center;
+              color: #4CAF50;
+              font-size: 32px;
+              margin-bottom: 20px;
+            }
+            .content {
+              font-size: 16px;
+              line-height: 1.6;
+              color: #555;
+            }
+            .content p {
+              margin: 10px 0;
+            }
+            .highlight {
+              color: #4CAF50;
+              font-weight: bold;
+            }
+            .footer {
+              text-align: center;
+              font-size: 14px;
+              color: #999;
+              margin-top: 30px;
+            }
+            .footer a {
+              color: #4CAF50;
+              text-decoration: none;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1>Booking Confirmation</h1>
+            <div class="content">
+              <p>Dear <span class="highlight">${booking.user?.dataValues?.name || 'Customer'}</span>,</p>
+              <p>Your booking has been successfully submitted. Below are the details:</p>
+
+              <p><strong>Booking ID:</strong> <span class="highlight">${booking.id}</span></p>
+              <p><strong>Event:</strong> <span class="highlight">${booking.event?.dataValues?.name || 'N/A'}</span></p>
+              <p><strong>Date:</strong> <span class="highlight">${booking.event_date}</span></p>
+              <p><strong>Venue:</strong> <span class="highlight">${booking.venue?.dataValues?.name || 'N/A'}</span></p>
+              <p><strong>Shift:</strong> <span class="highlight">${booking.shift?.dataValues?.name || 'N/A'}</span></p>
+              <p><strong>Guests:</strong> <span class="highlight">${booking.guest_count}</span></p>
+              <p><strong>Package:</strong> <span class="highlight">${booking.package?.dataValues?.name || 'N/A'}</span></p>
+              <p><strong>Total Fare:</strong> <span class="highlight">$${booking.total_fare}</span></p>
+
+              <p>We'll contact you soon to confirm availability. If you have any questions, feel free to reach out to us.</p>
+            </div>
+
+            <div class="footer">
+              <p>Thank you for choosing us!</p>
+              <p>Need help? <a href="mailto:support@example.com">Contact Support</a></p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
 
 
     await sendEmail({
