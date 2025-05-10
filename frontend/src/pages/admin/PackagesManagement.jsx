@@ -26,7 +26,7 @@ const PackagesManagement = () => {
       try {
         setLoading(true);
         const data = await getAllPackages();
-        setPackages(data.packages?.length > 0 ? data.packages : mockPackages);
+        setPackages(Array.isArray(data) && data.length ? data : mockPackages);
       } catch (error) {
         console.error('Error fetching packages:', error);
         setError('Failed to load packages');

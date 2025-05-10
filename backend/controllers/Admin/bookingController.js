@@ -44,14 +44,14 @@ exports.checkBookingAvailability = [
   body('shift_id').notEmpty().withMessage('Shift is required'),
   body('event_date').isDate().withMessage('Event date is required'),
   body('guest_count').isInt({ min: 1 }).withMessage('Guest count must be a number'),
-  
+
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
     const { event_id, venue_id, shift_id, event_date, guest_count } = req.body;
-   
+
     try {
       const venue = await Venue.findByPk(venue_id);
       if (!venue || venue.capacity < guest_count) {
@@ -81,7 +81,7 @@ exports.checkBookingAvailability = [
 
 // Fetch packages
 exports.selectPackage = async (req, res) => {
-  
+
   try {
     const packages = await Package.findAll({
       attributes: ['id', 'name', 'base_price'],
@@ -96,7 +96,7 @@ exports.selectPackage = async (req, res) => {
 // Get menus for a package
 exports.getPackageMenus = async (req, res) => {
   const { packageId } = req.params;
-  
+
   try {
     const menus = await Menu.findAll({
       where: { package_id: packageId },
@@ -124,14 +124,14 @@ exports.calculateFare = [
   body('package_id').isInt().withMessage('Invalid package ID'),
   body('guest_count').isInt({ min: 10 }).withMessage('Invalid guest count'),
   body('selected_menus').isObject().withMessage('Invalid menu selections'),
- 
+
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
     const { package_id, guest_count, selected_menus } = req.body;
-    
+
     try {
       const pkg = await Package.findByPk(package_id);
       if (!pkg) {
@@ -178,7 +178,7 @@ exports.storeBooking = [
   body('base_fare').isFloat({ min: 0 }).withMessage('Invalid base fare'),
   body('extra_charges').isFloat({ min: 0 }).withMessage('Invalid extra charges'),
   body('total_fare').isFloat({ min: 0 }).withMessage('Invalid total fare'),
-  
+
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -198,7 +198,7 @@ exports.storeBooking = [
       total_fare,
       sessionId,
     } = req.body;
-   
+
     try {
       const [user, event, venue, shift, pkg] = await Promise.all([
         User.findByPk(user_id),
@@ -250,25 +250,36 @@ exports.sendConfirmation = async (req, res) => {
   const { bookingId, email } = req.body;
   try {
     const booking = await Booking.findByPk(bookingId, {
-      include: [Event, Venue, Shift, Package, User],
+      include: [
+        { model: Event, as: 'event' },      // Use alias 'event' here
+        { model: Venue, as: 'venue' },      // Use alias 'venue' here
+        { model: Shift, as: 'shift' },      // Use alias 'shift' here
+        { model: Package, as: 'package' },  // Use alias 'package' here
+        { model: User, as: 'user' }         // Use alias 'user' here
+      ],
     });
+
     if (!booking) {
       return res.status(404).json({ error: 'Booking not found' });
     }
+
+    // console.log(booking);
     const html = `
-      <h1>Booking Confirmation</h1>
-      <p>Dear ${booking.User?.name || 'Customer'},</p>
-      <p>Your booking has been successfully submitted.</p>
-      <p><strong>Booking ID:</strong> ${booking.id}</p>
-      <p><strong>Event:</strong> ${booking.Event.name}</p>
-      <p><strong>Date:</strong> ${booking.event_date}</p>
-      <p><strong>Venue:</strong> ${booking.Venue.name}</p>
-      <p><strong>Shift:</strong> ${booking.Shift.name}</p>
-      <p><strong>Guests:</strong> ${booking.guest_count}</p>
-      <p><strong>Package:</strong> ${booking.Package.name}</p>
-      <p><strong>Total Fare:</strong> $${booking.total_fare}</p>
-      <p>We'll contact you soon to confirm availability.</p>
-    `;
+  <h1>Booking Confirmation</h1>
+  <p>Dear ${booking.user?.dataValues?.name || 'Customer'},</p>
+  <p>Your booking has been successfully submitted.</p>
+  <p><strong>Booking ID:</strong> ${booking.id}</p>
+  <p><strong>Event:</strong> ${booking.event?.dataValues?.name || 'N/A'}</p>
+  <p><strong>Date:</strong> ${booking.event_date}</p>
+  <p><strong>Venue:</strong> ${booking.venue?.dataValues?.name || 'N/A'}</p>
+  <p><strong>Shift:</strong> ${booking.shift?.dataValues?.name || 'N/A'}</p>
+  <p><strong>Guests:</strong> ${booking.guest_count}</p>
+  <p><strong>Package:</strong> ${booking.package?.dataValues?.name || 'N/A'}</p>
+  <p><strong>Total Fare:</strong> $${booking.total_fare}</p>
+  <p>We'll contact you soon to confirm availability.</p>
+`;
+
+
     await sendEmail({
       to: email,
       subject: 'Booking Confirmation',
@@ -280,6 +291,7 @@ exports.sendConfirmation = async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
 
 // Get venue details
 exports.getVenueDetails = async (req, res) => {

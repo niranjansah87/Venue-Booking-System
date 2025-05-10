@@ -57,24 +57,25 @@ const MenusManagement = () => {
   ];
 
   // Fetch menus and packages
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const [menuData, packageData] = await Promise.all([getAllMenus(), getAllPackages()]);
-        setMenus(menuData.menus?.length > 0 ? menuData.menus : mockMenus);
-        setPackages(packageData.packages?.length > 0 ? packageData.packages : mockPackages);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setError('Failed to load menus or packages');
-        setMenus(mockMenus);
-        setPackages(mockPackages);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const [menuData, packageData] = await Promise.all([getAllMenus(), getAllPackages()]);
+      setMenus(Array.isArray(menuData) && menuData.length ? menuData : mockMenus);
+      setPackages(packageData.packages?.length > 0 ? packageData.packages : mockPackages);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setError('Failed to load menus or packages');
+      setMenus(mockMenus);
+      setPackages(mockPackages);
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchData();
+}, []);
+
 
   // Handle form input changes
   const handleInputChange = (e) => {
