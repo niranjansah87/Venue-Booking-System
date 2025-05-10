@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
@@ -13,12 +12,16 @@ import {
   AlertCircle,
   MapPin,
   Package,
+  DollarSign,
 } from 'lucide-react';
+import { Tooltip } from 'react-tooltip';
 import { getAllBookings } from '../../services/bookingService';
 import { getAllEvents } from '../../services/eventService';
 import { getAllVenues } from '../../services/venueService';
 import { getAllShifts } from '../../services/shiftService';
 import { getAllPackages } from '../../services/packageService';
+import { getAllUsers } from '../../services/userService';
+import { formatDate } from './utils';
 
 const Dashboard = () => {
   const [bookings, setBookings] = useState([]);
@@ -26,6 +29,7 @@ const Dashboard = () => {
   const [venues, setVenues] = useState([]);
   const [shifts, setShifts] = useState([]);
   const [packages, setPackages] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [stats, setStats] = useState({
@@ -33,8 +37,8 @@ const Dashboard = () => {
     pendingBookings: 0,
     confirmedBookings: 0,
     cancelledBookings: 0,
-    bookingsThisMonth: 0,
     bookingChange: 0,
+    totalRevenue: 0,
   });
 
   // Mock data for preview
@@ -68,6 +72,7 @@ const Dashboard = () => {
 
       bookings.push({
         id: `booking-${i + 1}`,
+        user_id: Math.floor(Math.random() * 3) + 1,
         event_id: mockEvents[Math.floor(Math.random() * mockEvents.length)].id,
         venue_id: mockVenues[Math.floor(Math.random() * mockVenues.length)].id,
         shift_id: mockShifts[Math.floor(Math.random() * mockShifts.length)].id,
@@ -93,7 +98,8 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [bookingData, eventData, venueData, shiftData, packageData] = await Promise.all([
+        const [userData, bookingData, eventData, venueData, shiftData, packageData] = await Promise.all([
+          getAllUsers(),
           getAllBookings(),
           getAllEvents(),
           getAllVenues(),
@@ -101,25 +107,54 @@ const Dashboard = () => {
           getAllPackages(),
         ]);
 
+
+
+        // Normalize booking data to include user_name and user_email
+        const normalizedBookings = Array.isArray(bookingData)
+          ? bookingData.map((booking) => {
+              const user = Array.isArray(userData) ? userData.find((u) => u.id === booking.user_id) : null;
+              return {
+                ...booking,
+                id: String(booking.id),
+                user_name: user?.name || booking.user_name || 'Unknown',
+                user_email: user?.email || booking.user_email || 'N/A',
+                venue_id: booking.venue_id ? String(booking.venue_id) : null,
+              };
+            })
+          : [];
+
         const mockBookings = generateMockBookings();
-        const bookingsToUse = bookingData.bookings?.length > 0 ? bookingData.bookings : mockBookings;
+        const bookingsToUse = normalizedBookings.length > 0 ? normalizedBookings : mockBookings;
+
+        setUsers(Array.isArray(userData) ? userData : []);
         setBookings(bookingsToUse);
         calculateStats(bookingsToUse);
-        setEvents(eventData.events?.length > 0 ? eventData.events : mockEvents);
-        setVenues(venueData.venues?.length > 0 ? venueData.venues : mockVenues);
-        setShifts(shiftData.shifts?.length > 0 ? shiftData.shifts : mockShifts);
-        setPackages(packageData.packages?.length > 0 ? packageData.packages : mockPackages);
+        setEvents(Array.isArray(eventData) ? eventData : mockEvents);
+        setVenues(Array.isArray(venueData.venues) ? venueData.venues : Array.isArray(venueData) ? venueData : mockVenues);
+        setShifts(Array.isArray(shiftData) ? shiftData : mockShifts);
+        setPackages(Array.isArray(packageData) ? packageData : mockPackages);
+
+        // Debug venues
+        console.log('Venues State:', Array.isArray(venueData.venues) ? venueData.venues : Array.isArray(venueData) ? venueData : mockVenues);
+        console.log('Venue Names:', (Array.isArray(venueData.venues) ? venueData.venues : Array.isArray(venueData) ? venueData : mockVenues).map(v => v.name));
+        console.log('Booking Venue IDs:', bookingsToUse.map((b) => b.venue_id));
+        console.log('Venue IDs in venueData:', (Array.isArray(venueData.venues) ? venueData.venues : Array.isArray(venueData) ? venueData : mockVenues).map((v) => v.id));
       } catch (error) {
         console.error('Error fetching data:', error);
         setError('Failed to load dashboard data');
 
         const mockBookings = generateMockBookings();
+        setUsers([]);
         setBookings(mockBookings);
         calculateStats(mockBookings);
         setEvents(mockEvents);
         setVenues(mockVenues);
         setShifts(mockShifts);
         setPackages(mockPackages);
+
+        // Debug venues on error
+        console.log('Venues State (Error):', mockVenues);
+        console.log('Booking Venue IDs (Error):', mockBookings.map((b) => b.venue_id));
       } finally {
         setLoading(false);
       }
@@ -140,37 +175,40 @@ const Dashboard = () => {
     const cancelledBookings = bookings.filter((booking) => booking.status === 'cancelled');
 
     const currentMonthBookings = bookings.filter((booking) => {
-      const bookingDate = new Date(booking.event_date);
+      const bookingDate = new Date(booking.created_at);
       return bookingDate.getMonth() === currentMonth && bookingDate.getFullYear() === currentYear;
     });
 
     const previousMonthBookings = bookings.filter((booking) => {
-      const bookingDate = new Date(booking.event_date);
+      const bookingDate = new Date(booking.created_at);
       return bookingDate.getMonth() === previousMonth && bookingDate.getFullYear() === previousMonthYear;
     });
 
     const bookingChange = previousMonthBookings.length !== 0
       ? ((currentMonthBookings.length - previousMonthBookings.length) / previousMonthBookings.length) * 100
-      : 100;
+      : currentMonthBookings.length > 0
+      ? 100
+      : 0;
+
+    const totalRevenue = bookings.reduce((sum, booking) => sum + (booking.total_fare || 0), 0);
 
     setStats({
       totalBookings: bookings.length,
       pendingBookings: pendingBookings.length,
       confirmedBookings: confirmedBookings.length,
       cancelledBookings: cancelledBookings.length,
-      bookingsThisMonth: currentMonthBookings.length,
       bookingChange,
+      totalRevenue,
     });
   };
 
-  // Format date
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      weekday: 'short',
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
+  // Format currency
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(amount);
   };
 
   // Get status badge
@@ -178,21 +216,21 @@ const Dashboard = () => {
     switch (status) {
       case 'confirmed':
         return (
-          <span className="flex items-center px-3 py-1 rounded-full text-xs font-medium bg-success-100 text-success-800">
+          <span className="flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
             <CheckCircle className="h-4 w-4 mr-1.5" />
             Confirmed
           </span>
         );
       case 'pending':
         return (
-          <span className="flex items-center px-3 py-1 rounded-full text-xs font-medium bg-warning-100 text-warning-800">
+          <span className="flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
             <AlertCircle className="h-4 w-4 mr-1.5" />
             Pending
           </span>
         );
       case 'cancelled':
         return (
-          <span className="flex items-center px-3 py-1 rounded-full text-xs font-medium bg-error-100 text-error-800">
+          <span className="flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
             <XCircle className="h-4 w-4 mr-1.5" />
             Cancelled
           </span>
@@ -208,75 +246,86 @@ const Dashboard = () => {
 
   // Filter recent bookings
   const recentBookings = [...bookings]
-    .sort((a, b) => new Date(b.event_date) - new Date(a.event_date))
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
     .slice(0, 5);
 
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen">
+    <div className="p-6 bg-gradient-to-br from-indigo-50 to-purple-100 min-h-screen">
       <div className="max-w-7xl mx-auto">
         <header className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-            <BarChart className="h-8 w-8 text-primary-600 mr-2" />
+          <h1 className="text-4xl font-extrabold text-gray-900 flex items-center">
+            <BarChart className="h-10 w-10 text-indigo-600 mr-3" />
             Dashboard
           </h1>
-          <p className="text-gray-600 mt-1">Welcome back! Here's an overview of your venue bookings.</p>
+          <p className="text-gray-600 mt-2 text-lg">Your venue bookings at a glance, beautifully presented.</p>
         </header>
 
         {error && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6 bg-error-50 p-4 rounded-lg flex items-center"
+            className="mb-6 bg-red-50 p-4 rounded-xl flex items-center shadow-md"
+            data-tooltip-id="error-tooltip"
+            data-tooltip-content="An error occurred while loading data"
           >
-            <XCircle className="h-5 w-5 text-error-600 mr-2" />
-            <p className="text-sm text-error-700">{error}</p>
-            <button
+            <XCircle className="h-5 w-5 text-red-600 mr-2" />
+            <p className="text-sm text-red-700">{error}</p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => window.location.reload()}
-              className="ml-auto px-3 py-1 bg-error-600 text-white rounded-md hover:bg-error-700"
+              className="ml-auto px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700"
             >
               Retry
-            </button>
+            </motion.button>
           </motion.div>
         )}
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {/* Total Bookings */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white rounded-xl shadow-xl border border-gray-200 p-6 bg-gradient-to-br from-white to-gray-50"
+            whileHover={{ scale: 1.03, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}
+            className="bg-white rounded-xl shadow-2xl border border-gray-200 p-6 bg-gradient-to-br from-indigo-50 to-purple-50"
+            data-tooltip-id="total-bookings"
+            data-tooltip-content="Total bookings this month"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-gray-600">Total Bookings</h3>
-              <div className="p-2 bg-primary-100 rounded-full">
-                <Calendar className="h-6 w-6 text-primary-600" />
-              </div>
+              <h3 className="text-lg font-semibold text-gray-700">Total Bookings</h3>
+              <motion.div
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ repeat: Infinity, duration: 2 }}
+                className="p-2 bg-indigo-100 rounded-full"
+              >
+                <Calendar className="h-8 w-8 text-indigo-600" />
+              </motion.div>
             </div>
             <div className="flex items-end justify-between">
               <div>
-                <p className="text-3xl font-bold text-gray-900">{stats.totalBookings}</p>
+                <p className="text-4xl font-extrabold text-gray-900">{stats.totalBookings}</p>
                 <div className="flex items-center mt-2">
                   {stats.bookingChange >= 0 ? (
                     <>
-                      <ArrowUp className="h-4 w-4 text-success-600" />
-                      <span className="text-sm font-medium text-success-700">
+                      <ArrowUp className="h-5 w-5 text-green-600" />
+                      <span className="text-sm font-medium text-green-700">
                         {Math.abs(stats.bookingChange).toFixed(1)}%
                       </span>
                     </>
                   ) : (
                     <>
-                      <ArrowDown className="h-4 w-4 text-error-600" />
-                      <span className="text-sm font-medium text-error-700">
+                      <ArrowDown className="h-5 w-5 text-red-600" />
+                      <span className="text-sm font-medium text-red-700">
                         {Math.abs(stats.bookingChange).toFixed(1)}%
                       </span>
                     </>
@@ -287,23 +336,30 @@ const Dashboard = () => {
             </div>
           </motion.div>
 
-          {/* Bookings This Month */}
+          {/* Revenue Now */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white rounded-xl shadow-xl border border-gray-200 p-6 bg-gradient-to-br from-white to-gray-50"
+            whileHover={{ scale: 1.03, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}
+            className="bg-white rounded-xl shadow-2xl border border-gray-200 p-6 bg-gradient-to-br from-indigo-50 to-purple-50"
+            data-tooltip-id="revenue"
+            data-tooltip-content="Total revenue from all bookings"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-gray-600">Bookings This Month</h3>
-              <div className="p-2 bg-primary-100 rounded-full">
-                <Calendar className="h-6 w-6 text-primary-600" />
-              </div>
+              <h3 className="text-lg font-semibold text-gray-700">Revenue Now</h3>
+              <motion.div
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ repeat: Infinity, duration: 2 }}
+                className="p-2 bg-green-100 rounded-full"
+              >
+                <DollarSign className="h-8 w-8 text-green-600" />
+              </motion.div>
             </div>
             <div className="flex items-end justify-between">
               <div>
-                <p className="text-3xl font-bold text-gray-900">{stats.bookingsThisMonth}</p>
-                <p className="text-xs text-gray-500 mt-2">Current month activity</p>
+                <p className="text-4xl font-extrabold text-gray-900">{formatCurrency(stats.totalRevenue)}</p>
+                <p className="text-xs text-gray-500 mt-2">From all bookings</p>
               </div>
             </div>
           </motion.div>
@@ -313,20 +369,27 @@ const Dashboard = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-white rounded-xl shadow-xl border border-gray-200 p-6 bg-gradient-to-br from-white to-gray-50"
+            whileHover={{ scale: 1.03, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}
+            className="bg-white rounded-xl shadow-2xl border border-gray-200 p-6 bg-gradient-to-br from-indigo-50 to-purple-50"
+            data-tooltip-id="pending-approvals"
+            data-tooltip-content="Bookings awaiting approval"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-gray-600">Pending Approvals</h3>
-              <div className="p-2 bg-warning-100 rounded-full">
-                <Clock className="h-6 w-6 text-warning-600" />
-              </div>
+              <h3 className="text-lg font-semibold text-gray-700">Pending Approvals</h3>
+              <motion.div
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ repeat: Infinity, duration: 2 }}
+                className="p-2 bg-yellow-100 rounded-full"
+              >
+                <Clock className="h-8 w-8 text-yellow-600" />
+              </motion.div>
             </div>
             <div className="flex items-end justify-between">
               <div>
-                <p className="text-3xl font-bold text-gray-900">{stats.pendingBookings}</p>
+                <p className="text-4xl font-extrabold text-gray-900">{stats.pendingBookings}</p>
                 <p className="text-xs text-gray-500 mt-2">Requires action</p>
               </div>
-              <div className="text-xs text-white bg-warning-600 py-1 px-2 rounded-full">
+              <div className="text-xs text-white bg-yellow-600 py-1 px-2 rounded-full">
                 {stats.pendingBookings > 0 ? 'Action needed' : 'All clear'}
               </div>
             </div>
@@ -340,37 +403,42 @@ const Dashboard = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-white rounded-xl shadow-xl border border-gray-200 p-6 lg:col-span-2"
+            className="bg-white rounded-xl shadow-2xl border border-gray-200 p-6 lg:col-span-2"
           >
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-semibold text-gray-800 flex items-center">
-                <Calendar className="h-5 w-5 text-primary-600 mr-2" />
+              <h3 className="text-xl font-semibold text-gray-800 flex items-center">
+                <Calendar className="h-6 w-6 text-indigo-600 mr-2" />
                 Recent Bookings
               </h3>
-              <a href="/admin/bookings" className="text-sm text-primary-600 hover:text-primary-800 font-medium">
+              <a
+                href="/admin/bookings"
+                className="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+                data-tooltip-id="view-all-bookings"
+                data-tooltip-content="View all bookings"
+              >
                 View All
               </a>
             </div>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                <thead className="bg-gradient-to-r from-indigo-600 to-purple-600 sticky top-0 z-10">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider" data-tooltip-id="col-booking-id" data-tooltip-content="Unique booking identifier">
                       Booking ID
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider" data-tooltip-id="col-date" data-tooltip-content="Event date">
                       Date
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider" data-tooltip-id="col-customer" data-tooltip-content="Customer details">
                       Customer
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider" data-tooltip-id="col-venue" data-tooltip-content="Venue and event type">
                       Venue
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider" data-tooltip-id="col-guests" data-tooltip-content="Number of guests">
                       Guests
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider" data-tooltip-id="col-status" data-tooltip-content="Booking status">
                       Status
                     </th>
                   </tr>
@@ -379,13 +447,15 @@ const Dashboard = () => {
                   {recentBookings.map((booking, index) => (
                     <motion.tr
                       key={booking.id || index}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.3, delay: index * 0.1 }}
-                      className="hover:bg-gray-50 transition-colors"
+                      className={`${
+                        index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
+                      } hover:bg-indigo-50 transition-colors`}
                     >
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="text-sm font-medium text-gray-900">#{booking.id.substring(0, 8)}</span>
+                        <span className="text-sm font-medium text-gray-900">#{String(booking.id).substring(0, 8)}</span>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         <span className="text-sm text-gray-700">{formatDate(booking.event_date)}</span>
@@ -399,7 +469,7 @@ const Dashboard = () => {
                       <td className="px-4 py-3 whitespace-nowrap">
                         <div>
                           <span className="text-sm text-gray-900">
-                            {venues.find((v) => v.id === booking.venue_id)?.name || 'N/A'}
+                            {venues.find((v) => String(v.id) === booking.venue_id)?.name || 'N/A'}
                           </span>
                           <p className="text-xs text-gray-500">
                             {events.find((e) => e.id === booking.event_id)?.name || 'N/A'}
@@ -422,10 +492,10 @@ const Dashboard = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="bg-white rounded-xl shadow-xl border border-gray-200 p-6"
+            className="bg-white rounded-xl shadow-2xl border border-gray-200 p-6"
           >
-            <h3 className="text-lg font-semibold text-gray-800 mb-6 flex items-center">
-              <BarChart className="h-5 w-5 text-primary-600 mr-2" />
+            <h3 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+              <BarChart className="h-6 w-6 text-indigo-600 mr-2" />
               Booking Status
             </h3>
             <div className="space-y-8">
@@ -436,9 +506,9 @@ const Dashboard = () => {
                     {stats.confirmedBookings}/{stats.totalBookings}
                   </span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-3">
+                <div className="w-full bg-gray-200 rounded-full h-4">
                   <motion.div
-                    className="bg-success-600 h-3 rounded-full"
+                    className="bg-gradient-to-r from-green-500 to-green-700 h-4 rounded-full"
                     initial={{ width: 0 }}
                     animate={{
                       width: `${
@@ -456,9 +526,9 @@ const Dashboard = () => {
                     {stats.pendingBookings}/{stats.totalBookings}
                   </span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-3">
+                <div className="w-full bg-gray-200 rounded-full h-4">
                   <motion.div
-                    className="bg-warning-600 h-3 rounded-full"
+                    className="bg-gradient-to-r from-yellow-500 to-yellow-700 h-4 rounded-full"
                     initial={{ width: 0 }}
                     animate={{
                       width: `${
@@ -476,9 +546,9 @@ const Dashboard = () => {
                     {stats.cancelledBookings}/{stats.totalBookings}
                   </span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-3">
+                <div className="w-full bg-gray-200 rounded-full h-4">
                   <motion.div
-                    className="bg-error-600 h-3 rounded-full"
+                    className="bg-gradient-to-r from-red-500 to-red-700 h-4 rounded-full"
                     initial={{ width: 0 }}
                     animate={{
                       width: `${
@@ -492,34 +562,40 @@ const Dashboard = () => {
             </div>
             <div className="mt-8 grid grid-cols-3 gap-4 text-center">
               <motion.div
-                className="p-4 bg-success-100 rounded-lg"
+                className="p-4 bg-green-100 rounded-lg"
                 initial={{ scale: 0.9 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.1 }}
+                data-tooltip-id="status-confirmed"
+                data-tooltip-content="Confirmed bookings"
               >
-                <CheckCircle className="h-6 w-6 text-success-600 mx-auto mb-1" />
-                <p className="text-xs font-medium text-success-700">Confirmed</p>
-                <p className="text-lg font-bold text-success-800">{stats.confirmedBookings}</p>
+                <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-1" />
+                <p className="text-xs font-medium text-green-700">Confirmed</p>
+                <p className="text-xl font-bold text-green-800">{stats.confirmedBookings}</p>
               </motion.div>
               <motion.div
-                className="p-4 bg-warning-100 rounded-lg"
+                className="p-4 bg-yellow-100 rounded-lg"
                 initial={{ scale: 0.9 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.2 }}
+                data-tooltip-id="status-pending"
+                data-tooltip-content="Pending bookings"
               >
-                <AlertCircle className="h-6 w-6 text-warning-600 mx-auto mb-1" />
-                <p className="text-xs font-medium text-warning-700">Pending</p>
-                <p className="text-lg font-bold text-warning-800">{stats.pendingBookings}</p>
+                <AlertCircle className="h-8 w-8 text-yellow-600 mx-auto mb-1" />
+                <p className="text-xs font-medium text-yellow-700">Pending</p>
+                <p className="text-xl font-bold text-yellow-800">{stats.pendingBookings}</p>
               </motion.div>
               <motion.div
-                className="p-4 bg-error-100 rounded-lg"
+                className="p-4 bg-red-100 rounded-lg"
                 initial={{ scale: 0.9 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.3 }}
+                data-tooltip-id="status-cancelled"
+                data-tooltip-content="Cancelled bookings"
               >
-                <XCircle className="h-6 w-6 text-error-600 mx-auto mb-1" />
-                <p className="text-xs font-medium text-error-700">Cancelled</p>
-                <p className="text-lg font-bold text-error-800">{stats.cancelledBookings}</p>
+                <XCircle className="h-8 w-8 text-red-600 mx-auto mb-1" />
+                <p className="text-xs font-medium text-red-700">Cancelled</p>
+                <p className="text-xl font-bold text-red-800">{stats.cancelledBookings}</p>
               </motion.div>
             </div>
           </motion.div>
@@ -534,45 +610,93 @@ const Dashboard = () => {
         >
           <a
             href="/admin/bookings"
-            className="bg-white p-6 rounded-xl border border-gray-200 shadow-md flex items-center justify-between hover:shadow-lg transition-shadow bg-gradient-to-br from-white to-gray-50"
+            className="bg-white p-6 rounded-xl border border-gray-200 shadow-2xl flex items-center justify-between bg-gradient-to-br from-indigo-50 to-purple-50 transition-transform transform hover:scale-105 hover:shadow-xl"
+            data-tooltip-id="action-bookings"
+            data-tooltip-content="Manage all bookings"
           >
             <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-1">Manage Bookings</h3>
+              <h3 className="text-xl font-semibold text-gray-800 mb-1">Manage Bookings</h3>
               <p className="text-sm text-gray-500">View and update all bookings</p>
             </div>
-            <Calendar className="h-10 w-10 text-primary-600" />
+            <motion.div
+              whileHover={{ rotate: 15 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Calendar className="h-12 w-12 text-indigo-600" />
+            </motion.div>
           </a>
           <a
             href="/admin/venues"
-            className="bg-white p-6 rounded-xl border border-gray-200 shadow-md flex items-center justify-between hover:shadow-lg transition-shadow bg-gradient-to-br from-white to-gray-50"
+            className="bg-white p-6 rounded-xl border border-gray-200 shadow-2xl flex items-center justify-between bg-gradient-to-br from-indigo-50 to-purple-50 transition-transform transform hover:scale-105 hover:shadow-xl"
+            data-tooltip-id="action-venues"
+            data-tooltip-content="Manage venue details"
           >
             <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-1">Manage Venues</h3>
+              <h3 className="text-xl font-semibold text-gray-800 mb-1">Manage Venues</h3>
               <p className="text-sm text-gray-500">Update venue details</p>
             </div>
-            <MapPin className="h-10 w-10 text-primary-600" />
+            <motion.div
+              whileHover={{ rotate: 15 }}
+              transition={{ duration: 0.3 }}
+            >
+              <MapPin className="h-12 w-12 text-indigo-600" />
+            </motion.div>
           </a>
           <a
             href="/admin/packages"
-            className="bg-white p-6 rounded-xl border border-gray-200 shadow-md flex items-center justify-between hover:shadow-lg transition-shadow bg-gradient-to-br from-white to-gray-50"
+            className="bg-white p-6 rounded-xl border border-gray-200 shadow-2xl flex items-center justify-between bg-gradient-to-br from-indigo-50 to-purple-50 transition-transform transform hover:scale-105 hover:shadow-xl"
+            data-tooltip-id="action-packages"
+            data-tooltip-content="Manage package pricing"
           >
             <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-1">Manage Packages</h3>
+              <h3 className="text-xl font-semibold text-gray-800 mb-1">Manage Packages</h3>
               <p className="text-sm text-gray-500">Update package pricing</p>
             </div>
-            <Package className="h-10 w-10 text-primary-600" />
+            <motion.div
+              whileHover={{ rotate: 15 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Package className="h-12 w-12 text-indigo-600" />
+            </motion.div>
           </a>
           <a
             href="/admin/users"
-            className="bg-white p-6 rounded-xl border border-gray-200 shadow-md flex items-center justify-between hover:shadow-lg transition-shadow bg-gradient-to-br from-white to-gray-50"
+            className="bg-white p-6 rounded-xl border border-gray-200 shadow-2xl flex items-center justify-between bg-gradient-to-br from-indigo-50 to-purple-50 transition-transform transform hover:scale-105 hover:shadow-xl"
+            data-tooltip-id="action-users"
+            data-tooltip-content="Manage customer accounts"
           >
             <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-1">Manage Users</h3>
+              <h3 className="text-xl font-semibold text-gray-800 mb-1">Manage Users</h3>
               <p className="text-sm text-gray-500">View customer accounts</p>
             </div>
-            <Users className="h-10 w-10 text-primary-600" />
+            <motion.div
+              whileHover={{ rotate: 15 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Users className="h-12 w-12 text-indigo-600" />
+            </motion.div>
           </a>
         </motion.div>
+
+        {/* Tooltips */}
+        <Tooltip id="error-tooltip" />
+        <Tooltip id="total-bookings" />
+        <Tooltip id="revenue" />
+        <Tooltip id="pending-approvals" />
+        <Tooltip id="view-all-bookings" />
+        <Tooltip id="col-booking-id" />
+        <Tooltip id="col-date" />
+        <Tooltip id="col-customer" />
+        <Tooltip id="col-venue" />
+        <Tooltip id="col-guests" />
+        <Tooltip id="col-status" />
+        <Tooltip id="status-confirmed" />
+        <Tooltip id="status-pending" />
+        <Tooltip id="status-cancelled" />
+        <Tooltip id="action-bookings" />
+        <Tooltip id="action-venues" />
+        <Tooltip id="action-packages" />
+        <Tooltip id="action-users" />
       </div>
     </div>
   );
