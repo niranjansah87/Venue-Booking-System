@@ -100,7 +100,9 @@ router.delete('/shift/delete/:id', shiftController.deleteShift);
 router.get('/users', userontroller.getAllUsers);
 router.post('/users/create', userontroller.createUser);
 router.get('/:id', AdminProfileController.getUserById);
-router.put('/users/:id', AdminProfileController.updateProfile);
+// router.put('/users/:id', AdminProfileController.updateProfile);
+router.put('/users/:id', userontroller.updateUser);
+router.delete('/users/:id', userontroller.deleteUser);
 // router.delete('/users/:id', AdminProfileController.deleteUser);
 
 

@@ -135,10 +135,10 @@ const Dashboard = () => {
         setPackages(Array.isArray(packageData) ? packageData : mockPackages);
 
         // Debug venues
-        console.log('Venues State:', Array.isArray(venueData.venues) ? venueData.venues : Array.isArray(venueData) ? venueData : mockVenues);
-        console.log('Venue Names:', (Array.isArray(venueData.venues) ? venueData.venues : Array.isArray(venueData) ? venueData : mockVenues).map(v => v.name));
-        console.log('Booking Venue IDs:', bookingsToUse.map((b) => b.venue_id));
-        console.log('Venue IDs in venueData:', (Array.isArray(venueData.venues) ? venueData.venues : Array.isArray(venueData) ? venueData : mockVenues).map((v) => v.id));
+        // console.log('Venues State:', Array.isArray(venueData.venues) ? venueData.venues : Array.isArray(venueData) ? venueData : mockVenues);
+        // console.log('Venue Names:', (Array.isArray(venueData.venues) ? venueData.venues : Array.isArray(venueData) ? venueData : mockVenues).map(v => v.name));
+        // console.log('Booking Venue IDs:', bookingsToUse.map((b) => b.venue_id));
+        // console.log('Venue IDs in venueData:', (Array.isArray(venueData.venues) ? venueData.venues : Array.isArray(venueData) ? venueData : mockVenues).map((v) => v.id));
       } catch (error) {
         console.error('Error fetching data:', error);
         setError('Failed to load dashboard data');

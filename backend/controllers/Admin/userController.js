@@ -5,6 +5,11 @@ const { generateToken } = require('../../utils/token');
 const sendEmail = require('../../utils/sendEmail');
 // Admin-only user management controller
 
+
+
+
+
+
 exports.getAllUsers = async (req, res) => {
     try {
         const users = await User.findAll({
@@ -58,9 +63,9 @@ exports.createUser = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
     try {
-        const { name, email, password, } = req.body;
+        const { name, email } = req.body;
 
-        if (!name || !phone) {
+        if (!name || !email) {
             return res.status(400).send('Name and email are required');
         }
 
@@ -72,15 +77,12 @@ exports.updateUser = async (req, res) => {
             },
         });
 
-        if (phoneExists) {
+        if (emailExists) {
             return res.status(400).send('email already exists');
         }
 
-        const updateData = { name, phone };
-        if (password && password === password_confirmation) {
-            updateData.password = await bcrypt.hash(password, 10);
-        }
-
+        const updateData = { name, email };
+        
         await user.update(updateData);
         res.status(201).json({ message: 'User updated' });
     } catch (err) {

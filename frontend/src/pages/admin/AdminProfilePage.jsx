@@ -13,7 +13,7 @@ function AdminProfilePage() {
   const [successMessage, setSuccessMessage] = useState('');
 
   // Get user from localStorage
-  const user = JSON.parse(localStorage.getItem('user'));
+  const user = JSON.parse(localStorage.getItem('admin'));
 
   // Fetch user data
   useEffect(() => {

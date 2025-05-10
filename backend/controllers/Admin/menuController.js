@@ -44,20 +44,49 @@ exports.createMenu = async (req, res) => {
 exports.updateMenu = async (req, res) => {
   try {
     const { package_id, name, items, free_limit } = req.body;
+    const updateFields = {};
 
-    if (!package_id || !name || !Array.isArray(items) || typeof free_limit !== 'number') {
-      return res.status(400).json({ error: 'All fields are required and must be valid' });
+    // Validate and assign only provided fields
+    if (package_id !== undefined) {
+      const pkg = await Package.findByPk(package_id);
+      if (!pkg) {
+        return res.status(400).json({ error: 'Invalid package_id. Package does not exist.' });
+      }
+      updateFields.package_id = package_id;
     }
 
-    const pkg = await Package.findByPk(package_id);
-    if (!pkg) {
-      return res.status(400).json({ error: 'Invalid package_id. Package does not exist.' });
+    if (name !== undefined) {
+      if (typeof name !== 'string' || name.trim() === '') {
+        return res.status(400).json({ error: 'Invalid name' });
+      }
+      updateFields.name = name;
     }
 
-    await Menu.update(
-      { package_id, name, items, free_limit },
-      { where: { id: req.params.id } }
-    );
+    if (items !== undefined) {
+      if (!Array.isArray(items)) {
+        return res.status(400).json({ error: 'Items must be an array' });
+      }
+      updateFields.items = items;
+    }
+
+    if (free_limit !== undefined) {
+      if (typeof free_limit !== 'number') {
+        return res.status(400).json({ error: 'Free limit must be a number' });
+      }
+      updateFields.free_limit = free_limit;
+    }
+
+    if (Object.keys(updateFields).length === 0) {
+      return res.status(400).json({ error: 'At least one valid field is required to update' });
+    }
+
+    const [updated] = await Menu.update(updateFields, {
+      where: { id: req.params.id },
+    });
+
+    if (!updated) {
+      return res.status(404).json({ error: 'Menu not found or no changes applied' });
+    }
 
     res.json({ message: 'Menu updated successfully' });
   } catch (err) {
@@ -65,6 +94,7 @@ exports.updateMenu = async (req, res) => {
     res.status(500).json({ error: 'Error updating menu' });
   }
 };
+
 
 exports.deleteMenu = async (req, res) => {
   try {

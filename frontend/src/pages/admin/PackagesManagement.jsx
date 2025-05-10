@@ -1,7 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Package, Plus, Edit, Trash2, XCircle, CheckCircle, AlertCircle } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { getAllPackages, createPackage, updatePackage, deletePackage } from '../../services/packageService';
 
 const PackagesManagement = () => {
@@ -49,7 +49,7 @@ const PackagesManagement = () => {
   const validateForm = () => {
     const errors = {};
     if (!formData.name.trim()) errors.name = 'Package name is required';
-    if (!formData.base_price || formData.base_price <= 0) {
+    if (!formData.base_price || parseFloat(formData.base_price) <= 0) {
       errors.base_price = 'Base price must be a positive number';
     }
     setFormErrors(errors);
@@ -74,15 +74,28 @@ const PackagesManagement = () => {
         setPackages((prev) =>
           prev.map((pkg) => (pkg.id === formData.id ? { ...pkg, ...response } : pkg))
         );
+        toast.success('Package updated successfully', { icon: <CheckCircle className="h-5 w-5" /> });
       } else {
         // Create package
         const response = await createPackage(packageData);
-        setPackages((prev) => [...prev, response]);
+        console.log('createPackage response:', response); // Debug log
+        // Normalize response to match expected package structure
+        const newPackage = {
+          id: response.id || Date.now(), // Fallback ID
+          name: response.name || packageData.name,
+          base_price: response.base_price || packageData.base_price,
+          created_at: response.created_at || new Date().toISOString(),
+          updated_at: response.updated_at || new Date().toISOString(),
+        };
+        setPackages((prev) => [...prev, newPackage]);
+        toast.success('Package created successfully', { icon: <CheckCircle className="h-5 w-5" /> });
       }
 
       resetForm();
     } catch (error) {
-      setError('Failed to save package');
+      console.error('Error saving package:', error.message, error.response?.data);
+      setError(error.message || 'Failed to save package');
+      toast.error(error.message || 'Failed to save package', { icon: <XCircle className="h-5 w-5" /> });
     } finally {
       setLoading(false);
     }
@@ -101,8 +114,11 @@ const PackagesManagement = () => {
       await deletePackage(id);
       setPackages((prev) => prev.filter((pkg) => pkg.id !== id));
       setDeleteConfirm(null);
+      toast.success('Package deleted successfully', { icon: <CheckCircle className="h-5 w-5" /> });
     } catch (error) {
-      setError('Failed to delete package');
+      console.error('Error deleting package:', error.message);
+      setError(error.message || 'Failed to delete package');
+      toast.error(error.message || 'Failed to delete package', { icon: <XCircle className="h-5 w-5" /> });
     } finally {
       setLoading(false);
     }
@@ -136,6 +152,7 @@ const PackagesManagement = () => {
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowForm(true)}
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
+            aria-label="Add new package"
           >
             <Plus className="h-5 w-5 mr-2" />
             Add Package
@@ -178,6 +195,7 @@ const PackagesManagement = () => {
                     onClick={() => handleEdit(pkg)}
                     className="p-2 bg-primary-600 text-white rounded-full hover:bg-primary-700"
                     title="Edit Package"
+                    aria-label={`Edit ${pkg.name}`}
                   >
                     <Edit className="h-4 w-4" />
                   </motion.button>
@@ -187,6 +205,7 @@ const PackagesManagement = () => {
                     onClick={() => setDeleteConfirm(pkg.id)}
                     className="p-2 bg-error-600 text-white rounded-full hover:bg-error-700"
                     title="Delete Package"
+                    aria-label={`Delete ${pkg.name}`}
                   >
                     <Trash2 className="h-4 w-4" />
                   </motion.button>
@@ -197,84 +216,167 @@ const PackagesManagement = () => {
         </div>
 
         {/* Package Form */}
-        {showForm && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4 z-50"
-          >
-            <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8 relative">
-              <button
-                onClick={resetForm}
-                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
-              >
-                <XCircle className="h-6 w-6" />
-              </button>
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                {formData.id ? 'Edit Package' : 'Add New Package'}
-              </h2>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Package Name</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-600 focus:ring-primary-600 sm:text-sm transition-all duration-300 ${
-                      formErrors.name ? 'border-error-500' : ''
-                    }`}
-                    placeholder="e.g., Premium Package"
-                  />
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: formErrors.name ? 1 : 0 }}
-                    className="mt-1 text-sm text-error-500"
-                  >
-                    {formErrors.name}
-                  </motion.p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Base Price ($)</label>
-                  <input
-                    type="number"
-                    name="base_price"
-                    value={formData.base_price}
-                    onChange={handleInputChange}
-                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-600 focus:ring-primary-600 sm:text-sm transition-all duration-300 ${
-                      formErrors.base_price ? 'border-error-500' : ''
-                    }`}
-                    placeholder="e.g., 1000"
-                    step="0.01"
-                    min="0"
-                  />
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: formErrors.base_price ? 1 : 0 }}
-                    className="mt-1 text-sm text-error-500"
-                  >
-                    {formErrors.base_price}
-                  </motion.p>
-                </div>
+        <AnimatePresence>
+          {showForm && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4 z-50"
+              role="dialog"
+              aria-labelledby="form-title"
+            >
+              <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8 relative">
+                <button
+                  onClick={resetForm}
+                  className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                  aria-label="Close form"
+                >
+                  <XCircle className="h-6 w-6" />
+                </button>
+                <h2 id="form-title" className="text-2xl font-bold text-gray-900 mb-6">
+                  {formData.id ? 'Edit Package' : 'Add New Package'}
+                </h2>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Package Name</label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-600 focus:ring-primary-600 sm:text-sm transition-all duration-300 ${
+                        formErrors.name ? 'border-error-500' : ''
+                      }`}
+                      placeholder="e.g., Premium Package"
+                      aria-invalid={formErrors.name ? 'true' : 'false'}
+                      aria-describedby={formErrors.name ? 'name-error' : undefined}
+                    />
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: formErrors.name ? 1 : 0 }}
+                      exit={{ opacity: 0 }}
+                      id="name-error"
+                      className="mt-1 text-sm text-error-500"
+                    >
+                      {formErrors.name}
+                    </motion.p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Base Price ($)</label>
+                    <input
+                      type="number"
+                      name="base_price"
+                      value={formData.base_price}
+                      onChange={handleInputChange}
+                      className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-600 focus:ring-primary-600 sm:text-sm transition-all duration-300 ${
+                        formErrors.base_price ? 'border-error-500' : ''
+                      }`}
+                      placeholder="e.g., 1000"
+                      step="0.01"
+                      min="0"
+                      aria-invalid={formErrors.base_price ? 'true' : 'false'}
+                      aria-describedby={formErrors.base_price ? 'base-price-error' : undefined}
+                    />
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: formErrors.base_price ? 1 : 0 }}
+                      exit={{ opacity: 0 }}
+                      id="base-price-error"
+                      className="mt-1 text-sm text-error-500"
+                    >
+                      {formErrors.base_price}
+                    </motion.p>
+                  </div>
+                  <div className="flex justify-end space-x-3">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      type="button"
+                      onClick={resetForm}
+                      className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300"
+                      aria-label="Cancel form"
+                    >
+                      Cancel
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      type="submit"
+                      disabled={loading}
+                      className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 disabled:bg-primary-400 flex items-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
+                      aria-label={formData.id ? 'Update package' : 'Create package'}
+                    >
+                      {loading && (
+                        <svg
+                          className="animate-spin h-5 w-5 mr-2 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                      )}
+                      {loading ? 'Saving...' : formData.id ? 'Update' : 'Create'}
+                    </motion.button>
+                  </div>
+                </form>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Delete Confirmation */}
+        <AnimatePresence>
+          {deleteConfirm && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4 z-50"
+              role="dialog"
+              aria-labelledby="delete-title"
+            >
+              <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
+                <h2 id="delete-title" className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                  <AlertCircle className="h-6 w-6 text-error-500 mr-2" />
+                  Confirm Deletion
+                </h2>
+                <p className="text-sm text-gray-600 mb-6">
+                  Are you sure you want to delete this package? This action cannot be undone.
+                </p>
                 <div className="flex justify-end space-x-3">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    type="button"
-                    onClick={resetForm}
-                    className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                    onClick={() => setDeleteConfirm(null)}
+                    className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300"
+                    aria-label="Cancel deletion"
                   >
                     Cancel
                   </motion.button>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    type="submit"
-                    disabled={loading}
-                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 disabled:bg-primary-400 flex items-center"
+                    onClick={() => handleDelete(deleteConfirm)}
+                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-error-600 hover:bg-error-700 flex items-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-error-600"
+                    aria-label="Confirm deletion"
                   >
-                    {loading ? (
+                    {loading && (
                       <svg
                         className="animate-spin h-5 w-5 mr-2 text-white"
                         xmlns="http://www.w3.org/2000/svg"
@@ -295,74 +397,14 @@ const PackagesManagement = () => {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         ></path>
                       </svg>
-                    ) : null}
-                    {loading ? 'Saving...' : formData.id ? 'Update' : 'Create'}
+                    )}
+                    {loading ? 'Deleting...' : 'Delete'}
                   </motion.button>
                 </div>
-              </form>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Delete Confirmation */}
-        {deleteConfirm && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4 z-50"
-          >
-            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-                <AlertCircle className="h-6 w-6 text-error-500 mr-2" />
-                Confirm Deletion
-              </h2>
-              <p className="text-sm text-gray-600 mb-6">
-                Are you sure you want to delete this package? This action cannot be undone.
-              </p>
-              <div className="flex justify-end space-x-3">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setDeleteConfirm(null)}
-                  className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-                >
-                  Cancel
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => handleDelete(deleteConfirm)}
-                  className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-error-600 hover:bg-error-700 flex items-center"
-                >
-                  {loading ? (
-                    <svg
-                      className="animate-spin h-5 w-5 mr-2 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                  ) : null}
-                  {loading ? 'Deleting...' : 'Delete'}
-                </motion.button>
               </div>
-            </div>
-          </motion.div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

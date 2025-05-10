@@ -1,33 +1,41 @@
-import React from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-
-const AdminHeader = () => (
-  <header className="bg-teal-600 text-white py-4">
-    <div className="container mx-auto px-4 flex justify-between items-center">
-      <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-      <nav>
-        <Link to="/admin/dashboard" className="px-4 hover:underline">Dashboard</Link>
-        <Link to="/admin/bookings" className="px-4 hover:underline">Bookings</Link>
-        <Link to="/admin/venues" className="px-4 hover:underline">Venues</Link>
-        <Link to="/admin/shifts" className="px-4 hover:underline">Shifts</Link>
-        <Link to="/admin/packages" className="px-4 hover:underline">Packages</Link>
-        <Link to="/admin/menus" className="px-4 hover:underline">Menus</Link>
-        <Link to="/admin/users" className="px-4 hover:underline">Users</Link>
-        <Link to="/admin/profile" className="px-4 hover:underline">Profile</Link>
-        <Link to="/logout" className="px-4 hover:underline">Logout</Link>
-      </nav>
-    </div>
-  </header>
-);
+import AdminHeader from '../components/layout/AdminHeader';
 
 const AdminLayout = () => {
   const location = useLocation();
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Mock user data (replace with your auth system)
+  const user = {
+    name: 'Admin User',
+    email: 'admin@elegancevenues.com',
+    // avatar: 'https://example.com/avatar.jpg', // Uncomment if available
+  };
+
+  const handleLogout = () => {
+    // Implement logout logic (e.g., clear token, redirect to /logout)
+    console.log('Logged out');
+    window.location.href = '/logout';
+  };
+
+  const toggleSidebar = () => {
+    setSidebarOpen((prev) => !prev);
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
-      <AdminHeader />
-      <main className="flex-grow">
+      <AdminHeader
+        toggleSidebar={toggleSidebar}
+        userMenuOpen={userMenuOpen}
+        setUserMenuOpen={setUserMenuOpen}
+        user={user}
+        handleLogout={handleLogout}
+        sidebarOpen={sidebarOpen}
+      />
+      <main className="flex-grow bg-gray-50">
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}

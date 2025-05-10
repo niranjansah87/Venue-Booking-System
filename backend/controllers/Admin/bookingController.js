@@ -196,7 +196,7 @@ exports.storeBooking = [
       base_fare,
       extra_charges,
       total_fare,
-      sessionId,
+      
     } = req.body;
 
     try {
