@@ -25,7 +25,7 @@ function AdminLogin() {
       localStorage.setItem('user', JSON.stringify(admin));
 
       console.log('Navigating to /admin/dashboard');
-      navigate('/admin/dashboard'); // Redirect to admin dashboard after successful login
+      navigate('/admin/dashboard'); 
     } catch (err) {
       console.error('Login error:', err);
       setError(err.response?.data?.message || 'Login failed. Please try again.');

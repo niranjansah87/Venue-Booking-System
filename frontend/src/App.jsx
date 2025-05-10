@@ -113,13 +113,13 @@ function App() {
           >
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="/admin/dashboard" element={<Dashboard />} />
-            <Route path="bookings" element={<BookingsManagement />} />
-            <Route path="venues" element={<VenuesManagement />} />
-            <Route path="shifts" element={<ShiftsManagement />} />
-            <Route path="packages" element={<PackagesManagement />} />
-            <Route path="menus" element={<MenusManagement />} />
-            <Route path="users" element={<UsersManagement />} />
-            <Route path="profile" element={<AdminProfilePage />} />
+            <Route path="/admin/bookings" element={<BookingsManagement />} />
+            <Route path="/admin/venues" element={<VenuesManagement />} />
+            <Route path="/admin/shifts" element={<ShiftsManagement />} />
+            <Route path="/admin/packages" element={<PackagesManagement />} />
+            <Route path="/admin/menus" element={<MenusManagement />} />
+            <Route path="/admin/users" element={<UsersManagement />} />
+            <Route path="/admin/profile" element={<AdminProfilePage />} />
           </Route>
 
           {/* ---------------- Catch-all Route ---------------- */}
