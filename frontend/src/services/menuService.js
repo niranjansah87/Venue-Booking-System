@@ -3,7 +3,7 @@ import api from './api';
 // Fetch all menus
 export const getAllMenus = async () => {
   try {
-    const response = await api.get('/menus');
+    const response = await api.get('/api/admin/menus');
     return response.data;
   } catch (error) {
     console.error('Error fetching menus:', error);
@@ -36,7 +36,7 @@ export const getMenuById = async (id) => {
 // Create a new menu
 export const createMenu = async (menuData) => {
   try {
-    const response = await api.post('/menus', menuData);
+    const response = await api.post('/api/admin/menus/create', menuData);
     return response.data;
   } catch (error) {
     console.error('Error creating menu:', error);
@@ -47,7 +47,7 @@ export const createMenu = async (menuData) => {
 // Update a menu
 export const updateMenu = async (id, menuData) => {
   try {
-    const response = await api.put(`/menus/${id}`, menuData);
+    const response = await api.put(`/api/admin/menus/update/${id}`, menuData);
     return response.data;
   } catch (error) {
     console.error(`Error updating menu with ID ${id}:`, error);
@@ -58,7 +58,7 @@ export const updateMenu = async (id, menuData) => {
 // Delete a menu
 export const deleteMenu = async (id) => {
   try {
-    const response = await api.delete(`/menus/${id}`);
+    const response = await api.delete(`/api/admin/menus/delete/${id}`);
     return response.data;
   } catch (error) {
     console.error(`Error deleting menu with ID ${id}:`, error);

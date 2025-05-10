@@ -1,15 +1,30 @@
 const { Admin } = require('../../models');
-const bcrypt = require('bcrypt');
 const { Op } = require('sequelize');
 
-// POST /admin/profile/update
-exports.updateProfile = async (req, res) => {
-  const { name, email, password } = req.body;
-  const adminSession = req.session.admin;
+// GET /api/user/:id - Fetch user data by ID
+exports.getUserById = async (req, res) => {
+  const userId = req.params.id;
 
-  if (!adminSession) {
-    return res.status(401).json({ message: 'Unauthorized' });
+  try {
+    const user = await Admin.findByPk(userId, {
+      attributes: ['id', 'name', 'email', 'role'],
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    return res.json({ user });
+  } catch (error) {
+    console.error('Fetch user error:', error);
+    return res.status(500).json({ message: 'Server error' });
   }
+};
+
+// PUT /api/user/:id - Update user profile by ID
+exports.updateProfile = async (req, res) => {
+  const { name, email } = req.body;
+  const userId = req.params.id;
 
   // Manual validation
   const errors = [];
@@ -22,27 +37,23 @@ exports.updateProfile = async (req, res) => {
     errors.push({ field: 'email', message: 'Valid email is required' });
   }
 
-  if (password !== undefined && password.length < 6) {
-    errors.push({ field: 'password', message: 'Password must be at least 6 characters' });
-  }
-
   if (errors.length > 0) {
     return res.status(422).json({ errors });
   }
 
   try {
-    const admin = await Admin.findByPk(adminSession.id);
-    if (!admin) {
-      return res.status(404).json({ message: 'Admin not found' });
+    const user = await Admin.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
 
     // Check email uniqueness only if email is changing
-    if (email && email !== admin.email) {
+    if (email && email !== user.email) {
       const existingEmail = await Admin.findOne({
         where: {
           email,
-          id: { [Op.ne]: admin.id }
-        }
+          id: { [Op.ne]: userId },
+        },
       });
 
       if (existingEmail) {
@@ -51,16 +62,22 @@ exports.updateProfile = async (req, res) => {
     }
 
     // Update only provided fields
-    if (name !== undefined) admin.name = name;
-    if (email !== undefined) admin.email = email;
-    if (password !== undefined) {
-      admin.password = await bcrypt.hash(password, 10);
-    }
+    if (name !== undefined) user.name = name;
+    if (email !== undefined) user.email = email;
 
-    await admin.save();
+    await user.save();
 
-    return res.json({ message: 'Profile updated successfully.', admin });
+    return res.json({
+      message: 'Profile updated successfully.',
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
   } catch (error) {
-    return res.status(500).json({ error: 'Server error' });
+    console.error('Update user error:', error);
+    return res.status(500).json({ message: 'Server error' });
   }
 };

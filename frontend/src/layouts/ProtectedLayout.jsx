@@ -1,32 +1,25 @@
 import React from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, Link } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 
-const AdminHeader = () => (
+const ProtectedHeader = () => (
   <header className="bg-teal-600 text-white py-4">
     <div className="container mx-auto px-4 flex justify-between items-center">
-      <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+      <h1 className="text-2xl font-bold">User Dashboard</h1>
       <nav>
-        <Link to="/admin/dashboard" className="px-4 hover:underline">Dashboard</Link>
-        <Link to="/admin/bookings" className="px-4 hover:underline">Bookings</Link>
-        <Link to="/admin/venues" className="px-4 hover:underline">Venues</Link>
-        <Link to="/admin/shifts" className="px-4 hover:underline">Shifts</Link>
-        <Link to="/admin/packages" className="px-4 hover:underline">Packages</Link>
-        <Link to="/admin/menus" className="px-4 hover:underline">Menus</Link>
-        <Link to="/admin/users" className="px-4 hover:underline">Users</Link>
-        <Link to="/admin/profile" className="px-4 hover:underline">Profile</Link>
+        <Link to="/profile" className="px-4 hover:underline">Profile</Link>
         <Link to="/logout" className="px-4 hover:underline">Logout</Link>
       </nav>
     </div>
   </header>
 );
 
-const AdminLayout = () => {
+const ProtectedLayout = () => {
   const location = useLocation();
 
   return (
     <div className="flex flex-col min-h-screen">
-      <AdminHeader />
+      <ProtectedHeader />
       <main className="flex-grow">
         <AnimatePresence mode="wait">
           <motion.div
@@ -47,4 +40,4 @@ const AdminLayout = () => {
   );
 };
 
-export default AdminLayout;
+export default ProtectedLayout;

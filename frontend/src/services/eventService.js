@@ -3,7 +3,7 @@ import api from './api';
 // Fetch all events
 export const getAllEvents = async () => {
   try {
-    const response = await api.get('/events');
+    const response = await api.get('/api/admin/events');
     return response.data;
   } catch (error) {
     console.error('Error fetching events:', error);
@@ -14,7 +14,7 @@ export const getAllEvents = async () => {
 // Fetch a single event by ID
 export const getEventById = async (id) => {
   try {
-    const response = await api.get(`/events/${id}`);
+    const response = await api.get(`/api/admin/events`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching event with ID ${id}:`, error);
@@ -25,7 +25,7 @@ export const getEventById = async (id) => {
 // Create a new event
 export const createEvent = async (eventData) => {
   try {
-    const response = await api.post('/events', eventData);
+    const response = await api.post('/api/admin/events/create', eventData);
     return response.data;
   } catch (error) {
     console.error('Error creating event:', error);
@@ -36,7 +36,7 @@ export const createEvent = async (eventData) => {
 // Update an event
 export const updateEvent = async (id, eventData) => {
   try {
-    const response = await api.put(`/events/${id}`, eventData);
+    const response = await api.put(`/api/admin/events/edit/${id}`, eventData);
     return response.data;
   } catch (error) {
     console.error(`Error updating event with ID ${id}:`, error);
@@ -47,7 +47,7 @@ export const updateEvent = async (id, eventData) => {
 // Delete an event
 export const deleteEvent = async (id) => {
   try {
-    const response = await api.delete(`/events/${id}`);
+    const response = await api.delete(`/api/admin/delete/events/${id}`);
     return response.data;
   } catch (error) {
     console.error(`Error deleting event with ID ${id}:`, error);

@@ -19,14 +19,17 @@ const upload = multer({
 }).single('image');
 
 // Display all venues
+// controllers/adminController.js
 exports.getAllVenues = async (req, res) => {
-    try {
-        const venues = await Venue.findAll();
-        res.json(venues);
-    } catch (err) {
-        res.status(500).send('Error fetching venues');
-    }
+  try {
+    const venues = await Venue.findAll(); // or your Sequelize query
+    res.json({ venues });
+  } catch (error) {
+    console.error('Error fetching venues:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
 };
+
 
 // Create a new venue
 exports.createVenue = [upload, async (req, res) => {

@@ -1,27 +1,38 @@
-import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import React, { useState, useEffect } from 'react';
+import { Navigate } from 'react-router-dom';
+import api from '../../services/api';
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
-  const { user, loading, isAdmin } = useAuth();
-  const location = useLocation();
-  
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
-      </div>
-    );
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
+  const [userRole, setUserRole] = useState(null);
+
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const response = await api.get('/api/check-session');
+        setIsAuthenticated(true);
+        setUserRole(response.data.user.role);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+      } catch (err) {
+        setIsAuthenticated(false);
+        localStorage.removeItem('user');
+      }
+    };
+    checkSession();
+  }, []);
+
+  if (isAuthenticated === null) {
+    return <div>Loading...</div>;
   }
-  
-  if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+
+  if (!isAuthenticated) {
+    return <Navigate to={adminOnly ? '/admin/login' : '/login'} state={{ from: window.location.pathname }} replace />;
   }
-  
-  if (adminOnly && !isAdmin) {
+
+  if (adminOnly && userRole !== 'admin') {
     return <Navigate to="/" replace />;
   }
-  
+
   return children;
 };
 

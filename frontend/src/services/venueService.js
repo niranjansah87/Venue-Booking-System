@@ -3,7 +3,7 @@ import api from './api';
 // Fetch all venues with optional pagination
 export const getAllVenues = async (page = 1, limit = 10) => {
   try {
-    const response = await api.get(`/venues?page=${page}&limit=${limit}`);
+    const response = await api.get(`api/admin/venues`);
     return response.data;
   } catch (error) {
     console.error('Error fetching venues:', error);
@@ -14,7 +14,7 @@ export const getAllVenues = async (page = 1, limit = 10) => {
 // Fetch a single venue by ID
 export const getVenueById = async (id) => {
   try {
-    const response = await api.get(`/venues/${id}`);
+    const response = await api.get(`/api/admin/venues/${id}`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching venue with ID ${id}:`, error);
@@ -36,7 +36,7 @@ export const createVenue = async (venueData) => {
       }
     }
     
-    const response = await api.post('/venues', formData, {
+    const response = await api.post('/api/admin/venues/create', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -63,7 +63,7 @@ export const updateVenue = async (id, venueData) => {
       }
     }
     
-    const response = await api.put(`/venues/${id}`, formData, {
+    const response = await api.put(`/api/admin/venues/update/${id}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -79,7 +79,7 @@ export const updateVenue = async (id, venueData) => {
 // Delete a venue
 export const deleteVenue = async (id) => {
   try {
-    const response = await api.delete(`/venues/${id}`);
+    const response = await api.delete(`api/admin/venues/delete${id}`);
     return response.data;
   } catch (error) {
     console.error(`Error deleting venue with ID ${id}:`, error);

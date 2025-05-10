@@ -22,8 +22,9 @@ router.post('/login', AuthController.login);
 router.post('/logout', AuthController.logout);
 
 // Admin Profile Routes
-router.post('/update', AdminProfileController.updateProfile);
-
+router.post('/update/:id', AdminProfileController.updateProfile);
+// GET /api/user/:id - Fetch user data by ID
+router.get('/:id', AdminProfileController.getUserById);
 // Event Routes
 router.get('/events', eventController.listEvents);
 router.post('/events/create', eventController.createEvent);
