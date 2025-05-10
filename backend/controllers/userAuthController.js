@@ -158,10 +158,34 @@ exports.updateProfile = async (req, res) => {
       user.verification_token_expires = new Date(Date.now() + 1000 * 60 * 60);
       const link = `${req.protocol}://${req.get('host')}/api/verify-email?token=${raw}&email=${encodeURIComponent(email)}`;
       await sendEmail({
-        to: email,
-        subject: 'Verify your new email',
-        html: `<p>Click to verify your new email:</p><a href="${link}">${link}</a>`,
-      });
+  to: email,
+  subject: 'Verify Your New Email Address',
+  html: `
+    <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 30px; border-radius: 10px; max-width: 600px; margin: auto;">
+      <h2 style="color: #4CAF50;">Email Verification Required</h2>
+      <p style="font-size: 16px; color: #333;">
+        Hello,
+      </p>
+      <p style="font-size: 16px; color: #333;">
+        We received a request to update the email associated with your account. Please click the button below to verify your new email address:
+      </p>
+      <p style="text-align: center; margin: 30px 0;">
+        <a href="${link}" style="display: inline-block; background-color: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+          Verify Email
+        </a>
+      </p>
+      <p style="font-size: 14px; color: #666;">
+        Or copy and paste this link into your browser:<br>
+        <a href="${link}" style="color: #4CAF50;">${link}</a>
+      </p>
+      <hr style="margin: 30px 0;">
+      <p style="font-size: 12px; color: #999;">
+        If you didn’t request this change, please ignore this email or contact our support.
+      </p>
+    </div>
+  `,
+});
+
     }
 
     // Update fields
@@ -210,10 +234,34 @@ exports.requestReset = async (req, res) => {
 
     const link = `${req.protocol}://${req.get('host')}/api/reset-password?token=${raw}&email=${email}`;
     await sendEmail({
-      to: email,
-      subject: 'Password Reset',
-      html: `Click here to reset your password: <a href="${link}">${link}</a>`,
-    });
+  to: email,
+  subject: 'Reset Your Password',
+  html: `
+    <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 30px; border-radius: 10px; max-width: 600px; margin: auto;">
+      <h2 style="color: #d9534f;">Password Reset Request</h2>
+      <p style="font-size: 16px; color: #333;">
+        Hello,
+      </p>
+      <p style="font-size: 16px; color: #333;">
+        We received a request to reset your account password. Click the button below to continue:
+      </p>
+      <p style="text-align: center; margin: 30px 0;">
+        <a href="${link}" style="display: inline-block; background-color: #d9534f; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+          Reset Password
+        </a>
+      </p>
+      <p style="font-size: 14px; color: #666;">
+        Or copy and paste this link into your browser:<br>
+        <a href="${link}" style="color: #d9534f;">${link}</a>
+      </p>
+      <hr style="margin: 30px 0;">
+      <p style="font-size: 12px; color: #999;">
+        If you didn't request a password reset, please ignore this email or contact support if you have concerns.
+      </p>
+    </div>
+  `,
+});
+
 
     res.json({ message: 'Reset link sent if user exists.' });
   } catch (err) {

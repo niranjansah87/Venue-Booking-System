@@ -234,11 +234,30 @@ exports.sendOTP = async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000); // 6-digit OTP
     req.session.verificationOTP = otp;
 
-    const success = await sendEmail({
-      to: email,
-      subject: 'Venue Booking OTP Verification',
-      html: `<p>Your OTP is: <strong>${otp}</strong></p>`,
-    });
+const success = await sendEmail({
+  to: email,
+  subject: 'Venue Booking OTP Verification',
+  html: `
+    <div style="font-family: Arial, sans-serif; background-color: #f0f4f8; padding: 30px; max-width: 500px; margin: auto; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+      <h2 style="color: #2c3e50; text-align: center;">Verify Your Booking</h2>
+      <p style="font-size: 16px; color: #333;">
+        Thank you for choosing our venue! To proceed with your booking, please enter the following One-Time Password (OTP):
+      </p>
+      <div style="text-align: center; margin: 20px 0;">
+        <span style="display: inline-block; background-color: #4CAF50; color: #fff; padding: 14px 28px; font-size: 24px; border-radius: 8px; letter-spacing: 4px;">
+          ${otp}
+        </span>
+      </div>
+      <p style="font-size: 14px; color: #666;">
+        This OTP is valid for the next 10 minutes. If you did not request this, please ignore this message.
+      </p>
+      <p style="font-size: 14px; color: #999; text-align: center; margin-top: 30px;">
+        &copy; ${new Date().getFullYear()} Venue Booking System
+      </p>
+    </div>
+  `,
+});
+
 
     if (success) {
       res.json({ sent: true });
