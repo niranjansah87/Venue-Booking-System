@@ -32,6 +32,8 @@ router.delete('/events/delete/:id', eventController.deleteEvent);
 
 // Booking Flow Routes (Admin API)
 router.get('/bookings/initiate', bookingController.initiateBooking);
+router.get('/bookings/:user_id', bookingController.getBookingsByUserId);
+
 router.post(
   '/bookings/check-date',
   [

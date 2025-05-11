@@ -12,6 +12,23 @@ export const getAllBookings = async () => {
   }
 };
 
+
+
+
+// Get all bookings for a specific user
+export const getUserBookings = async (userId) => {
+  try {
+    const response = await api.get(`/api/admin/bookings/${userId}`, { withCredentials: true });
+    return response.data;
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || 'Failed to fetch user bookings';
+    console.error('Error fetching user bookings:', errorMessage, error);
+    throw new Error(errorMessage);
+  }
+};
+
+
+
 // Check venue availability for a specific date, venue, and shift
 export const checkAvailability = async (eventId, venueId, shiftId, eventDate, guestCount, sessionId) => {
   try {

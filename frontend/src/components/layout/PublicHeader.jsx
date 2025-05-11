@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, User, Calendar, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../../services/api';
 
@@ -8,11 +8,11 @@ const PublicHeader = ({ isScrolled }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
+  const dropdownRef = useRef(null);
 
   // Get user data from localStorage
   const userData = localStorage.getItem('user');
   const user = userData ? JSON.parse(userData) : null;
-  const isAdmin = user && user.role === 'admin';
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -21,6 +21,19 @@ const PublicHeader = ({ isScrolled }) => {
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
   };
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -41,15 +54,10 @@ const PublicHeader = ({ isScrolled }) => {
     { name: 'Contact', path: '/contact' },
   ];
 
-  // Get user's initials for the circular button
-  const getInitials = (name) => {
-    if (!name) return 'U';
-    const names = name.split(' ');
-    return names
-      .map((n) => n.charAt(0))
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
+  // Get user's first name
+  const getFirstName = (name) => {
+    if (!name) return 'User';
+    return name.split(' ')[0];
   };
 
   return (
@@ -100,8 +108,8 @@ const PublicHeader = ({ isScrolled }) => {
                         ? 'text-teal-700'
                         : 'text-gray-700 hover:text-teal-600'
                       : isActive
-                      ? 'text-white font-semibold'
-                      : 'text-white/80 hover:text-white'
+                        ? 'text-white font-semibold'
+                        : 'text-white/80 hover:text-white'
                   }
                 `}
               >
@@ -113,43 +121,70 @@ const PublicHeader = ({ isScrolled }) => {
           {/* Authentication Buttons */}
           <div className="hidden md:flex items-center space-x-4">
             {user ? (
-              <div className="relative">
-                <button
-                  onClick={toggleDropdown}
-                  className={`flex items-center justify-center w-10 h-10 rounded-full transition-colors ${
-                    isScrolled
-                      ? 'bg-gray-200 text-gray-900 hover:bg-gray-300'
-                      : 'bg-white/20 text-white hover:bg-white/30'
-                  }`}
-                >
-                  <span className="text-sm font-medium">{getInitials(user.name)}</span>
+              <div className="relative" ref={dropdownRef}>
+                <button onClick={toggleDropdown} className="flex items-center">
+                  <div className="relative">
+                    <img
+                      src="/user_avatar.png"
+                      alt="User Avatar"
+                      className="w-10 h-10 rounded-full object-cover"
+                      onError={(e) => {
+                        e.target.src = 'https://via.placeholder.com/40';
+                      }}
+                    />
+                    <div className="absolute inset-[-2px] rounded-full avatar-gradient-border" />
+                  </div>
                 </button>
 
                 {dropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg overflow-hidden z-20">
-                    <Link
-                      to="/profile"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={() => setDropdownOpen(false)}
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute right-0 mt-2 w-56 bg-gradient-to-b from-teal-50 to-white rounded-lg shadow-xl border border-teal-100 overflow-hidden z-20"
+                  >
+                    <div className="px-4 py-3 text-base text-teal-700 font-semibold border-b border-teal-100">
+                      Hello, {getFirstName(user.name)}
+                    </div>
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      className="block"
                     >
-                      Profile
-                    </Link>
-                    {isAdmin && (
                       <Link
-                        to="/admin/dashboard"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        to="/profile"
+                        className="flex items-center px-4 py-2 text-base text-gray-700 hover:bg-teal-100 hover:text-teal-600 transition-colors"
                         onClick={() => setDropdownOpen(false)}
                       >
-                        Admin Dashboard
+                        <User className="w-4 h-4 mr-2" />
+                        Profile
                       </Link>
-                    )}
-                    <button
-                      onClick={handleLogout}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    </motion.div>
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      className="block"
                     >
-                      Log out
-                    </button>
-                  </div>
+                      <Link
+                        to="/user/booking"
+                        className="flex items-center px-4 py-2 text-base text-gray-700 hover:bg-teal-100 hover:text-teal-600 transition-colors"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        <Calendar className="w-4 h-4 mr-2" />
+                        My Bookings
+                      </Link>
+                    </motion.div>
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      className="block"
+                    >
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center w-full text-left px-4 py-2 text-base text-gray-700 hover:bg-teal-100 hover:text-teal-600 transition-colors"
+                      >
+                        <LogOut className="w-4 h-4 mr-2" />
+                        Log out
+                      </button>
+                    </motion.div>
+                  </motion.div>
                 )}
               </div>
             ) : (
@@ -222,38 +257,42 @@ const PublicHeader = ({ isScrolled }) => {
 
                 {user ? (
                   <>
+                    <div className="px-3 py-2 text-base font-semibold text-gray-700">
+                      Hello, {getFirstName(user.name)}
+                    </div>
                     <Link
                       to="/profile"
-                      className={`block px-3 py-2 rounded-md text-base font-medium ${
+                      className={`flex items-center px-3 py-2 rounded-md text-base font-medium ${
                         isScrolled
                           ? 'text-gray-700 hover:bg-gray-50'
                           : 'text-white/90 hover:bg-white/5'
                       }`}
                       onClick={() => setMobileMenuOpen(false)}
                     >
+                      <User className="w-4 h-4 mr-2" />
                       Profile
                     </Link>
-                    {isAdmin && (
-                      <Link
-                        to="/admin/dashboard"
-                        className={`block px-3 py-2 rounded-md text-base font-medium ${
-                          isScrolled
-                            ? 'text-gray-700 hover:bg-gray-50'
-                            : 'text-white/90 hover:bg-white/5'
-                        }`}
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Admin Dashboard
-                      </Link>
-                    )}
+                    <Link
+                      to="/bookings"
+                      className={`flex items-center px-3 py-2 rounded-md text-base font-medium ${
+                        isScrolled
+                          ? 'text-gray-700 hover:bg-gray-50'
+                          : 'text-white/90 hover:bg-white/5'
+                      }`}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <Calendar className="w-4 h-4 mr-2" />
+                      My Bookings
+                    </Link>
                     <button
                       onClick={handleLogout}
-                      className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium ${
+                      className={`flex items-center w-full text-left px-3 py-2 rounded-md text-base font-medium ${
                         isScrolled
                           ? 'text-gray-700 hover:bg-gray-50'
                           : 'text-white/90 hover:bg-white/5'
                       }`}
                     >
+                      <LogOut className="w-4 h-4 mr-2" />
                       Log out
                     </button>
                   </>
@@ -284,6 +323,23 @@ const PublicHeader = ({ isScrolled }) => {
           )}
         </AnimatePresence>
       </div>
+
+      {/* Custom CSS for gradient border */}
+      <style>
+        {`
+          .avatar-gradient-border::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            z-index: -1;
+          }
+        `}
+      </style>
     </header>
   );
 };

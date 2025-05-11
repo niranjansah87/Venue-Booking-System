@@ -17,6 +17,55 @@ exports.initiateBooking = async (req, res) => {
   }
 };
 
+
+
+
+// Get booking by ID
+
+exports.getBookingsByUserId = async (req, res) => {
+  try {
+    const { user_id } = req.params; // Get the user_id from the URL parameter
+    console.log('Fetching bookings for user ID:', user_id);  // Debugging: log the user ID
+
+    // Check if the user exists
+    const user = await User.findByPk(user_id);
+    if (!user) {
+      console.error('User not found with ID:', user_id);
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Attempt to fetch all bookings for the specified user
+    const bookings = await Booking.findAll({
+      where: { user_id }, // Fetch bookings where the user_id matches the parameter
+      include: [
+        { model: Event, as: 'event', required: false },
+        { model: Venue, as: 'venue', required: false },
+        { model: Shift, as: 'shift', required: false },
+        { model: Package, as: 'package', required: false }
+      ]
+    });
+
+    // If no bookings are found for the user
+    if (!bookings || bookings.length === 0) {
+      console.error('No bookings found for user ID:', user_id);
+      return res.status(404).json({ message: 'No bookings found for this user' });
+    }
+
+    // Log bookings data for debugging
+    console.log('User bookings data:', bookings);
+
+    // Send the bookings data as a JSON response
+    res.json(bookings);
+  } catch (error) {
+    // Log any error encountered during the process
+    console.error('Error fetching bookings by user ID:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+
+
+
 // Check date availability
 exports.checkDate = [
   body('event_date').isDate().withMessage('Invalid date'),

@@ -12,6 +12,7 @@ import ProtectedLayout from './layouts/ProtectedLayout';
 // Public Pages
 import HomePage from './pages/public/HomePage';
 import BookingPage from './pages/public/BookingPage';
+import UserBookingPage from './pages/public/UserBookingPage';
 import AboutPage from './pages/public/AboutPage';
 import ContactPage from './pages/public/ContactPage';
 import LoginPage from './pages/public/LoginPage';
@@ -67,6 +68,7 @@ function App() {
           <Route element={<PublicLayout />}>
             <Route index element={<HomePage />} />
             <Route path="booking" element={<BookingPage />} />
+            <Route path="/user/booking" element={<UserBookingPage />} />
             <Route path="about" element={<AboutPage />} />
             <Route path="contact" element={<ContactPage />} />
             <Route
