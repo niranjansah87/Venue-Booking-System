@@ -1,4 +1,4 @@
-const { Admin } = require('../../models');  // Ensure this is correctly pointing to your models
+const { Admin,Sequelize } = require('../../models');  // Ensure this is correctly pointing to your models
 
 const bcrypt = require('bcrypt');
 
@@ -84,6 +84,7 @@ exports.updateAdmin = async (req, res) => {
         res.status(201).json({ message: 'User updated' });
     } catch (err) {
         res.status(500).send('Error updating user');
+        console.log(err);
     }
 };
 

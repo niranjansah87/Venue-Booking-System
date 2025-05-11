@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -78,58 +79,6 @@ const BookingsManagement = () => {
     created_at: true,
   });
 
-  // Mock data for preview
-  const mockEvents = [
-    { id: 1, name: 'Wedding' },
-    { id: 2, name: 'Corporate Event' },
-    { id: 3, name: 'Birthday Party' },
-  ];
-  const mockVenues = [
-    { id: 1, name: 'Royal Garden Hall', capacity: 200 },
-    { id: 2, name: 'Lakeview Terrace', capacity: 150 },
-    { id: 3, name: 'Grand Ballroom', capacity: 300 },
-  ];
-  const mockShifts = [
-    { id: 1, name: 'Morning (9AM-12PM)' },
-    { id: 2, name: 'Evening (6PM-9PM)' },
-  ];
-  const mockPackages = [
-    { id: 1, name: 'Premium Package' },
-    { id: 2, name: 'Luxury Package' },
-  ];
-  const generateMockBookings = () => {
-    const statuses = ['pending', 'confirmed', 'cancelled'];
-    const bookings = [];
-    const today = new Date();
-    
-    for (let i = 0; i < 50; i++) {
-      const daysAgo = Math.floor(Math.random() * 90);
-      const date = new Date(today);
-      date.setDate(date.getDate() - daysAgo);
-      
-      bookings.push({
-        id: `booking-${i + 1}`,
-        user_id: Math.floor(Math.random() * 3) + 1,
-        event_id: mockEvents[Math.floor(Math.random() * mockEvents.length)].id,
-        venue_id: mockVenues[Math.floor(Math.random() * mockVenues.length)].id,
-        shift_id: mockShifts[Math.floor(Math.random() * mockShifts.length)].id,
-        package_id: mockPackages[Math.floor(Math.random() * mockPackages.length)].id,
-        menu_items: [
-          { name: `Item ${i + 1}`, price: Math.floor(Math.random() * 20) + 5 },
-        ],
-        guest_count: Math.floor(Math.random() * 300) + 20,
-        event_date: date.toISOString(),
-        user_name: `Customer ${i + 1}`,
-        user_email: `customer${i + 1}@example.com`,
-        total_fare: Math.floor(Math.random() * 50000) + 5000,
-        status: statuses[Math.floor(Math.random() * statuses.length)],
-        created_at: new Date(date.getTime() - Math.floor(Math.random() * 1000000)).toISOString(),
-        updated_at: new Date().toISOString(),
-      });
-    }
-    return bookings;
-  };
-
   // Fetch bookings and related data
   useEffect(() => {
     const fetchData = async () => {
@@ -143,7 +92,6 @@ const BookingsManagement = () => {
           getAllShifts(),
           getAllPackages(),
         ]);
-
 
         // Normalize booking data
         const normalizedBookings = Array.isArray(bookingData)
@@ -159,31 +107,28 @@ const BookingsManagement = () => {
             })
           : [];
 
-        const mockBookings = generateMockBookings();
-        setUsers(Array.isArray(userData) && userData.length > 0 ? userData : []);
-        setBookings(normalizedBookings.length > 0 ? normalizedBookings : mockBookings);
-        setFilteredBookings(normalizedBookings.length > 0 ? normalizedBookings : mockBookings);
-        setEvents(Array.isArray(eventData) && eventData.length > 0 ? eventData : mockEvents);
-        setVenues(Array.isArray(venueData.venues) ? venueData.venues : Array.isArray(venueData) ? venueData : mockVenues);
-        setShifts(Array.isArray(shiftData) && shiftData.length > 0 ? shiftData : mockShifts);
-        setPackages(Array.isArray(packageData) && packageData.length > 0 ? packageData : mockPackages);
+        setUsers(Array.isArray(userData) ? userData : []);
+        setBookings(normalizedBookings);
+        setFilteredBookings(normalizedBookings);
+        setEvents(Array.isArray(eventData) ? eventData : []);
+        setVenues(Array.isArray(venueData.venues) ? venueData.venues : Array.isArray(venueData) ? venueData : []);
+        setShifts(Array.isArray(shiftData) ? shiftData : []);
+        setPackages(Array.isArray(packageData) ? packageData : []);
 
         // Debug venues
         console.log('Venues State:', venues);
         console.log('Venue Names:', venues.map((v) => v.name));
-        console.log('Booking Venue IDs:', normalizedBookings.length > 0 ? normalizedBookings.map((b) => b.venue_id) : mockBookings.map((b) => b.venue_id));
+        console.log('Booking Venue IDs:', normalizedBookings.map((b) => b.venue_id));
       } catch (error) {
         console.error('Error fetching data:', error);
         setError('Failed to load bookings or related data');
-        
-        const mockBookings = generateMockBookings();
+        setBookings([]);
+        setFilteredBookings([]);
         setUsers([]);
-        setBookings(mockBookings);
-        setFilteredBookings(mockBookings);
-        setEvents(mockEvents);
-        setVenues(mockVenues);
-        setShifts(mockShifts);
-        setPackages(mockPackages);
+        setEvents([]);
+        setVenues([]);
+        setShifts([]);
+        setPackages([]);
       } finally {
         setLoading(false);
       }

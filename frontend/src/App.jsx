@@ -28,7 +28,7 @@ import PackagesManagement from './pages/admin/PackagesManagement';
 import MenusManagement from './pages/admin/MenusManagement';
 import UsersManagement from './pages/admin/UsersManagement';
 import AdminProfilePage from './pages/Admin/AdminProfilePage';
-
+import AdminSettings from './pages/Admin/Settings';
 // Error Boundary Component
 class ErrorBoundary extends React.Component {
   state = { error: null };
@@ -120,6 +120,7 @@ function App() {
             <Route path="/admin/menus" element={<MenusManagement />} />
             <Route path="/admin/users" element={<UsersManagement />} />
             <Route path="/admin/profile" element={<AdminProfilePage />} />
+            <Route path="/admin/settings" element={<AdminSettings />} />
           </Route>
 
           {/* ---------------- Catch-all Route ---------------- */}

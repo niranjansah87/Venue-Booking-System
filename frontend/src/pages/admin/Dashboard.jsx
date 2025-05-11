@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
@@ -41,58 +42,6 @@ const Dashboard = () => {
     totalRevenue: 0,
   });
 
-  // Mock data for preview
-  const mockEvents = [
-    { id: 1, name: 'Wedding' },
-    { id: 2, name: 'Corporate Event' },
-    { id: 3, name: 'Birthday Party' },
-  ];
-  const mockVenues = [
-    { id: 1, name: 'Royal Garden Hall', capacity: 200 },
-    { id: 2, name: 'Lakeview Terrace', capacity: 150 },
-    { id: 3, name: 'Grand Ballroom', capacity: 300 },
-  ];
-  const mockShifts = [
-    { id: 1, name: 'Morning (9AM-12PM)' },
-    { id: 2, name: 'Evening (6PM-9PM)' },
-  ];
-  const mockPackages = [
-    { id: 1, name: 'Premium Package' },
-    { id: 2, name: 'Luxury Package' },
-  ];
-  const generateMockBookings = () => {
-    const statuses = ['pending', 'confirmed', 'cancelled'];
-    const bookings = [];
-    const today = new Date();
-
-    for (let i = 0; i < 50; i++) {
-      const daysAgo = Math.floor(Math.random() * 90);
-      const date = new Date(today);
-      date.setDate(date.getDate() - daysAgo);
-
-      bookings.push({
-        id: `booking-${i + 1}`,
-        user_id: Math.floor(Math.random() * 3) + 1,
-        event_id: mockEvents[Math.floor(Math.random() * mockEvents.length)].id,
-        venue_id: mockVenues[Math.floor(Math.random() * mockVenues.length)].id,
-        shift_id: mockShifts[Math.floor(Math.random() * mockShifts.length)].id,
-        package_id: mockPackages[Math.floor(Math.random() * mockPackages.length)].id,
-        menu_items: [
-          { name: `Item ${i + 1}`, price: Math.floor(Math.random() * 20) + 5 },
-        ],
-        guest_count: Math.floor(Math.random() * 300) + 20,
-        event_date: date.toISOString(),
-        user_name: `Customer ${i + 1}`,
-        user_email: `customer${i + 1}@example.com`,
-        total_fare: Math.floor(Math.random() * 50000) + 5000,
-        status: statuses[Math.floor(Math.random() * statuses.length)],
-        created_at: new Date(date.getTime() - Math.floor(Math.random() * 1000000)).toISOString(),
-        updated_at: new Date().toISOString(),
-      });
-    }
-    return bookings;
-  };
-
   // Fetch bookings and related data
   useEffect(() => {
     const fetchData = async () => {
@@ -106,8 +55,6 @@ const Dashboard = () => {
           getAllShifts(),
           getAllPackages(),
         ]);
-
-
 
         // Normalize booking data to include user_name and user_email
         const normalizedBookings = Array.isArray(bookingData)
@@ -123,38 +70,28 @@ const Dashboard = () => {
             })
           : [];
 
-        const mockBookings = generateMockBookings();
-        const bookingsToUse = normalizedBookings.length > 0 ? normalizedBookings : mockBookings;
-
         setUsers(Array.isArray(userData) ? userData : []);
-        setBookings(bookingsToUse);
-        calculateStats(bookingsToUse);
-        setEvents(Array.isArray(eventData) ? eventData : mockEvents);
-        setVenues(Array.isArray(venueData.venues) ? venueData.venues : Array.isArray(venueData) ? venueData : mockVenues);
-        setShifts(Array.isArray(shiftData) ? shiftData : mockShifts);
-        setPackages(Array.isArray(packageData) ? packageData : mockPackages);
+        setBookings(normalizedBookings);
+        calculateStats(normalizedBookings);
+        setEvents(Array.isArray(eventData) ? eventData : []);
+        setVenues(Array.isArray(venueData.venues) ? venueData.venues : Array.isArray(venueData) ? venueData : []);
+        setShifts(Array.isArray(shiftData) ? shiftData : []);
+        setPackages(Array.isArray(packageData) ? packageData : []);
 
-        // Debug venues
-        // console.log('Venues State:', Array.isArray(venueData.venues) ? venueData.venues : Array.isArray(venueData) ? venueData : mockVenues);
-        // console.log('Venue Names:', (Array.isArray(venueData.venues) ? venueData.venues : Array.isArray(venueData) ? venueData : mockVenues).map(v => v.name));
-        // console.log('Booking Venue IDs:', bookingsToUse.map((b) => b.venue_id));
-        // console.log('Venue IDs in venueData:', (Array.isArray(venueData.venues) ? venueData.venues : Array.isArray(venueData) ? venueData : mockVenues).map((v) => v.id));
+        // Debug data
+        console.log('Bookings:', normalizedBookings);
+        console.log('Venues:', venues);
+        console.log('Events:', events);
       } catch (error) {
         console.error('Error fetching data:', error);
         setError('Failed to load dashboard data');
-
-        const mockBookings = generateMockBookings();
         setUsers([]);
-        setBookings(mockBookings);
-        calculateStats(mockBookings);
-        setEvents(mockEvents);
-        setVenues(mockVenues);
-        setShifts(mockShifts);
-        setPackages(mockPackages);
-
-        // Debug venues on error
-        console.log('Venues State (Error):', mockVenues);
-        console.log('Booking Venue IDs (Error):', mockBookings.map((b) => b.venue_id));
+        setBookings([]);
+        calculateStats([]);
+        setEvents([]);
+        setVenues([]);
+        setShifts([]);
+        setPackages([]);
       } finally {
         setLoading(false);
       }
@@ -419,72 +356,106 @@ const Dashboard = () => {
                 View All
               </a>
             </div>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gradient-to-r from-indigo-600 to-purple-600 sticky top-0 z-10">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider" data-tooltip-id="col-booking-id" data-tooltip-content="Unique booking identifier">
-                      Booking ID
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider" data-tooltip-id="col-date" data-tooltip-content="Event date">
-                      Date
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider" data-tooltip-id="col-customer" data-tooltip-content="Customer details">
-                      Customer
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider" data-tooltip-id="col-venue" data-tooltip-content="Venue and event type">
-                      Venue
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider" data-tooltip-id="col-guests" data-tooltip-content="Number of guests">
-                      Guests
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider" data-tooltip-id="col-status" data-tooltip-content="Booking status">
-                      Status
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {recentBookings.map((booking, index) => (
-                    <motion.tr
-                      key={booking.id || index}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: index * 0.1 }}
-                      className={`${
-                        index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
-                      } hover:bg-indigo-50 transition-colors`}
-                    >
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="text-sm font-medium text-gray-900">#{String(booking.id).substring(0, 8)}</span>
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="text-sm text-gray-700">{formatDate(booking.event_date)}</span>
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <div>
-                          <span className="text-sm font-medium text-gray-900">{booking.user_name || 'N/A'}</span>
-                          <p className="text-xs text-gray-500">{booking.user_email || 'N/A'}</p>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <div>
-                          <span className="text-sm text-gray-900">
-                            {venues.find((v) => String(v.id) === booking.venue_id)?.name || 'N/A'}
+            {recentBookings.length === 0 ? (
+              <div className="p-8 text-center">
+                <AlertCircle className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">No Recent Bookings</h3>
+                <p className="text-gray-500">No bookings available in the system</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gradient-to-r from-indigo-600 to-purple-600 sticky top-0 z-10">
+                    <tr>
+                      <th
+                        className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider"
+                        data-tooltip-id="col-booking-id"
+                        data-tooltip-content="Unique booking identifier"
+                      >
+                        Booking ID
+                      </th>
+                      <th
+                        className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider"
+                        data-tooltip-id="col-date"
+                        data-tooltip-content="Event date"
+                      >
+                        Date
+                      </th>
+                      <th
+                        className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider"
+                        data-tooltip-id="col-customer"
+                        data-tooltip-content="Customer details"
+                      >
+                        Customer
+                      </th>
+                      <th
+                        className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider"
+                        data-tooltip-id="col-venue"
+                        data-tooltip-content="Venue and event type"
+                      >
+                        Venue
+                      </th>
+                      <th
+                        className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider"
+                        data-tooltip-id="col-guests"
+                        data-tooltip-content="Number of guests"
+                      >
+                        Guests
+                      </th>
+                      <th
+                        className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider"
+                        data-tooltip-id="col-status"
+                        data-tooltip-content="Booking status"
+                      >
+                        Status
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {recentBookings.map((booking, index) => (
+                      <motion.tr
+                        key={booking.id || index}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: index * 0.1 }}
+                        className={`${
+                          index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
+                        } hover:bg-indigo-50 transition-colors`}
+                      >
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <span className="text-sm font-medium text-gray-900">
+                            #{String(booking.id).substring(0, 8)}
                           </span>
-                          <p className="text-xs text-gray-500">
-                            {events.find((e) => e.id === booking.event_id)?.name || 'N/A'}
-                          </p>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="text-sm text-gray-700">{booking.guest_count || 'N/A'}</span>
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">{getStatusBadge(booking.status)}</td>
-                    </motion.tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <span className="text-sm text-gray-700">{formatDate(booking.event_date)}</span>
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <div>
+                            <span className="text-sm font-medium text-gray-900">{booking.user_name || 'N/A'}</span>
+                            <p className="text-xs text-gray-500">{booking.user_email || 'N/A'}</p>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <div>
+                            <span className="text-sm text-gray-900">
+                              {venues.find((v) => String(v.id) === booking.venue_id)?.name || 'N/A'}
+                            </span>
+                            <p className="text-xs text-gray-500">
+                              {events.find((e) => e.id === booking.event_id)?.name || 'N/A'}
+                            </p>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <span className="text-sm text-gray-700">{booking.guest_count || 'N/A'}</span>
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap">{getStatusBadge(booking.status)}</td>
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </motion.div>
 
           {/* Booking Status */}
@@ -618,10 +589,7 @@ const Dashboard = () => {
               <h3 className="text-xl font-semibold text-gray-800 mb-1">Manage Bookings</h3>
               <p className="text-sm text-gray-500">View and update all bookings</p>
             </div>
-            <motion.div
-              whileHover={{ rotate: 15 }}
-              transition={{ duration: 0.3 }}
-            >
+            <motion.div whileHover={{ rotate: 15 }} transition={{ duration: 0.3 }}>
               <Calendar className="h-12 w-12 text-indigo-600" />
             </motion.div>
           </a>
@@ -635,10 +603,7 @@ const Dashboard = () => {
               <h3 className="text-xl font-semibold text-gray-800 mb-1">Manage Venues</h3>
               <p className="text-sm text-gray-500">Update venue details</p>
             </div>
-            <motion.div
-              whileHover={{ rotate: 15 }}
-              transition={{ duration: 0.3 }}
-            >
+            <motion.div whileHover={{ rotate: 15 }} transition={{ duration: 0.3 }}>
               <MapPin className="h-12 w-12 text-indigo-600" />
             </motion.div>
           </a>
@@ -652,10 +617,7 @@ const Dashboard = () => {
               <h3 className="text-xl font-semibold text-gray-800 mb-1">Manage Packages</h3>
               <p className="text-sm text-gray-500">Update package pricing</p>
             </div>
-            <motion.div
-              whileHover={{ rotate: 15 }}
-              transition={{ duration: 0.3 }}
-            >
+            <motion.div whileHover={{ rotate: 15 }} transition={{ duration: 0.3 }}>
               <Package className="h-12 w-12 text-indigo-600" />
             </motion.div>
           </a>
@@ -669,10 +631,7 @@ const Dashboard = () => {
               <h3 className="text-xl font-semibold text-gray-800 mb-1">Manage Users</h3>
               <p className="text-sm text-gray-500">View customer accounts</p>
             </div>
-            <motion.div
-              whileHover={{ rotate: 15 }}
-              transition={{ duration: 0.3 }}
-            >
+            <motion.div whileHover={{ rotate: 15 }} transition={{ duration: 0.3 }}>
               <Users className="h-12 w-12 text-indigo-600" />
             </motion.div>
           </a>
