@@ -29,9 +29,8 @@ const MenusManagement = () => {
       try {
         const [menuData, packageData] = await Promise.all([getAllMenus(), getAllPackages()]);
         console.log('Fetched menus:', menuData);
-        // Log items for each menu
         menuData.forEach((menu) => {
-          console.log(`Menu ${menu.name} (ID: ${menu.id}) items:`, menu.items);
+          console.log(`Menu ${menu.name} (ID: ${menu.id}) items:`, JSON.stringify(menu.items, null, 2));
         });
         console.log('Fetched packages:', packageData);
         setMenus(Array.isArray(menuData) ? menuData : []);
@@ -122,7 +121,7 @@ const MenusManagement = () => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form items before validation:', formData.items); // Debug log
+    console.log('Form items before validation:', JSON.stringify(formData.items, null, 2));
     if (!validateForm()) {
       toast.error('Please fix form errors before submitting');
       return;
@@ -139,10 +138,9 @@ const MenusManagement = () => {
         })),
         free_limit: parseInt(formData.free_limit),
       };
-      console.log('Submitting menu:', menuData);
+      console.log('Submitting menu:', JSON.stringify(menuData, null, 2));
 
       if (formData.id) {
-        // Validate menu ID
         if (!menus.find((m) => String(m.id) === String(formData.id))) {
           throw new Error('Menu not found in current list');
         }
@@ -172,12 +170,12 @@ const MenusManagement = () => {
 
   // Handle edit menu
   const handleEdit = (menu) => {
-    console.log('Editing menu:', menu);
-    // Sanitize items to support alternative field names
+    console.log('Editing menu:', JSON.stringify(menu, null, 2));
+    // Handle items as strings or objects
     const sanitizedItems = Array.isArray(menu.items) && menu.items.length > 0
       ? menu.items.map((item) => ({
-          name: item.name || item.itemName || item.title || '',
-          price: item.price ? String(item.price) : item.cost ? String(item.cost) : '',
+          name: typeof item === 'string' ? item : item.name || item.itemName || item.title || item.item_name || item.dishName || item.description || '',
+          price: typeof item === 'string' ? '' : item.price || item.cost || item.amount || '',
         }))
       : [{ name: '', price: '' }];
     setFormData({
@@ -296,7 +294,17 @@ const MenusManagement = () => {
                     Items:{' '}
                     {Array.isArray(menu.items) && menu.items.length > 0
                       ? menu.items
-                          .map((item) => item.name || item.itemName || item.title || 'Unnamed Item')
+                          .map((item) =>
+                            typeof item === 'string'
+                              ? item
+                              : item.name ||
+                                item.itemName ||
+                                item.title ||
+                                item.item_name ||
+                                item.dishName ||
+                                item.description ||
+                                'Unnamed Item'
+                          )
                           .join(', ')
                       : 'None'}
                   </p>

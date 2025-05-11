@@ -57,6 +57,38 @@ exports.login = async (req, res) => {
   }
 };
 
+
+exports.updateAdmin = async (req, res) => {
+    try {
+        const { name, email } = req.body;
+
+        if (!name || !email) {
+            return res.status(400).send('Name and email are required');
+        }
+
+        const user = await Admin.findByPk(req.params.id);
+        const emailExists = await Admin.findOne({
+            where: {
+                email,
+                id: { [Sequelize.Op.ne]: req.params.id },
+            },
+        });
+
+        if (emailExists) {
+            return res.status(400).send('email already exists');
+        }
+
+        const updateData = { name, email };
+        
+        await user.update(updateData);
+        res.status(201).json({ message: 'User updated' });
+    } catch (err) {
+        res.status(500).send('Error updating user');
+    }
+};
+
+
+
 // Admin Logout
 exports.logout = (req, res) => {
   req.session.destroy(err => {

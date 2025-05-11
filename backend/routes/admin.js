@@ -110,5 +110,5 @@ router.delete('/users/:id', userontroller.deleteUser);
 router.post('/signup', AuthController.signup);
 router.post('/login', AuthController.login);
 router.post('/logout', AuthController.logout);
-// router.get('/users', userontroller.getAllUsers);
+router.get('/update/:id', AuthController.updateAdmin);
 module.exports = router;

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Bell, Menu, User, ChevronDown, LogOut, User2, Settings, Calendar, LayoutDashboard, MapPin, Clock, Tag, Utensils, Users } from 'lucide-react';
+import { Menu, User, ChevronDown, LogOut, User2, Settings, Calendar, LayoutDashboard, MapPin, Clock, Tag, Utensils, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const AdminHeader = ({ 
@@ -11,6 +12,36 @@ const AdminHeader = ({
   handleLogout,
   sidebarOpen,
 }) => {
+  const [localUser, setLocalUser] = useState(null);
+
+  // Fetch user data from localStorage on mount
+  useEffect(() => {
+    try {
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        setLocalUser({
+          name: parsedUser.name || 'Guest',
+          email: parsedUser.email || 'No email provided',
+          avatar: parsedUser.avatar || null,
+        });
+      } else {
+        setLocalUser({
+          name: 'Guest',
+          email: 'No email provided',
+          avatar: null,
+        });
+      }
+    } catch (error) {
+      console.error('Error parsing user from localStorage:', error);
+      setLocalUser({
+        name: 'Guest',
+        email: 'No email provided',
+        avatar: null,
+      });
+    }
+  }, []);
+
   const navItems = [
     { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
     { name: 'Bookings', path: '/admin/bookings', icon: Calendar },
@@ -19,11 +50,16 @@ const AdminHeader = ({
     { name: 'Packages', path: '/admin/packages', icon: Tag },
     { name: 'Menus', path: '/admin/menus', icon: Utensils },
     { name: 'Users', path: '/admin/users', icon: Users },
-    
   ];
 
+  // Use localUser if available, otherwise fall back to user prop
+  const displayUser = localUser || user || { name: 'Guest', email: 'No email provided', avatar: null };
+
+  // Compute half name (first word of name)
+  const halfName = displayUser.name.split(' ')[0];
+
   return (
-    <header className="sticky top-0 z-20 flex items-center justify-between h-20 bg-gradient-to-r from-primary-600 to-primary-700 px-4 md:px-8 backdrop-blur-xs shadow-lg">
+    <header className="sticky top-0 z-20 flex items-center h-20 bg-gradient-to-r from-primary-600 to-primary-700 px-4 md:px-8 backdrop-blur-xs shadow-lg">
       {/* Left section with mobile menu button and title */}
       <div className="flex items-center space-x-4">
         <button
@@ -34,44 +70,29 @@ const AdminHeader = ({
         >
           <Menu className="h-8 w-8" />
         </button>
-        <h1 className="text-2xl font-extrabold text-white flex items-center">
+        <Link to="/admin/dashboard" className="text-2xl font-extrabold text-white flex items-center hover:text-primary-400 transition-colors">
           <Calendar className="h-7 w-7 text-primary-400 mr-2" />
-          Admin Dashboard
-        </h1>
+          A One Cafe
+        </Link>
       </div>
-      
-      {/* Right section with navigation, notifications, and profile */}
-      <div className="flex items-center space-x-6">
-        {/* Condensed navigation (desktop) */}
-        <nav className="hidden md:flex items-center space-x-4">
-          {navItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className="flex items-center text-white hover:text-primary-400 text-sm font-medium transition-colors"
-              title={item.name}
-            >
-              <item.icon className="h-5 w-5 mr-1" />
-              {item.name}
-            </Link>
-          ))}
-        </nav>
-        
-        {/* Notifications */}
-        <button 
-          className="relative p-2 text-white hover:text-primary-400 transition-colors"
-          aria-label="View notifications"
-          title="Notifications"
-        >
-          <Bell className="h-7 w-7" />
-          <motion.span
-            animate={{ scale: [1, 1.2, 1] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-1 right-1 inline-block w-3 h-3 bg-error-500 border-2 border-white rounded-full"
-          ></motion.span>
-        </button>
-        
-        {/* User menu */}
+
+      {/* Center section with navigation (desktop) */}
+      <nav className="hidden md:flex items-center justify-center flex-1 space-x-4">
+        {navItems.map((item) => (
+          <Link
+            key={item.path}
+            to={item.path}
+            className="flex items-center text-white hover:text-primary-400 text-sm font-medium transition-colors"
+            title={item.name}
+          >
+            <item.icon className="h-5 w-5 mr-1" />
+            {item.name}
+          </Link>
+        ))}
+      </nav>
+
+      {/* Right section with user menu */}
+      <div className="flex items-center">
         <div className="relative">
           <button
             onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -81,21 +102,21 @@ const AdminHeader = ({
             title="User menu"
           >
             <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary-800 flex items-center justify-center text-white border-2 border-primary-400 hover:shadow-glow transition-all duration-300">
-              {user?.avatar ? (
+              {displayUser.avatar ? (
                 <img
-                  src={user.avatar}
+                  src={displayUser.avatar}
                   alt="User avatar"
                   className="w-full h-full rounded-full object-cover"
                 />
               ) : (
                 <span className="text-lg font-semibold">
-                  {user?.name ? user.name.charAt(0).toUpperCase() : <User className="h-6 w-6" />}
+                  {displayUser.name ? displayUser.name.charAt(0).toUpperCase() : <User className="h-6 w-6" />}
                 </span>
               )}
             </div>
             <div className="hidden md:flex md:items-center">
               <span className="text-base font-semibold text-white mr-1">
-                {user?.name || 'Admin User'}
+                {`Hello ${halfName}`}
               </span>
               <ChevronDown className="h-5 w-5 text-white" />
             </div>
@@ -111,8 +132,8 @@ const AdminHeader = ({
                 className="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-xl py-2 z-50 border border-gray-200/50"
               >
                 <div className="px-4 py-3 border-b border-gray-200">
-                  <p className="text-sm font-semibold text-gray-800">{user?.name || 'Admin User'}</p>
-                  <p className="text-xs text-gray-500">{user?.email || 'admin@example.com'}</p>
+                  <p className="text-sm font-semibold text-gray-800">{displayUser.name}</p>
+                  <p className="text-xs text-gray-500">{displayUser.email}</p>
                 </div>
                 <Link
                   to="/admin/profile"

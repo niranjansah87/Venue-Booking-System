@@ -59,3 +59,17 @@ export const updateUserRole = async (id, role) => {
     throw new Error(errorMessage);
   }
 };
+
+
+
+
+export const updateAdmin = async (id, userData) => {
+  try {
+    const response = await api.put(`/api/admin/update/${id}`, userData, { withCredentials: true });
+    return response.data;
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || `Failed to update user with ID ${id}`;
+    console.error(`Error updating user with ID ${id}:`, errorMessage, error);
+    throw new Error(errorMessage);
+  }
+};
