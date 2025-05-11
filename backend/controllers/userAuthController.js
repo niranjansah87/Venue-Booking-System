@@ -4,67 +4,7 @@ const crypto = require('crypto');
 const { generateToken } = require('../utils/token');
 const sendEmail = require('../utils/sendEmail');
 
-exports.signup = async (req, res) => {
-  try {
-    const { name, email, password } = req.body;
 
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: 'Name, email, and password are required.' });
-    }
-
-    const existing = await User.findOne({ where: { email } });
-    if (existing) {
-      return res.status(400).json({ message: 'Email already registered' });
-    }
-
-    const { raw, hash } = generateToken();
-    const expires = new Date(Date.now() + 1000 * 60 * 60);
-
-    const user = await User.create({
-      name,
-      email,
-      password: await bcrypt.hash(password, 10),
-      verification_token: hash,
-      verification_token_expires: expires,
-      
-    });
-
-    const link = `${req.protocol}://${req.get('host')}/api/verify-email?token=${raw}&email=${encodeURIComponent(email)}`;
-    await sendEmail({
-      to: email,
-      subject: 'Verify your email',
-      html: `
-    <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 30px; border-radius: 10px; max-width: 600px; margin: auto;">
-      <h2 style="color: #4CAF50;">Email Verification Required</h2>
-      <p style="font-size: 16px; color: #333;">
-        Hello,
-      </p>
-      <p style="font-size: 16px; color: #333;">
-        We received a request to update the email associated with your account. Please click the button below to verify your new email address:
-      </p>
-      <p style="text-align: center; margin: 30px 0;">
-        <a href="${link}" style="display: inline-block; background-color: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-          Verify Email
-        </a>
-      </p>
-      <p style="font-size: 14px; color: #666;">
-        Or copy and paste this link into your browser:<br>
-        <a href="${link}" style="color: #4CAF50;">${link}</a>
-      </p>
-      <hr style="margin: 30px 0;">
-      <p style="font-size: 12px; color: #999;">
-        If you didn’t request this change, please ignore this email or contact our support.
-      </p>
-    </div>
-  `,
-    });
-
-    res.status(201).json({ message: 'Signup successful. Please check your email to verify your account.' });
-  } catch (err) {
-    console.error('Signup error:', err);
-    res.status(500).json({ message: 'Internal server error during signup.' });
-  }
-};
 
 exports.verifyEmail = async (req, res) => {
   const { token, email } = req.query;
@@ -88,15 +28,102 @@ exports.verifyEmail = async (req, res) => {
   }
 };
 
+exports.signup = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: 'Name, email, and password are required.' });
+    }
+
+    // Validate password format
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&^#_\-+])[A-Za-z\d@$!%*?&^#_\-+]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        message:
+          'Password must be at least 8 characters long, include one uppercase letter, one number, and one special character (@$!%*?&^#_-+).',
+      });
+    }
+
+    const existing = await User.findOne({ where: { email } });
+    if (existing) {
+      return res.status(400).json({ message: 'Email already registered' });
+    }
+
+    const { raw, hash } = generateToken();
+    const expires = new Date(Date.now() + 1000 * 60 * 60);
+
+    // Do NOT hash password here; let the model hook handle it
+    const user = await User.create({
+      name,
+      email,
+      password, // Pass plaintext password
+      verification_token: hash,
+      verification_token_expires: expires,
+      email_verified: false, // Explicitly set
+    });
+
+    const link = `${req.protocol}://${req.get('host')}/api/verify-email?token=${raw}&email=${encodeURIComponent(email)}`;
+    await sendEmail({
+      to: email,
+      subject: 'Verify your email',
+      html: `
+        <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 30px; border-radius: 10px; max-width: 600px; margin: auto;">
+          <h2 style="color: #4CAF50;">Email Verification Required</h2>
+          <p style="font-size: 16px; color: #333;">
+            Hello,
+          </p>
+          <p style="font-size: 16px; color: #333;">
+            We received a request to update the email associated with your account. Please click the button below to verify your new email address:
+          </p>
+          <p style="text-align: center; margin: 30px 0;">
+            <a href="${link}" style="display: inline-block; background-color: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+              Verify Email
+            </a>
+          </p>
+          <p style="font-size: 14px; color: #666;">
+            Or copy and paste this link into your browser:<br>
+            <a href="${link}" style="color: #4CAF50;">${link}</a>
+          </p>
+          <hr style="margin: 30px 0;">
+          <p style="font-size: 12px; color: #999;">
+            If you didn’t request this change, please ignore this email or contact our support.
+          </p>
+        </div>
+      `,
+    });
+
+    res.status(201).json({ message: 'Signup successful. Please check your email to verify your account.' });
+  } catch (err) {
+    console.error('Signup error:', err);
+    res.status(500).json({ message: 'Internal server error during signup.' });
+  }
+};
+
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   try {
-    const user = await User.findOne({ where: { email } });
-    if (!user || !user.email_verified) {
-      return res.status(403).json({ message: 'Email not verified or user not found' });
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
     }
 
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      console.log('User not found for email:', email);
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    if (!user.email_verified) {
+      console.log('Email not verified for user:', email);
+      return res.status(403).json({ message: 'Email not verified' });
+    }
+
+    // console.log('Login attempt - Email:', email);
+    // console.log('Provided password:', password);
+    // console.log('Stored password hash:', user.password);
     const match = await bcrypt.compare(password, user.password);
+    // console.log('Password match:', match);
+
     if (!match) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
@@ -148,9 +175,6 @@ exports.updateProfile = async (req, res) => {
   const userId = req.params.id;
 
   try {
-    if (!req.session.userId || req.session.userId !== userId) {
-      return res.status(403).json({ message: 'Unauthorized: You can only update your own profile' });
-    }
 
     const user = await User.findByPk(userId);
     if (!user) {

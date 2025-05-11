@@ -90,7 +90,7 @@ function App() {
           {/* ---------------- Protected User Routes ---------------- */}
           <Route element={<ProtectedLayout />}>
             <Route
-              path="profile"
+              path="/profile"
               element={
                 <ProtectedRoute>
                   <ProfilePage />

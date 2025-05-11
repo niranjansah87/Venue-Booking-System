@@ -27,7 +27,7 @@ export const createUser = async (id) => {
 // Update a user
 export const updateUser = async (id, userData) => {
   try {
-    const response = await api.put(`/api/admin/users/${id}`, userData, { withCredentials: true });
+    const response = await api.put(`/api/user/update/${id}`, userData, { withCredentials: true });
     return response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || `Failed to update user with ID ${id}`;
