@@ -49,7 +49,7 @@ const AdminLayout = () => {
         </AnimatePresence>
       </main>
       <footer className="bg-gray-800 text-white py-4 text-center">
-        <p>© 2025 Elegance Venues. All rights reserved.</p>
+        <p>© 2025 A One Cafe All rights reserved.</p>
       </footer>
     </div>
   );

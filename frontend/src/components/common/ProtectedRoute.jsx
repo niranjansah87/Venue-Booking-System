@@ -6,7 +6,7 @@ function ProtectedRoute({ children, adminOnly = false }) {
 
   // Check if the user is authenticated and if the route requires admin only
   if (!user || (adminOnly && user.role !== 'admin')) {
-    return <Navigate to="/admin/login" replace />; // Redirect to login if not authenticated
+    return <Navigate to="/admin/login" replace />; 
   }
 
   return children; // Return the protected content if authenticated

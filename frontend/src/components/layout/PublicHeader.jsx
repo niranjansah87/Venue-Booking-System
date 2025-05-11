@@ -82,7 +82,7 @@ const PublicHeader = ({ isScrolled }) => {
                 isScrolled ? 'text-gray-900' : 'text-white'
               }`}
             >
-              Elegance Venues
+              A One Cafe
             </span>
           </Link>
 

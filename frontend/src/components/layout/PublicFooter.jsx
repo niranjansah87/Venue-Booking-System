@@ -14,7 +14,7 @@ const PublicFooter = () => {
           <div>
             <div className="flex items-center space-x-2 mb-6">
               <Calendar className="h-7 w-7 text-primary-400" />
-              <span className="text-2xl font-heading font-bold">Elegance Venues</span>
+              <span className="text-2xl font-heading font-bold">A One Cafe</span>
             </div>
             <p className="text-gray-300 mb-6">
               Creating unforgettable experiences in stunning venues. 
@@ -98,7 +98,7 @@ const PublicFooter = () => {
       {/* Copyright Bar */}
       <div className="border-t border-gray-800 py-6">
         <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-400 text-sm">&copy; {currentYear} Elegance Venues. All rights reserved.</p>
+          <p className="text-gray-400 text-sm">&copy; {currentYear} A One Cafe All rights reserved.</p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <Link to="#" className="text-gray-400 hover:text-white text-sm transition-colors">Privacy Policy</Link>
             <Link to="#" className="text-gray-400 hover:text-white text-sm transition-colors">Terms of Service</Link>
