@@ -1,198 +1,96 @@
+
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import api from '../../services/api';
+import { motion } from 'framer-motion';
+import { User2, Mail, Shield } from 'lucide-react';
 
-function AdminProfilePage() {
-  const navigate = useNavigate();
+const AdminProfilePage = () => {
   const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({ name: '', email: '' });
-  const [formError, setFormError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
 
-  // Get user from localStorage
-  const user = JSON.parse(localStorage.getItem('admin'));
-
-  // Fetch user data
+  // Load user data from localStorage
   useEffect(() => {
-    if (!user?.id || user.role !== 'admin') {
-      navigate('/admin/login', { state: { from: '/admin/profile' } });
-      return;
-    }
-
-    const fetchUser = async () => {
-      try {
-        const response = await api.get(`/api/user/${user.id}`);
-        setProfile(response.data.user);
-        setFormData({ name: response.data.user.name, email: response.data.user.email });
-        setLoading(false);
-      } catch (err) {
-        console.error('Fetch user error:', err);
-        if (err.response?.status === 401 || err.response?.status === 403) {
-          localStorage.removeItem('user');
-          navigate('/admin/login', { state: { from: '/admin/profile' } });
-        }
-        setError(err.response?.data?.message || 'Failed to load user data. Please try again.');
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
-  }, [user, navigate]);
-
-  // Handle form input changes
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setFormError('');
-    setSuccessMessage('');
-
-    // Basic validation
-    if (!formData.name.trim() || !formData.email.trim()) {
-      setFormError('Name and email are required.');
-      return;
-    }
-    if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      setFormError('Please enter a valid email address.');
-      return;
-    }
-
-    try {
-      const response = await api.put(`/api/user/${user.id}`, {
-        name: formData.name,
-        email: formData.email,
+    const user = JSON.parse(localStorage.getItem('admin'));
+    if (user?.id) {
+      setProfile({
+        name: user.name || 'Unknown',
+        email: user.email || 'N/A',
+        role: user.role || 'admin',
       });
-      setProfile(response.data.user);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      setIsEditing(false);
-      setSuccessMessage(response.data.message);
-    } catch (err) {
-      console.error('Update user error:', err);
-      if (err.response?.status === 401 || err.response?.status === 403) {
-        localStorage.removeItem('user');
-        navigate('/admin/login', { state: { from: '/admin/profile' } });
-      }
-      setFormError(err.response?.data?.message || 'Failed to update profile. Please try again.');
+    } else {
+      setError('No user data found in local storage.');
     }
-  };
-
-  // Toggle edit mode
-  const toggleEdit = () => {
-    setIsEditing(!isEditing);
-    setFormError('');
-    setSuccessMessage('');
-  };
+  }, []);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-lg w-full bg-white rounded-xl shadow-2xl p-8">
-        <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">Admin Profile</h2>
+    <div className="h-screen flex items-center justify-center bg-gradient-to-b from-white to-slate-50 overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 100, damping: 20, duration: 0.6 }}
+        className="max-w-md w-full bg-slate-100/90 backdrop-blur-sm rounded-xl shadow-xl border border-teal-200/50 p-8 hover:shadow-2xl transition-shadow"
+      >
+        <h2 className="text-2xl font-extrabold text-gray-800 text-center mb-6 tracking-tight">
+          Admin Profile
+        </h2>
 
-        {loading ? (
-          <div className="flex justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-600"></div>
+        {error ? (
+          <div className="bg-teal-50 border-l-4 border-teal-500 text-teal-700 p-3 rounded-md text-center text-sm font-medium">
+            {error}
           </div>
-        ) : error ? (
-          <p className="text-red-600 text-center">{error}</p>
+        ) : !profile ? (
+          <div className="flex justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-600"></div>
+          </div>
         ) : (
-          <div className="space-y-6">
-            {successMessage && (
-              <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded">
-                {successMessage}
-              </div>
-            )}
+          <div className="space-y-5">
+            {/* Avatar */}
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="flex justify-center"
+            >
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="w-28 h-28 rounded-full bg-gray-200 flex items-center justify-center ring-3 ring-teal-400/60 ring-offset-2 ring-offset-slate-100"
+              >
+                <img
+                  src="/avatar.png"
+                  alt="Admin avatar"
+                  className="w-full h-full rounded-full object-cover"
+                />
+              </motion.div>
+            </motion.div>
 
-            {!isEditing ? (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Name</p>
-                    <p className="text-lg text-gray-900">{profile?.name}</p>
-                  </div>
+            {/* Profile Details */}
+            <div className="space-y-3">
+              <div className="flex items-center space-x-3">
+                <User2 className="h-6 w-6 text-teal-600" />
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Name</p>
+                  <p className="text-base font-semibold text-gray-800">{profile.name}</p>
                 </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Email</p>
-                    <p className="text-lg text-gray-900">{profile?.email}</p>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Role</p>
-                    <p className="text-lg text-gray-900 capitalize">{profile?.role}</p>
-                  </div>
-                </div>
-                <button
-                  onClick={toggleEdit}
-                  className="w-full py-3 px-4 bg-teal-600 text-white font-medium rounded-lg hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all"
-                >
-                  Edit Profile
-                </button>
               </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {formError && (
-                  <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
-                    {formError}
-                  </div>
-                )}
+              <div className="flex items-center space-x-3">
+                <Mail className="h-6 w-6 text-teal-600" />
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                    Name
-                  </label>
-                  <input
-                    id="name"
-                    name="name"
-                    type="text"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
-                    placeholder="Enter your name"
-                  />
+                  <p className="text-sm font-medium text-gray-500">Email</p>
+                  <p className="text-base font-semibold text-gray-800">{profile.email}</p>
                 </div>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Shield className="h-6 w-6 text-teal-600" />
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                    Email
-                  </label>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
-                    placeholder="Enter your email"
-                  />
+                  <p className="text-sm font-medium text-gray-500">Role</p>
+                  <p className="text-base font-semibold text-gray-800 capitalize">{profile.role}</p>
                 </div>
-                <div className="flex space-x-4">
-                  <button
-                    type="submit"
-                    className="flex-1 py-3 px-4 bg-teal-600 text-white font-medium rounded-lg hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all"
-                  >
-                    Save Changes
-                  </button>
-                  <button
-                    type="button"
-                    onClick={toggleEdit}
-                    className="flex-1 py-3 px-4 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            )}
+              </div>
+            </div>
           </div>
         )}
-      </div>
+      </motion.div>
     </div>
   );
-}
+};
 
 export default AdminProfilePage;

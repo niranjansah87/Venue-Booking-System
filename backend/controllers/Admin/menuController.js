@@ -43,11 +43,11 @@ exports.createMenu = async (req, res) => {
 
 exports.updateMenu = async (req, res) => {
   try {
-    const { package_id, name, items, free_limit } = req.body;
+    const { name, items, free_limit } = req.body;
+    const { package_id, id: menu_id } = req.params;
     const updateFields = {};
 
-    // Validate and assign only provided fields
-    if (package_id !== undefined) {
+    if (package_id) {
       const pkg = await Package.findByPk(package_id);
       if (!pkg) {
         return res.status(400).json({ error: 'Invalid package_id. Package does not exist.' });
@@ -81,7 +81,7 @@ exports.updateMenu = async (req, res) => {
     }
 
     const [updated] = await Menu.update(updateFields, {
-      where: { id: req.params.id },
+      where: { id: menu_id },
     });
 
     if (!updated) {
@@ -94,6 +94,7 @@ exports.updateMenu = async (req, res) => {
     res.status(500).json({ error: 'Error updating menu' });
   }
 };
+
 
 
 exports.deleteMenu = async (req, res) => {

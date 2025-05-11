@@ -1,46 +1,98 @@
 
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Menu, User, ChevronDown, LogOut, User2, Settings, Calendar, LayoutDashboard, MapPin, Clock, Tag, Utensils, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'react-toastify';
+import api from '../../services/api'; // Assuming this is your Axios instance
 
 const AdminHeader = ({ 
   toggleSidebar, 
   userMenuOpen, 
   setUserMenuOpen, 
   user, 
-  handleLogout,
+  handleLogout, // Remove this prop if implementing logout here
   sidebarOpen,
 }) => {
   const [localUser, setLocalUser] = useState(null);
+  const menuRef = useRef(null);
+  const navigate = useNavigate();
 
-  // Fetch user data from localStorage on mount
-  useEffect(() => {
+  // Fetch user data from localStorage
+  const fetchUserFromStorage = () => {
     try {
       const storedUser = localStorage.getItem('user');
       if (storedUser) {
         const parsedUser = JSON.parse(storedUser);
-        setLocalUser({
+        return {
           name: parsedUser.name || 'Guest',
           email: parsedUser.email || 'No email provided',
           avatar: parsedUser.avatar || null,
-        });
-      } else {
-        setLocalUser({
-          name: 'Guest',
-          email: 'No email provided',
-          avatar: null,
-        });
+        };
       }
-    } catch (error) {
-      console.error('Error parsing user from localStorage:', error);
-      setLocalUser({
+      return {
         name: 'Guest',
         email: 'No email provided',
         avatar: null,
-      });
+      };
+    } catch (error) {
+      console.error('Error parsing user from localStorage:', error);
+      return {
+        name: 'Guest',
+        email: 'No email provided',
+        avatar: null,
+      };
     }
+  };
+
+  // Initialize localUser and listen for storage changes
+  useEffect(() => {
+    setLocalUser(fetchUserFromStorage());
+
+    const handleStorageChange = (event) => {
+      if (event.key === 'user') {
+        console.log('localStorage user updated:', event.newValue);
+        setLocalUser(fetchUserFromStorage());
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
+
+  // Handle click outside to close user menu
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userMenuOpen && menuRef.current && !menuRef.current.contains(event.target)) {
+        setUserMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [userMenuOpen, setUserMenuOpen]);
+
+  // Handle logout
+  const onLogout = async () => {
+    try {
+      // Call backend logout endpoint
+      await api.post('/api/admin/logout', {}, { withCredentials: true });
+      // Clear localStorage
+      localStorage.removeItem('user');
+      // Clear cookies (optional, if client-side cookies are used)
+      document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+      toast.success('Logged out successfully');
+      // Redirect to login
+      navigate('/admin/login');
+    } catch (error) {
+      console.error('Error during logout:', error);
+      toast.error('Failed to log out. Please try again.');
+    }
+  };
 
   const navItems = [
     { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
@@ -101,18 +153,12 @@ const AdminHeader = ({
             aria-expanded={userMenuOpen}
             title="User menu"
           >
-            <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary-800 flex items-center justify-center text-white border-2 border-primary-400 hover:shadow-glow transition-all duration-300">
-              {displayUser.avatar ? (
-                <img
-                  src={displayUser.avatar}
-                  alt="User avatar"
-                  className="w-full h-full rounded-full object-cover"
-                />
-              ) : (
-                <span className="text-lg font-semibold">
-                  {displayUser.name ? displayUser.name.charAt(0).toUpperCase() : <User className="h-6 w-6" />}
-                </span>
-              )}
+            <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary-800 flex items-center justify-center text-white border-2 border-transparent gradient-border hover:shadow-glow transition-all duration-300">
+              <img
+                src="/avatar.png"
+                alt="User avatar"
+                className="w-full h-full rounded-full object-cover"
+              />
             </div>
             <div className="hidden md:flex md:items-center">
               <span className="text-base font-semibold text-white mr-1">
@@ -125,6 +171,7 @@ const AdminHeader = ({
           <AnimatePresence>
             {userMenuOpen && (
               <motion.div
+                ref={menuRef}
                 initial={{ opacity: 0, y: 10, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
@@ -151,7 +198,7 @@ const AdminHeader = ({
                 </Link>
                 <div className="border-t border-gray-200 my-1"></div>
                 <button
-                  onClick={handleLogout}
+                  onClick={onLogout}
                   className="flex items-center w-full text-left px-4 py-2 text-sm text-error-600 hover:bg-error-50 hover:text-error-700 transition-colors"
                   aria-label="Sign out"
                 >

@@ -11,6 +11,10 @@ const Settings = () => {
     password: '',
     confirmPassword: '',
   });
+  const [originalData, setOriginalData] = useState({
+    name: '',
+    email: '',
+  });
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState('');
   const [serverError, setServerError] = useState('');
@@ -29,6 +33,10 @@ const Settings = () => {
           email: parsedUser.email || '',
           password: '',
           confirmPassword: '',
+        });
+        setOriginalData({
+          name: parsedUser.name || '',
+          email: parsedUser.email || '',
         });
       }
     } catch (error) {
@@ -77,9 +85,10 @@ const Settings = () => {
     setServerError('');
 
     try {
+      // Build updateData with original values for unchanged fields
       const updateData = {
-        name: formData.name,
-        email: formData.email,
+        name: formData.name !== originalData.name ? formData.name : originalData.name,
+        email: formData.email !== originalData.email ? formData.email : originalData.email,
       };
       if (formData.password) {
         updateData.password = formData.password;
@@ -90,10 +99,15 @@ const Settings = () => {
       // Update localStorage
       const updatedUser = {
         id: userId,
-        name: formData.name,
-        email: formData.email,
+        name: updateData.name,
+        email: updateData.email,
       };
       localStorage.setItem('user', JSON.stringify(updatedUser));
+      // Update originalData to reflect new values
+      setOriginalData({
+        name: updateData.name,
+        email: updateData.email,
+      });
 
       setSuccess('Profile updated successfully!');
       setFormData((prev) => ({ ...prev, password: '', confirmPassword: '' }));
@@ -119,17 +133,13 @@ const Settings = () => {
           </h1>
 
           {/* Default Avatar Preview */}
-          <div className="flex items-center mb-6">
-            <div className="flex-shrink-0 w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
+          <div className="flex justify-center mb-8">
+            <div className="flex-shrink-0 w-32 h-32 sm:w-24 sm:h-24 rounded-full bg-gray-100 flex items-center justify-center">
               <img
                 src="/avatar.png"
                 alt="Default avatar"
                 className="w-full h-full rounded-full object-cover"
               />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-700">Profile Picture</p>
-              <p className="text-xs text-gray-500">Default avatar</p>
             </div>
           </div>
 

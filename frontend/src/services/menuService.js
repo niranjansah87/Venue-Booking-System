@@ -49,9 +49,9 @@ export const createMenu = async (menuData) => {
 };
 
 // Update a menu
-export const updateMenu = async (id, menuData) => {
+export const updateMenu = async (id, package_id, menuData) => {
   try {
-    const response = await api.put(`/api/admin/menu/update/${id}`, menuData, { withCredentials: true });
+    const response = await api.put(`/api/admin/menu/${package_id}/${id}`, menuData, { withCredentials: true });
     return response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || `Failed to update menu with ID ${id}`;

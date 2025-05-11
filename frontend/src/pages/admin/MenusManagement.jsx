@@ -16,7 +16,7 @@ const MenusManagement = () => {
     id: null,
     package_id: '',
     name: '',
-    items: [{ name: '', price: '' }],
+    items: [{ name: '' }],
     free_limit: '',
   });
   const [formErrors, setFormErrors] = useState({});
@@ -28,11 +28,11 @@ const MenusManagement = () => {
       setLoading(true);
       try {
         const [menuData, packageData] = await Promise.all([getAllMenus(), getAllPackages()]);
-        console.log('Fetched menus:', menuData);
+        console.log('Fetched menus:', JSON.stringify(menuData, null, 2));
         menuData.forEach((menu) => {
           console.log(`Menu ${menu.name} (ID: ${menu.id}) items:`, JSON.stringify(menu.items, null, 2));
         });
-        console.log('Fetched packages:', packageData);
+        console.log('Fetched packages:', JSON.stringify(packageData, null, 2));
         setMenus(Array.isArray(menuData) ? menuData : []);
         setPackages(Array.isArray(packageData.packages) ? packageData.packages : packageData || []);
       } catch (error) {
@@ -56,12 +56,10 @@ const MenusManagement = () => {
   };
 
   // Handle item input changes
-  const handleItemChange = (index, field, value) => {
+  const handleItemChange = (index, value) => {
     setFormData((prev) => ({
       ...prev,
-      items: prev.items.map((item, i) =>
-        i === index ? { ...item, [field]: value } : item
-      ),
+      items: prev.items.map((item, i) => (i === index ? { name: value } : item)),
     }));
     setFormErrors((prev) => ({ ...prev, items: '' }));
   };
@@ -70,7 +68,7 @@ const MenusManagement = () => {
   const addItem = () => {
     setFormData((prev) => ({
       ...prev,
-      items: [...prev.items, { name: '', price: '' }],
+      items: [...prev.items, { name: '' }],
     }));
   };
 
@@ -101,13 +99,8 @@ const MenusManagement = () => {
       formData.items.forEach((item, index) => {
         if (!item || typeof item !== 'object') {
           itemErrors.push(`Item ${index + 1} is invalid`);
-        } else {
-          if (!item.name?.trim()) {
-            itemErrors.push(`Item ${index + 1}: Name is required`);
-          }
-          if (!item.price || parseFloat(item.price) <= 0) {
-            itemErrors.push(`Item ${index + 1}: Price must be a positive number`);
-          }
+        } else if (!item.name?.trim()) {
+          itemErrors.push(`Item ${index + 1}: Name is required`);
         }
       });
       if (itemErrors.length > 0) {
@@ -129,29 +122,45 @@ const MenusManagement = () => {
 
     setLoading(true);
     try {
-      const menuData = {
-        package_id: parseInt(formData.package_id),
-        name: formData.name,
-        items: formData.items.map((item) => ({
-          name: item.name,
-          price: parseFloat(item.price),
-        })),
-        free_limit: parseInt(formData.free_limit),
-      };
+      const menuData = {};
+      if (formData.name.trim()) menuData.name = formData.name;
+      if (formData.items.length > 0) menuData.items = formData.items;
+      if (formData.free_limit) menuData.free_limit = parseInt(formData.free_limit);
+
       console.log('Submitting menu:', JSON.stringify(menuData, null, 2));
 
       if (formData.id) {
         if (!menus.find((m) => String(m.id) === String(formData.id))) {
           throw new Error('Menu not found in current list');
         }
-        const response = await updateMenu(formData.id, menuData);
-        setMenus((prev) =>
-          prev.map((menu) => (String(menu.id) === String(formData.id) ? { ...menu, ...response } : menu))
-        );
+        const response = await updateMenu(formData.id, formData.package_id, menuData);
+        console.log('Update response:', JSON.stringify(response, null, 2));
+        // Fallback: Refetch if response is incomplete
+        if (!response.id) {
+          console.warn('Incomplete update response, refetching menus');
+          const updatedMenus = await getAllMenus();
+          setMenus(updatedMenus);
+        } else {
+          setMenus((prev) =>
+            prev.map((menu) =>
+              String(menu.id) === String(formData.id)
+                ? { ...menu, ...response, package_id: formData.package_id }
+                : menu
+            )
+          );
+        }
         toast.success('Menu updated successfully');
       } else {
-        const response = await createMenu(menuData);
-        setMenus((prev) => [...prev, response]);
+        const response = await createMenu({ ...menuData, package_id: parseInt(formData.package_id) });
+        console.log('Create response:', JSON.stringify(response, null, 2));
+        // Fallback: Refetch if response is incomplete
+        if (!response.id) {
+          console.warn('Incomplete create response, refetching menus');
+          const updatedMenus = await getAllMenus();
+          setMenus(updatedMenus);
+        } else {
+          setMenus((prev) => [...prev, response]);
+        }
         toast.success('Menu created successfully');
       }
 
@@ -171,13 +180,13 @@ const MenusManagement = () => {
   // Handle edit menu
   const handleEdit = (menu) => {
     console.log('Editing menu:', JSON.stringify(menu, null, 2));
-    // Handle items as strings or objects
     const sanitizedItems = Array.isArray(menu.items) && menu.items.length > 0
       ? menu.items.map((item) => ({
-          name: typeof item === 'string' ? item : item.name || item.itemName || item.title || item.item_name || item.dishName || item.description || '',
-          price: typeof item === 'string' ? '' : item.price || item.cost || item.amount || '',
+          name: typeof item === 'string'
+            ? item
+            : item.name || item.itemName || item.title || item.item_name || item.dishName || item.description || '',
         }))
-      : [{ name: '', price: '' }];
+      : [{ name: '' }];
     setFormData({
       id: String(menu.id),
       package_id: String(menu.package_id),
@@ -211,11 +220,18 @@ const MenusManagement = () => {
       id: null,
       package_id: '',
       name: '',
-      items: [{ name: '', price: '' }],
+      items: [{ name: '' }],
       free_limit: '',
     });
     setFormErrors({});
     setShowForm(false);
+  };
+
+  // Handle click outside to close form
+  const handleClickOutside = (e) => {
+    if (showForm && e.target.className.includes('bg-gray-600')) {
+      resetForm();
+    }
   };
 
   if (loading && menus.length === 0) {
@@ -227,7 +243,7 @@ const MenusManagement = () => {
   }
 
   return (
-    <div className="p-6 bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen">
+    <div className="p-6 bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen" onClick={handleClickOutside}>
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 flex items-center">
@@ -411,18 +427,9 @@ const MenusManagement = () => {
                       <input
                         type="text"
                         value={item.name || ''}
-                        onChange={(e) => handleItemChange(index, 'name', e.target.value)}
+                        onChange={(e) => handleItemChange(index, e.target.value)}
                         className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-600 focus:ring-indigo-600 sm:text-sm transition-all duration-300"
                         placeholder="Item name"
-                      />
-                      <input
-                        type="number"
-                        value={item.price || ''}
-                        onChange={(e) => handleItemChange(index, 'price', e.target.value)}
-                        className="w-24 rounded-md border-gray-300 shadow-sm focus:border-indigo-600 focus:ring-indigo-600 sm:text-sm transition-all duration-300"
-                        placeholder="Price"
-                        step="0.01"
-                        min="0"
                       />
                       <motion.button
                         whileHover={{ scale: 1.1 }}

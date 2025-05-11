@@ -80,7 +80,7 @@ router.delete('/bookings/:bookingId', bookingController.deleteBooking);
 router.get('/menu', menuController.displayMenus);
 // router.get('/menu/:id', menuController.getMenuById);
 router.post('/menu/create', menuController.createMenu);
-router.put('/menu/update/:id', menuController.updateMenu);
+router.put('/menu/:package_id/:id', menuController.updateMenu);
 router.delete('/menu/delete/:id', menuController.deleteMenu);
 
 // Package Routes
@@ -110,5 +110,5 @@ router.delete('/users/:id', userontroller.deleteUser);
 router.post('/signup', AuthController.signup);
 router.post('/login', AuthController.login);
 router.post('/logout', AuthController.logout);
-router.get('/update/:id', AuthController.updateAdmin);
+router.put('/update/:id', AuthController.updateAdmin);
 module.exports = router;
