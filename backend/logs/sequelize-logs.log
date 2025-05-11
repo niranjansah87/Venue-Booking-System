@@ -11127,3 +11127,106 @@
 [2025-05-11T09:29:44.902Z] info: Executing (default): INSERT INTO `users` (`id`,`name`,`email`,`password`,`email_verified`,`verification_token`,`verification_token_expires`,`createdAt`,`updatedAt`) VALUES (DEFAULT,?,?,?,?,?,?,?,?);
 [2025-05-11T09:29:46.071Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `email_verified`, `verification_token`, `verification_token_expires`, `reset_password_token`, `reset_password_expires`, `createdAt`, `updatedAt` FROM `users` AS `User` WHERE `User`.`email` = 'niranjansah250@gmail.com';
 [2025-05-11T09:29:58.014Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `email_verified`, `verification_token`, `verification_token_expires`, `reset_password_token`, `reset_password_expires`, `createdAt`, `updatedAt` FROM `users` AS `User` WHERE `User`.`email` = 'niranjansah250@gmail.com';
+[2025-05-11T09:30:45.387Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `email_verified`, `verification_token`, `verification_token_expires`, `reset_password_token`, `reset_password_expires`, `createdAt`, `updatedAt` FROM `users` AS `User` WHERE `User`.`email` = 'niranjansah250@gmail.com' AND `User`.`verification_token` = 'f292f41f1dda7d04d909975026b2cdd39c4b7af72662088575904883c0b2c9bb';
+[2025-05-11T09:30:45.390Z] info: Executing (default): UPDATE `users` SET `email_verified`=?,`verification_token`=?,`verification_token_expires`=?,`updatedAt`=? WHERE `id` = ?
+[2025-05-11T09:31:01.567Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `email_verified`, `verification_token`, `verification_token_expires`, `reset_password_token`, `reset_password_expires`, `createdAt`, `updatedAt` FROM `users` AS `User` WHERE `User`.`email` = 'niranjansah250@gmail.com';
+[2025-05-11T09:31:02.949Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `email_verified`, `verification_token`, `verification_token_expires`, `reset_password_token`, `reset_password_expires`, `createdAt`, `updatedAt` FROM `users` AS `User` WHERE `User`.`email` = 'niranjansah250@gmail.com';
+[2025-05-11T09:31:05.952Z] info: Executing (default): SELECT `id`, `name`, `email` FROM `users` AS `User`;
+[2025-05-11T09:31:05.960Z] info: Executing (default): SELECT `id`, `name`, `email` FROM `users` AS `User`;
+[2025-05-11T09:31:15.199Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `email_verified`, `verification_token`, `verification_token_expires`, `reset_password_token`, `reset_password_expires`, `createdAt`, `updatedAt` FROM `users` AS `User` WHERE `User`.`email` = 'niranjansah250@gmail.com';
+[2025-05-11T09:32:56.824Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-11T09:32:56.828Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'users' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:32:56.843Z] info: Executing (default): SHOW INDEX FROM `users`
+[2025-05-11T09:32:56.848Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'admins' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:32:56.850Z] info: Executing (default): SHOW INDEX FROM `admins`
+[2025-05-11T09:32:56.852Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:32:56.854Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-11T09:32:56.856Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'venues' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:32:56.858Z] info: Executing (default): SHOW INDEX FROM `venues`
+[2025-05-11T09:32:56.860Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'shifts' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:32:56.862Z] info: Executing (default): SHOW INDEX FROM `shifts`
+[2025-05-11T09:32:56.865Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'packages' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:32:56.867Z] info: Executing (default): SHOW INDEX FROM `packages`
+[2025-05-11T09:32:56.868Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'menus' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:32:56.870Z] info: Executing (default): SHOW INDEX FROM `menus`
+[2025-05-11T09:32:56.872Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:32:56.873Z] info: Executing (default): SHOW INDEX FROM `bookings`
+[2025-05-11T09:33:21.301Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `email_verified`, `verification_token`, `verification_token_expires`, `reset_password_token`, `reset_password_expires`, `createdAt`, `updatedAt` FROM `users` AS `User` WHERE `User`.`email` = 'niranjansah250@gmail.com';
+[2025-05-11T09:33:21.466Z] info: Executing (default): INSERT INTO `users` (`id`,`name`,`email`,`password`,`email_verified`,`verification_token`,`verification_token_expires`,`createdAt`,`updatedAt`) VALUES (DEFAULT,?,?,?,?,?,?,?,?);
+[2025-05-11T09:33:23.940Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `email_verified`, `verification_token`, `verification_token_expires`, `reset_password_token`, `reset_password_expires`, `createdAt`, `updatedAt` FROM `users` AS `User` WHERE `User`.`email` = 'niranjansah250@gmail.com';
+[2025-05-11T09:33:56.573Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `email_verified`, `verification_token`, `verification_token_expires`, `reset_password_token`, `reset_password_expires`, `createdAt`, `updatedAt` FROM `users` AS `User` WHERE `User`.`email` = 'niranjansah250@gmail.com' AND `User`.`verification_token` = 'b48ef8fba0c7e67f2264a122e968e35e9b95c28abd4f67f1920a3c4a960bd672';
+[2025-05-11T09:33:56.578Z] info: Executing (default): UPDATE `users` SET `email_verified`=?,`verification_token`=?,`verification_token_expires`=?,`updatedAt`=? WHERE `id` = ?
+[2025-05-11T09:34:28.538Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-11T09:34:28.545Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'users' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:34:28.552Z] info: Executing (default): SHOW INDEX FROM `users`
+[2025-05-11T09:34:28.559Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'admins' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:34:28.563Z] info: Executing (default): SHOW INDEX FROM `admins`
+[2025-05-11T09:34:28.567Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:34:28.570Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-11T09:34:28.574Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'venues' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:34:28.580Z] info: Executing (default): SHOW INDEX FROM `venues`
+[2025-05-11T09:34:28.584Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'shifts' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:34:28.587Z] info: Executing (default): SHOW INDEX FROM `shifts`
+[2025-05-11T09:34:28.590Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'packages' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:34:28.593Z] info: Executing (default): SHOW INDEX FROM `packages`
+[2025-05-11T09:34:28.598Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'menus' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:34:28.600Z] info: Executing (default): SHOW INDEX FROM `menus`
+[2025-05-11T09:34:28.605Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:34:28.607Z] info: Executing (default): SHOW INDEX FROM `bookings`
+[2025-05-11T09:34:31.174Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-11T09:34:31.177Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'users' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:34:31.193Z] info: Executing (default): SHOW INDEX FROM `users`
+[2025-05-11T09:34:31.199Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'admins' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:34:31.202Z] info: Executing (default): SHOW INDEX FROM `admins`
+[2025-05-11T09:34:31.205Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:34:31.208Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-11T09:34:31.212Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'venues' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:34:31.214Z] info: Executing (default): SHOW INDEX FROM `venues`
+[2025-05-11T09:34:31.218Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'shifts' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:34:31.220Z] info: Executing (default): SHOW INDEX FROM `shifts`
+[2025-05-11T09:34:31.222Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'packages' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:34:31.224Z] info: Executing (default): SHOW INDEX FROM `packages`
+[2025-05-11T09:34:31.226Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'menus' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:34:31.228Z] info: Executing (default): SHOW INDEX FROM `menus`
+[2025-05-11T09:34:31.231Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:34:31.234Z] info: Executing (default): SHOW INDEX FROM `bookings`
+[2025-05-11T09:34:32.817Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-11T09:34:32.821Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'users' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:34:32.826Z] info: Executing (default): SHOW INDEX FROM `users`
+[2025-05-11T09:34:32.831Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'admins' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:34:32.834Z] info: Executing (default): SHOW INDEX FROM `admins`
+[2025-05-11T09:34:32.838Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:34:32.841Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-11T09:34:32.844Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'venues' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:34:32.846Z] info: Executing (default): SHOW INDEX FROM `venues`
+[2025-05-11T09:34:32.849Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'shifts' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:34:32.852Z] info: Executing (default): SHOW INDEX FROM `shifts`
+[2025-05-11T09:34:32.854Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'packages' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:34:32.856Z] info: Executing (default): SHOW INDEX FROM `packages`
+[2025-05-11T09:34:32.858Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'menus' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:34:32.860Z] info: Executing (default): SHOW INDEX FROM `menus`
+[2025-05-11T09:34:32.863Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-11T09:34:32.864Z] info: Executing (default): SHOW INDEX FROM `bookings`
+[2025-05-11T09:34:56.308Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `email_verified`, `verification_token`, `verification_token_expires`, `reset_password_token`, `reset_password_expires`, `createdAt`, `updatedAt` FROM `users` AS `User` WHERE `User`.`email` = 'niranjansah250@gmail.com';
+[2025-05-11T09:35:07.328Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `email_verified`, `verification_token`, `verification_token_expires`, `reset_password_token`, `reset_password_expires`, `createdAt`, `updatedAt` FROM `users` AS `User` WHERE `User`.`email` = 'niranjansah250@gmail.com';
+[2025-05-11T09:35:08.246Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `email_verified`, `verification_token`, `verification_token_expires`, `reset_password_token`, `reset_password_expires`, `createdAt`, `updatedAt` FROM `users` AS `User` WHERE `User`.`email` = 'niranjansah250@gmail.com';
+[2025-05-11T09:35:08.412Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `email_verified`, `verification_token`, `verification_token_expires`, `reset_password_token`, `reset_password_expires`, `createdAt`, `updatedAt` FROM `users` AS `User` WHERE `User`.`email` = 'niranjansah250@gmail.com';
+[2025-05-11T09:36:26.792Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `email_verified`, `verification_token`, `verification_token_expires`, `reset_password_token`, `reset_password_expires`, `createdAt`, `updatedAt` FROM `users` AS `User` WHERE `User`.`email` = 'niranjansah250@gmail.com';
+[2025-05-11T09:37:02.182Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `email_verified`, `verification_token`, `verification_token_expires`, `reset_password_token`, `reset_password_expires`, `createdAt`, `updatedAt` FROM `users` AS `User` WHERE `User`.`email` = 'pondicherrytrip2025@gmail.com';
+[2025-05-11T09:38:00.450Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `email_verified`, `verification_token`, `verification_token_expires`, `reset_password_token`, `reset_password_expires`, `createdAt`, `updatedAt` FROM `users` AS `User` WHERE `User`.`email` = 'pondicherrytrip2025@gmail.com';
+[2025-05-11T09:38:00.718Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-11T09:38:00.722Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-11T09:38:00.731Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-11T09:38:00.732Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-11T09:40:34.398Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `email_verified`, `verification_token`, `verification_token_expires`, `reset_password_token`, `reset_password_expires`, `createdAt`, `updatedAt` FROM `users` AS `User` WHERE `User`.`email` = 'niranjansah250@gmail.com';
+[2025-05-11T09:40:38.893Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `email_verified`, `verification_token`, `verification_token_expires`, `reset_password_token`, `reset_password_expires`, `createdAt`, `updatedAt` FROM `users` AS `User` WHERE `User`.`email` = 'niranjansah250@gmail.com';
+[2025-05-11T09:41:06.776Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `email_verified`, `verification_token`, `verification_token_expires`, `reset_password_token`, `reset_password_expires`, `createdAt`, `updatedAt` FROM `users` AS `User` WHERE `User`.`email` = 'pondicherrytrip2025@gmail.com';
+[2025-05-11T09:41:06.960Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-11T09:41:06.966Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-11T09:41:06.972Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-11T09:41:06.973Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-11T09:41:23.630Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `email_verified`, `verification_token`, `verification_token_expires`, `reset_password_token`, `reset_password_expires`, `createdAt`, `updatedAt` FROM `users` AS `User` WHERE `User`.`email` = 'pondicherrytrip2025@gmail.com';
+[2025-05-11T09:41:23.880Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-11T09:41:23.883Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-11T09:41:23.897Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-11T09:41:23.897Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -8,27 +9,52 @@ function RegisterPage() {
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
   });
 
-  const [error, setError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
-  const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  // Allow more special characters
+  const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&^#_\-+])[A-Za-z\d@$!%*?&^#_\-+]{8,}$/;
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Name validation
+    if (!formData.name.trim()) {
+      newErrors.name = 'Full name is required';
+    }
+
+    // Email validation (basic)
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Invalid email format';
+    }
+
+    // Password validation
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (!passwordRegex.test(formData.password)) {
+      newErrors.password =
+        'Password must be at least 8 characters long, include one uppercase letter, one number, and one special character (@$!%*?&^#_-+).';
+    }
+
+    // Confirm password
+    if (formData.password && formData.confirmPassword !== formData.password) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    if (!passwordRegex.test(formData.password)) {
-      setPasswordError(
-        'Password must be at least 8 characters long, include one uppercase letter, one number, and one special character.'
-      );
+    if (!validateForm()) {
+      toast.error('Please fix the form errors');
       return;
     }
 
@@ -43,22 +69,61 @@ function RegisterPage() {
         toast.success('Signup successful! Please verify your email.');
         navigate('/login');
       } else {
-        setError(response.data?.message || 'Registration failed');
+        setErrors({ general: response.data?.message || 'Registration failed' });
       }
     } catch (err) {
-      if (err.response?.data?.message) {
-        setError(err.response.data.message);
-      } else {
-        setError('An error occurred. Please try again.');
-      }
+      const errorMessage = err.response?.data?.message || 'An error occurred. Please try again.';
+      setErrors({ general: errorMessage });
       console.error('Error during registration:', err);
     }
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setError('');
-    setPasswordError('');
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // Real-time validation for the changed field
+    const newErrors = { ...errors };
+    if (name === 'name') {
+      if (!value.trim()) {
+        newErrors.name = 'Full name is required';
+      } else {
+        delete newErrors.name;
+      }
+    }
+    if (name === 'email') {
+      if (!value) {
+        newErrors.email = 'Email is required';
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+        newErrors.email = 'Invalid email format';
+      } else {
+        delete newErrors.email;
+      }
+    }
+    if (name === 'password') {
+      if (!value) {
+        newErrors.password = 'Password is required';
+      } else if (!passwordRegex.test(value)) {
+        newErrors.password =
+          'Password must be at least 8 characters long, include one uppercase letter, one number, and one special character (@$!%*?&^#_-+).';
+      } else {
+        delete newErrors.password;
+      }
+      // Re-validate confirmPassword if password changes
+      if (formData.confirmPassword && value !== formData.confirmPassword) {
+        newErrors.confirmPassword = 'Passwords do not match';
+      } else {
+        delete newErrors.confirmPassword;
+      }
+    }
+    if (name === 'confirmPassword') {
+      if (formData.password && value !== formData.password) {
+        newErrors.confirmPassword = 'Passwords do not match';
+      } else {
+        delete newErrors.confirmPassword;
+      }
+    }
+    setErrors(newErrors);
   };
 
   return (
@@ -68,52 +133,85 @@ function RegisterPage() {
           Create your account
         </h2>
 
-        {error && <div className="text-center text-red-400 bg-white/10 p-3 rounded-lg mt-6">{error}</div>}
-        {passwordError && <div className="text-center text-red-400 bg-white/10 p-3 rounded-lg mt-6">{passwordError}</div>}
+        {errors.general && (
+          <div className="text-center text-red-400 bg-white/10 p-3 rounded-lg mt-6">{errors.general}</div>
+        )}
 
         <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
           <div className="space-y-4">
-            <input
-              id="name"
-              name="name"
-              type="text"
-              required
-              placeholder="Full name"
-              className="appearance-none rounded-lg relative block w-full px-4 py-3 bg-white/10 border border-white/30 placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 sm:text-sm transition-all"
-              value={formData.name}
-              onChange={handleChange}
-            />
-            <input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              required
-              placeholder="Email address"
-              className="appearance-none rounded-lg relative block w-full px-4 py-3 bg-white/10 border border-white/30 placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 sm:text-sm transition-all"
-              value={formData.email}
-              onChange={handleChange}
-            />
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              placeholder="Password"
-              className="appearance-none rounded-lg relative block w-full px-4 py-3 bg-white/10 border border-white/30 placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 sm:text-sm transition-all"
-              value={formData.password}
-              onChange={handleChange}
-            />
-            <input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              required
-              placeholder="Confirm password"
-              className="appearance-none rounded-lg relative block w-full px-4 py-3 bg-white/10 border border-white/30 placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 sm:text-sm transition-all"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-            />
+            <div>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                required
+                placeholder="Full name"
+                className={`appearance-none rounded-lg relative block w-full px-4 py-3 bg-white/10 border ${
+                  errors.name ? 'border-red-400' : 'border-white/30'
+                } placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 sm:text-sm transition-all`}
+                value={formData.name}
+                onChange={handleChange}
+              />
+              {errors.name && (
+                <p className="mt-1 text-sm text-red-400">{errors.name}</p>
+              )}
+            </div>
+            <div>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                placeholder="Email address"
+                className={`appearance-none rounded-lg relative block w-full px-4 py-3 bg-white/10 border ${
+                  errors.email ? 'border-red-400' : 'border-white/30'
+                } placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 sm:text-sm transition-all`}
+                value={formData.email}
+                onChange={handleChange}
+              />
+              {errors.email && (
+                <p className="mt-1 text-sm text-red-400">{errors.email}</p>
+              )}
+            </div>
+            <div>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                placeholder="Password"
+                className={`appearance-none rounded-lg relative block w-full px-4 py-3 bg-white/10 border ${
+                  errors.password ? 'border-red-400' : 'border-white/30'
+                } placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 sm:text-sm transition-all`}
+                value={formData.password}
+                onChange={handleChange}
+              />
+              {errors.password ? (
+                <p className="mt-1 text-sm text-red-400">{errors.password}</p>
+              ) : (
+                <p className="mt-1 text-xs text-gray-300">
+                  Password must be 8+ characters, with 1 uppercase, 1 number, 1 special character (@$!%*?&^#_-+).
+                </p>
+              )}
+            </div>
+            <div>
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                required
+                placeholder="Confirm password"
+                className={`appearance-none rounded-lg relative block w-full px-4 py-3 bg-white/10 border ${
+                  errors.confirmPassword ? 'border-red-400' : 'border-white/30'
+                } placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 sm:text-sm transition-all`}
+                value={formData.confirmPassword}
+                onChange={handleChange}
+              />
+              {errors.confirmPassword && (
+                <p className="mt-1 text-sm text-red-400">{errors.confirmPassword}</p>
+              )}
+            </div>
           </div>
 
           <button

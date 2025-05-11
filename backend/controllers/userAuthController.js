@@ -33,7 +33,30 @@ exports.signup = async (req, res) => {
     await sendEmail({
       to: email,
       subject: 'Verify your email',
-      html: `<p>Click to verify your email:</p><a href="${link}">${link}</a>`,
+      html: `
+    <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 30px; border-radius: 10px; max-width: 600px; margin: auto;">
+      <h2 style="color: #4CAF50;">Email Verification Required</h2>
+      <p style="font-size: 16px; color: #333;">
+        Hello,
+      </p>
+      <p style="font-size: 16px; color: #333;">
+        We received a request to update the email associated with your account. Please click the button below to verify your new email address:
+      </p>
+      <p style="text-align: center; margin: 30px 0;">
+        <a href="${link}" style="display: inline-block; background-color: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+          Verify Email
+        </a>
+      </p>
+      <p style="font-size: 14px; color: #666;">
+        Or copy and paste this link into your browser:<br>
+        <a href="${link}" style="color: #4CAF50;">${link}</a>
+      </p>
+      <hr style="margin: 30px 0;">
+      <p style="font-size: 12px; color: #999;">
+        If you didn’t request this change, please ignore this email or contact our support.
+      </p>
+    </div>
+  `,
     });
 
     res.status(201).json({ message: 'Signup successful. Please check your email to verify your account.' });
