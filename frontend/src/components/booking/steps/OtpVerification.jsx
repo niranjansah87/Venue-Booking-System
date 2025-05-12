@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Mail, Loader } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { sendOTP } from '../../../services/bookingService';
+import { useAuth } from '../../../contexts/AuthContext'; // Import useAuth
 import { toast } from 'react-toastify';
 
 const OtpVerification = ({ email, verifyOtp, submitting }) => {
@@ -9,25 +9,38 @@ const OtpVerification = ({ email, verifyOtp, submitting }) => {
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [sendingOtp, setSendingOtp] = useState(false);
   const [error, setError] = useState(null);
+  const { sendOtp } = useAuth(); // Use sendOtp from AuthContext
 
   useEffect(() => {
+    let isMounted = true;
+
     const sendOtpToEmail = async () => {
+      if (!email || isOtpSent || !isMounted) return; // Prevent duplicate sends
       try {
         setSendingOtp(true);
-        await sendOTP(email);
-        setIsOtpSent(true);
-        toast.success('OTP sent to your email.');
+        await sendOtp(email);
+        if (isMounted) {
+          setIsOtpSent(true);
+          toast.success('OTP sent to your email.');
+        }
       } catch (error) {
-        setError('Failed to send OTP.');
-        toast.error('Failed to send OTP.');
+        if (isMounted) {
+          setError('Failed to send OTP.');
+          toast.error('Failed to send OTP.');
+        }
       } finally {
-        setSendingOtp(false);
+        if (isMounted) {
+          setSendingOtp(false);
+        }
       }
     };
-    if (email && !isOtpSent) {
-      sendOtpToEmail();
-    }
-  }, [email, isOtpSent]);
+
+    sendOtpToEmail();
+
+    return () => {
+      isMounted = false; // Cleanup to prevent state updates after unmount
+    };
+  }, [email, isOtpSent, sendOtp]);
 
   const handleOtpSubmit = async () => {
     try {

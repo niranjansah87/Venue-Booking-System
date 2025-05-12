@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { body } = require('express-validator');
+const { body,check } = require('express-validator');
 const welcomeController = require('../controllers/welcomeController');
 
 router.get('/step1', welcomeController.step1);
@@ -37,8 +37,9 @@ router.post(
 );
 
 
-router.get(
+router.post(
   '/verify-otp',
+  [check('otp').isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits')],
   welcomeController.verifyOTP
 );
 router.post(

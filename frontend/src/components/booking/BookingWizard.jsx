@@ -32,7 +32,6 @@ const BookingWizard = () => {
   const navigate = useNavigate();
   const { user, sendOtp, verifyOtp, sendBookingConfirmationEmail } = useAuth();
 
-  // Fetch user data from local storage
   const getInitialUserData = () => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -72,7 +71,6 @@ const BookingWizard = () => {
   const [isComplete, setIsComplete] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  // Redirect if not logged in
   useEffect(() => {
     if (!user) {
       console.log('No user logged in, redirecting to login.');
@@ -164,17 +162,45 @@ const BookingWizard = () => {
     setSubmitting(true);
     try {
       await verifyOtp(otp);
-      const response = await api.post('/api/admin/bookings/store', {
-        ...bookingData,
-        event_date: bookingData.date.toISOString().split('T')[0],
-      });
+
+      // Validate bookingData
+      const requiredFields = ['date', 'event_id', 'venueId', 'shiftId', 'packageId', 'guestCount', 'name', 'email'];
+      const missingFields = requiredFields.filter((field) => !bookingData[field] || bookingData[field] === null);
+      if (missingFields.length > 0) {
+        throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+      }
+
+      // Map frontend keys to backend expected keys
+      const payload = {
+        event_id: bookingData.event_id,
+        venue_id: bookingData.venueId,
+        shift_id: bookingData.shiftId,
+        package_id: bookingData.packageId,
+        guest_count: bookingData.guestCount,
+        event_date: bookingData.date ? bookingData.date.toISOString().split('T')[0] : null,
+        selected_menus: bookingData.selectedMenus,
+        customer_name: bookingData.name,
+        customer_email: bookingData.email,
+        base_fare: bookingData.baseFare,
+        extra_charges: bookingData.extraCharges,
+        total_fare: bookingData.totalFare,
+      };
+
+      console.log('Sending store booking request:', payload); // Debug
+
+      const response = await api.post('/api/admin/bookings/store', payload);
       setBookingId(response.data.bookingId);
       await sendBookingConfirmationEmail(response.data.bookingId, bookingData.email);
       setIsComplete(true);
       setCurrentStep(steps.length - 1);
     } catch (error) {
       console.error('Error storing booking:', error);
-      toast.error(error.response?.data?.message || 'Failed to store booking.');
+      const errorMessage =
+        error.response?.data?.errors?.map((err) => err.msg).join(', ') ||
+        error.response?.data?.message ||
+        error.message ||
+        'Failed to store booking.';
+      toast.error(errorMessage);
       throw error;
     } finally {
       setSubmitting(false);
@@ -183,7 +209,6 @@ const BookingWizard = () => {
 
   const handleNext = () => {
     if (currentStep === steps.length - 2 && !isComplete) {
-      // OTP step requires verification
       return;
     }
     if (currentStep === steps.findIndex((s) => s.id === 'venue') && !bookingData.venueId) {

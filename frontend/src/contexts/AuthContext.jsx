@@ -13,7 +13,6 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkUser = () => {
       const storedUser = localStorage.getItem('user');
-
       if (storedUser) {
         try {
           const userData = JSON.parse(storedUser);
@@ -38,14 +37,12 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await api.post('/api/login', { email, password });
       const { user } = response.data;
-
       if (!user || typeof user !== 'object') {
         throw new Error('No user data received from server');
       }
       if (!user.id || !user.email || !user.name) {
         throw new Error('User data missing required fields (id, email, name)');
       }
-
       localStorage.setItem('user', JSON.stringify(user));
       setUser(user);
       toast.success('Logged in successfully!');
@@ -68,39 +65,45 @@ export const AuthProvider = ({ children }) => {
     toast.success('Logged out successfully!');
   };
 
-  const sendOtp = async () => {
+  const sendOtp = async (email) => {
     if (!user?.id || !user?.email) {
       toast.error('Please log in to send OTP.');
       throw new Error('User details not found');
     }
     try {
-      await api.post('/send-otp', { userId: user.id, email: user.email });
+      const response = await api.post('/api/admin/book/send-otp', { email: user.email });
+      console.log('OTP sent to:', user.email); // Debug
       toast.success('OTP sent to your email!');
+      return response.data;
     } catch (error) {
       console.error('Error sending OTP:', error);
-      toast.error(error.response?.data?.message || 'Failed to send OTP.');
-      throw error;
+      const errorMessage = error.response?.data?.message || 'Failed to send OTP';
+      toast.error(errorMessage);
+      throw new Error(errorMessage);
     }
   };
 
   const verifyOtp = async (otp) => {
-    if (!user?.id || !user?.name) {
+    if (!user?.id || !user?.email) {
       toast.error('Please log in to verify OTP.');
       throw new Error('User details not found');
     }
     try {
-      await api.post('/step3', { userId: user.id, otp, name: user.name });
+      const response = await api.post('/api/admin/book/verify-otp', { otp });
+      console.log('OTP verified:', otp); // Debug
       toast.success('OTP verified successfully!');
+      return response.data;
     } catch (error) {
       console.error('Error verifying OTP:', error);
-      toast.error(error.response?.data?.message || 'Invalid OTP.');
-      throw error;
+      const errorMessage = error.response?.data?.message || 'Invalid OTP';
+      toast.error(errorMessage);
+      throw new Error(errorMessage);
     }
   };
 
   const sendConfirmation = async (bookingId, email) => {
     try {
-      await api.post('/send-confirmation', { bookingId, email });
+      await api.post('/api/bookings/confirmation-email', { bookingId, email });
       toast.success('Confirmation email sent!');
     } catch (error) {
       console.error('Error sending confirmation:', error);

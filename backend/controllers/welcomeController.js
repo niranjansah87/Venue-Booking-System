@@ -336,8 +336,10 @@ exports.sendConfirmation = async (req, res) => {
 
 
 exports.verifyOTP = async (req, res) => {
-  
-  
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ message: errors.array()[0].msg });
+  }
 
   const { otp } = req.body;
 
@@ -345,7 +347,7 @@ exports.verifyOTP = async (req, res) => {
     const otpRecord = await Otp.findOne({
       where: {
         otp_code: otp,
-        expires_at: { [Op.gt]: new Date() }, // Not expired
+        expires_at: { [Op.gt]: new Date() },
       },
       include: [{ model: User }],
     });
@@ -354,7 +356,7 @@ exports.verifyOTP = async (req, res) => {
       return res.status(400).json({ message: 'Invalid or expired OTP' });
     }
 
-    // Optional: Delete OTP after verification
+    console.log(`OTP verified for user_id: ${otpRecord.user_id}`);
     await otpRecord.destroy();
 
     res.json({ message: 'OTP verified successfully' });

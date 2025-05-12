@@ -147,9 +147,9 @@ export const sendOTP = async (email) => {
 };
 
 // Verify OTP
-export const verifyOTP = async (otp, name) => {
+export const verifyOTP = async (otp) => {
   try {
-    const response = await api.post('/api/admin/book/step3', { otp, name });
+    const response = await api.post('/api/admin/book/verify-otp', { otp });
     return response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || 'Failed to verify OTP';
