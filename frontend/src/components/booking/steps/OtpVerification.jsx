@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../../../contexts/AuthContext';
 import { toast } from 'react-toastify';
 
-const OtpVerification = ({ verifyOtp, submitting }) => {
+const OtpVerification = ({ verifyOtp, submitting, sessionId }) => {
   const { user, sendOtp } = useAuth();
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [resendDisabled, setResendDisabled] = useState(true);
@@ -50,7 +50,7 @@ const OtpVerification = ({ verifyOtp, submitting }) => {
     try {
       setResendDisabled(true);
       setCountdown(30);
-      await sendOtp();
+      await sendOtp(sessionId);
       setOtp(['', '', '', '', '', '']);
       inputRefs[0].current?.focus();
       setVerificationError('');

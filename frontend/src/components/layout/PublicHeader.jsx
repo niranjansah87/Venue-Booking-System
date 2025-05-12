@@ -1,18 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { Menu, X, User, Calendar, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import api from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
+import { toast } from 'react-toastify';
 
 const PublicHeader = ({ isScrolled }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const navigate = useNavigate();
+  const { user, logout, loading } = useAuth();
   const dropdownRef = useRef(null);
-
-  // Get user data from localStorage
-  const userData = localStorage.getItem('user');
-  const user = userData ? JSON.parse(userData) : null;
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -37,13 +34,12 @@ const PublicHeader = ({ isScrolled }) => {
 
   const handleLogout = async () => {
     try {
-      await api.post('/api/logout');
-      localStorage.removeItem('user');
-      navigate('/');
+      await logout();
       setMobileMenuOpen(false);
       setDropdownOpen(false);
     } catch (error) {
       console.error('Logout error:', error);
+      toast.error('Failed to log out.');
     }
   };
 
@@ -59,6 +55,10 @@ const PublicHeader = ({ isScrolled }) => {
     if (!name) return 'User';
     return name.split(' ')[0];
   };
+
+  if (loading) {
+    return null; // Prevent rendering until auth state is resolved
+  }
 
   return (
     <header
@@ -245,8 +245,8 @@ const PublicHeader = ({ isScrolled }) => {
                             ? 'bg-teal-50 text-teal-700'
                             : 'text-gray-700 hover:bg-gray-50'
                           : isActive
-                          ? 'bg-white/10 text-white'
-                          : 'text-white/90 hover:bg-white/5'
+                            ? 'bg-white/10 text-white'
+                            : 'text-white/90 hover:bg-white/5'
                       }
                     `}
                     onClick={() => setMobileMenuOpen(false)}
@@ -273,7 +273,7 @@ const PublicHeader = ({ isScrolled }) => {
                       Profile
                     </Link>
                     <Link
-                      to="/bookings"
+                      to="/user/booking"
                       className={`flex items-center px-3 py-2 rounded-md text-base font-medium ${
                         isScrolled
                           ? 'text-gray-700 hover:bg-gray-50'

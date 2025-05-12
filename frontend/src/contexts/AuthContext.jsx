@@ -12,26 +12,21 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const checkUser = () => {
-      const token = localStorage.getItem('authToken');
       const storedUser = localStorage.getItem('user');
-      if (token && storedUser) {
+
+      if (storedUser) {
         try {
-          // Parse stored user data
           const userData = JSON.parse(storedUser);
+          if (!userData.id || !userData.email || !userData.name) {
+            throw new Error('Invalid user data in localStorage');
+          }
           setUser(userData);
-          // Set token in API headers
-          api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         } catch (error) {
           console.error('Error parsing user data:', error);
-          localStorage.removeItem('authToken');
           localStorage.removeItem('user');
-          delete api.defaults.headers.common['Authorization'];
           setUser(null);
         }
       } else {
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('user');
-        delete api.defaults.headers.common['Authorization'];
         setUser(null);
       }
       setLoading(false);
@@ -42,24 +37,32 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const response = await api.post('/api/admin/login', { email, password });
-      const { token, user } = response.data;
-      localStorage.setItem('authToken', token);
+      const { user } = response.data;
+
+      if (!user || typeof user !== 'object') {
+        throw new Error('No user data received from server');
+      }
+      if (!user.id || !user.email || !user.name) {
+        throw new Error('User data missing required fields (id, email, name)');
+      }
+
       localStorage.setItem('user', JSON.stringify(user));
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       setUser(user);
       toast.success('Logged in successfully!');
       navigate('/booking');
     } catch (error) {
       console.error('Error logging in:', error);
-      toast.error('Login failed. Please check your credentials.');
-      throw error;
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        'Login failed. Please check your credentials.';
+      toast.error(errorMessage);
+      throw new Error(errorMessage);
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('authToken');
     localStorage.removeItem('user');
-    delete api.defaults.headers.common['Authorization'];
     setUser(null);
     navigate('/login');
     toast.success('Logged out successfully!');
@@ -67,52 +70,56 @@ export const AuthProvider = ({ children }) => {
 
   const sendOtp = async () => {
     if (!user?.id || !user?.email) {
-      toast.error('User details not found. Please log in.');
+      toast.error('Please log in to send OTP.');
       throw new Error('User details not found');
     }
     try {
-      await api.post('/api/admin/book/send-otp', { userId: user.id, email: user.email });
+      await api.post('/send-otp', { userId: user.id, email: user.email });
       toast.success('OTP sent to your email!');
     } catch (error) {
       console.error('Error sending OTP:', error);
-      toast.error('Failed to send OTP.');
+      toast.error(error.response?.data?.message || 'Failed to send OTP.');
       throw error;
     }
   };
 
   const verifyOtp = async (otp) => {
     if (!user?.id || !user?.name) {
-      toast.error('User details not found. Please log in.');
+      toast.error('Please log in to verify OTP.');
       throw new Error('User details not found');
     }
     try {
-      await api.post('/api/admin/book/step3', { userId: user.id, otp, name: user.name });
+      await api.post('/step3', { userId: user.id, otp, name: user.name });
       toast.success('OTP verified successfully!');
     } catch (error) {
       console.error('Error verifying OTP:', error);
-      toast.error('Invalid OTP.');
+      toast.error(error.response?.data?.message || 'Invalid OTP.');
       throw error;
     }
   };
 
-  const sendBookingConfirmationEmail = async (bookingId, email) => {
+  const sendConfirmation = async (bookingId, email) => {
     try {
-      await api.post('/api/admin/bookings/send-confirmation', { bookingId, email });
+      await api.post('/send-confirmation', { bookingId, email });
       toast.success('Confirmation email sent!');
     } catch (error) {
-      console.error('Error sending confirmation email:', error);
-      toast.error('Failed to send confirmation email.');
+      console.error('Error sending confirmation:', error);
+      toast.error(error.response?.data?.message || 'Failed to send confirmation email.');
       throw error;
     }
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-xl font-semibold text-gray-700">Loading...</div>
+      </div>
+    );
   }
 
   return (
     <AuthContext.Provider
-      value={{ user, login, logout, sendOtp, verifyOtp, sendBookingConfirmationEmail, loading }}
+      value={{ user, login, logout, sendOtp, verifyOtp, sendConfirmation, loading }}
     >
       {children}
     </AuthContext.Provider>

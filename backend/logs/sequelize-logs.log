@@ -12577,3 +12577,319 @@
 [2025-05-12T04:20:35.585Z] info: Executing (default): SHOW INDEX FROM `menus`
 [2025-05-12T04:20:35.588Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
 [2025-05-12T04:20:35.590Z] info: Executing (default): SHOW INDEX FROM `bookings`
+[2025-05-12T04:40:44.911Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-12T04:40:44.915Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'users' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T04:40:44.920Z] info: Executing (default): SHOW INDEX FROM `users`
+[2025-05-12T04:40:44.926Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'admins' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T04:40:44.928Z] info: Executing (default): SHOW INDEX FROM `admins`
+[2025-05-12T04:40:44.930Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T04:40:44.932Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-12T04:40:44.934Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'venues' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T04:40:44.936Z] info: Executing (default): SHOW INDEX FROM `venues`
+[2025-05-12T04:40:44.939Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'shifts' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T04:40:44.942Z] info: Executing (default): SHOW INDEX FROM `shifts`
+[2025-05-12T04:40:44.944Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'packages' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T04:40:44.946Z] info: Executing (default): SHOW INDEX FROM `packages`
+[2025-05-12T04:40:44.947Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'menus' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T04:40:44.949Z] info: Executing (default): SHOW INDEX FROM `menus`
+[2025-05-12T04:40:44.951Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T04:40:44.953Z] info: Executing (default): SHOW INDEX FROM `bookings`
+[2025-05-12T04:40:50.062Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `admins` AS `Admin` WHERE `Admin`.`email` = 'sahn0075@gmail.com';
+[2025-05-12T04:41:08.902Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `admins` AS `Admin` WHERE `Admin`.`email` = 'sahn0075@gmail.com';
+[2025-05-12T04:44:12.974Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `admins` AS `Admin` WHERE `Admin`.`email` = 'sahn0075@gmail.com';
+[2025-05-12T04:44:15.598Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `admins` AS `Admin` WHERE `Admin`.`email` = 'sahn0075@gmail.com';
+[2025-05-12T04:45:08.646Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `admins` AS `Admin` WHERE `Admin`.`email` = 'sahn0075@gmail.com';
+[2025-05-12T04:45:43.521Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `admins` AS `Admin` WHERE `Admin`.`email` = 'sahn0075@gmail.com';
+[2025-05-12T04:46:47.306Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `admins` AS `Admin` WHERE `Admin`.`email` = 'sahn0075@gmail.com';
+[2025-05-12T04:46:55.625Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `admins` AS `Admin` WHERE `Admin`.`email` = 'sahn0075@gmail.com';
+[2025-05-12T04:46:55.821Z] info: Executing (default): SELECT `id`, `name`, `email` FROM `users` AS `User`;
+[2025-05-12T04:46:55.855Z] info: Executing (default): SELECT `Booking`.`id`, `Booking`.`user_id`, `Booking`.`event_id`, `Booking`.`venue_id`, `Booking`.`shift_id`, `Booking`.`package_id`, `Booking`.`event_date`, `Booking`.`guest_count`, `Booking`.`selected_menus`, `Booking`.`total_fare`, `Booking`.`status`, `Booking`.`createdAt`, `Booking`.`updatedAt`, `event`.`id` AS `event.id`, `event`.`name` AS `event.name`, `event`.`createdAt` AS `event.createdAt`, `event`.`updatedAt` AS `event.updatedAt`, `venue`.`id` AS `venue.id`, `venue`.`name` AS `venue.name`, `venue`.`image` AS `venue.image`, `venue`.`capacity` AS `venue.capacity`, `venue`.`createdAt` AS `venue.createdAt`, `venue`.`updatedAt` AS `venue.updatedAt`, `shift`.`id` AS `shift.id`, `shift`.`name` AS `shift.name`, `shift`.`createdAt` AS `shift.createdAt`, `shift`.`updatedAt` AS `shift.updatedAt`, `package`.`id` AS `package.id`, `package`.`name` AS `package.name`, `package`.`base_price` AS `package.base_price`, `package`.`createdAt` AS `package.createdAt`, `package`.`updatedAt` AS `package.updatedAt`, `user`.`id` AS `user.id`, `user`.`name` AS `user.name`, `user`.`email` AS `user.email`, `user`.`password` AS `user.password`, `user`.`email_verified` AS `user.email_verified`, `user`.`verification_token` AS `user.verification_token`, `user`.`verification_token_expires` AS `user.verification_token_expires`, `user`.`reset_password_token` AS `user.reset_password_token`, `user`.`reset_password_expires` AS `user.reset_password_expires`, `user`.`createdAt` AS `user.createdAt`, `user`.`updatedAt` AS `user.updatedAt` FROM `bookings` AS `Booking` LEFT OUTER JOIN `Events` AS `event` ON `Booking`.`event_id` = `event`.`id` LEFT OUTER JOIN `venues` AS `venue` ON `Booking`.`venue_id` = `venue`.`id` LEFT OUTER JOIN `shifts` AS `shift` ON `Booking`.`shift_id` = `shift`.`id` LEFT OUTER JOIN `packages` AS `package` ON `Booking`.`package_id` = `package`.`id` LEFT OUTER JOIN `users` AS `user` ON `Booking`.`user_id` = `user`.`id`;
+[2025-05-12T04:46:55.863Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T04:46:55.865Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T04:46:55.866Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-12T04:46:55.867Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T04:46:55.884Z] info: Executing (default): SELECT `id`, `name`, `base_price`, `createdAt`, `updatedAt` FROM `packages` AS `Package`;
+[2025-05-12T04:46:55.887Z] info: Executing (default): SELECT `id`, `name`, `email` FROM `users` AS `User`;
+[2025-05-12T04:46:55.895Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T04:46:55.900Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T04:46:55.903Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T04:46:55.904Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-12T04:46:55.921Z] info: Executing (default): SELECT `id`, `name`, `base_price`, `createdAt`, `updatedAt` FROM `packages` AS `Package`;
+[2025-05-12T04:46:55.925Z] info: Executing (default): SELECT `Booking`.`id`, `Booking`.`user_id`, `Booking`.`event_id`, `Booking`.`venue_id`, `Booking`.`shift_id`, `Booking`.`package_id`, `Booking`.`event_date`, `Booking`.`guest_count`, `Booking`.`selected_menus`, `Booking`.`total_fare`, `Booking`.`status`, `Booking`.`createdAt`, `Booking`.`updatedAt`, `event`.`id` AS `event.id`, `event`.`name` AS `event.name`, `event`.`createdAt` AS `event.createdAt`, `event`.`updatedAt` AS `event.updatedAt`, `venue`.`id` AS `venue.id`, `venue`.`name` AS `venue.name`, `venue`.`image` AS `venue.image`, `venue`.`capacity` AS `venue.capacity`, `venue`.`createdAt` AS `venue.createdAt`, `venue`.`updatedAt` AS `venue.updatedAt`, `shift`.`id` AS `shift.id`, `shift`.`name` AS `shift.name`, `shift`.`createdAt` AS `shift.createdAt`, `shift`.`updatedAt` AS `shift.updatedAt`, `package`.`id` AS `package.id`, `package`.`name` AS `package.name`, `package`.`base_price` AS `package.base_price`, `package`.`createdAt` AS `package.createdAt`, `package`.`updatedAt` AS `package.updatedAt`, `user`.`id` AS `user.id`, `user`.`name` AS `user.name`, `user`.`email` AS `user.email`, `user`.`password` AS `user.password`, `user`.`email_verified` AS `user.email_verified`, `user`.`verification_token` AS `user.verification_token`, `user`.`verification_token_expires` AS `user.verification_token_expires`, `user`.`reset_password_token` AS `user.reset_password_token`, `user`.`reset_password_expires` AS `user.reset_password_expires`, `user`.`createdAt` AS `user.createdAt`, `user`.`updatedAt` AS `user.updatedAt` FROM `bookings` AS `Booking` LEFT OUTER JOIN `Events` AS `event` ON `Booking`.`event_id` = `event`.`id` LEFT OUTER JOIN `venues` AS `venue` ON `Booking`.`venue_id` = `venue`.`id` LEFT OUTER JOIN `shifts` AS `shift` ON `Booking`.`shift_id` = `shift`.`id` LEFT OUTER JOIN `packages` AS `package` ON `Booking`.`package_id` = `package`.`id` LEFT OUTER JOIN `users` AS `user` ON `Booking`.`user_id` = `user`.`id`;
+[2025-05-12T04:47:00.091Z] info: Executing (default): SELECT `id`, `name`, `email` FROM `users` AS `User`;
+[2025-05-12T04:47:00.101Z] info: Executing (default): SELECT `Booking`.`id`, `Booking`.`user_id`, `Booking`.`event_id`, `Booking`.`venue_id`, `Booking`.`shift_id`, `Booking`.`package_id`, `Booking`.`event_date`, `Booking`.`guest_count`, `Booking`.`selected_menus`, `Booking`.`total_fare`, `Booking`.`status`, `Booking`.`createdAt`, `Booking`.`updatedAt`, `event`.`id` AS `event.id`, `event`.`name` AS `event.name`, `event`.`createdAt` AS `event.createdAt`, `event`.`updatedAt` AS `event.updatedAt`, `venue`.`id` AS `venue.id`, `venue`.`name` AS `venue.name`, `venue`.`image` AS `venue.image`, `venue`.`capacity` AS `venue.capacity`, `venue`.`createdAt` AS `venue.createdAt`, `venue`.`updatedAt` AS `venue.updatedAt`, `shift`.`id` AS `shift.id`, `shift`.`name` AS `shift.name`, `shift`.`createdAt` AS `shift.createdAt`, `shift`.`updatedAt` AS `shift.updatedAt`, `package`.`id` AS `package.id`, `package`.`name` AS `package.name`, `package`.`base_price` AS `package.base_price`, `package`.`createdAt` AS `package.createdAt`, `package`.`updatedAt` AS `package.updatedAt`, `user`.`id` AS `user.id`, `user`.`name` AS `user.name`, `user`.`email` AS `user.email`, `user`.`password` AS `user.password`, `user`.`email_verified` AS `user.email_verified`, `user`.`verification_token` AS `user.verification_token`, `user`.`verification_token_expires` AS `user.verification_token_expires`, `user`.`reset_password_token` AS `user.reset_password_token`, `user`.`reset_password_expires` AS `user.reset_password_expires`, `user`.`createdAt` AS `user.createdAt`, `user`.`updatedAt` AS `user.updatedAt` FROM `bookings` AS `Booking` LEFT OUTER JOIN `Events` AS `event` ON `Booking`.`event_id` = `event`.`id` LEFT OUTER JOIN `venues` AS `venue` ON `Booking`.`venue_id` = `venue`.`id` LEFT OUTER JOIN `shifts` AS `shift` ON `Booking`.`shift_id` = `shift`.`id` LEFT OUTER JOIN `packages` AS `package` ON `Booking`.`package_id` = `package`.`id` LEFT OUTER JOIN `users` AS `user` ON `Booking`.`user_id` = `user`.`id`;
+[2025-05-12T04:47:00.102Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T04:47:00.104Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T04:47:00.104Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-12T04:47:00.105Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T04:47:00.107Z] info: Executing (default): SELECT `id`, `name`, `base_price`, `createdAt`, `updatedAt` FROM `packages` AS `Package`;
+[2025-05-12T04:47:00.119Z] info: Executing (default): SELECT `id`, `name`, `email` FROM `users` AS `User`;
+[2025-05-12T04:47:00.121Z] info: Executing (default): SELECT `Booking`.`id`, `Booking`.`user_id`, `Booking`.`event_id`, `Booking`.`venue_id`, `Booking`.`shift_id`, `Booking`.`package_id`, `Booking`.`event_date`, `Booking`.`guest_count`, `Booking`.`selected_menus`, `Booking`.`total_fare`, `Booking`.`status`, `Booking`.`createdAt`, `Booking`.`updatedAt`, `event`.`id` AS `event.id`, `event`.`name` AS `event.name`, `event`.`createdAt` AS `event.createdAt`, `event`.`updatedAt` AS `event.updatedAt`, `venue`.`id` AS `venue.id`, `venue`.`name` AS `venue.name`, `venue`.`image` AS `venue.image`, `venue`.`capacity` AS `venue.capacity`, `venue`.`createdAt` AS `venue.createdAt`, `venue`.`updatedAt` AS `venue.updatedAt`, `shift`.`id` AS `shift.id`, `shift`.`name` AS `shift.name`, `shift`.`createdAt` AS `shift.createdAt`, `shift`.`updatedAt` AS `shift.updatedAt`, `package`.`id` AS `package.id`, `package`.`name` AS `package.name`, `package`.`base_price` AS `package.base_price`, `package`.`createdAt` AS `package.createdAt`, `package`.`updatedAt` AS `package.updatedAt`, `user`.`id` AS `user.id`, `user`.`name` AS `user.name`, `user`.`email` AS `user.email`, `user`.`password` AS `user.password`, `user`.`email_verified` AS `user.email_verified`, `user`.`verification_token` AS `user.verification_token`, `user`.`verification_token_expires` AS `user.verification_token_expires`, `user`.`reset_password_token` AS `user.reset_password_token`, `user`.`reset_password_expires` AS `user.reset_password_expires`, `user`.`createdAt` AS `user.createdAt`, `user`.`updatedAt` AS `user.updatedAt` FROM `bookings` AS `Booking` LEFT OUTER JOIN `Events` AS `event` ON `Booking`.`event_id` = `event`.`id` LEFT OUTER JOIN `venues` AS `venue` ON `Booking`.`venue_id` = `venue`.`id` LEFT OUTER JOIN `shifts` AS `shift` ON `Booking`.`shift_id` = `shift`.`id` LEFT OUTER JOIN `packages` AS `package` ON `Booking`.`package_id` = `package`.`id` LEFT OUTER JOIN `users` AS `user` ON `Booking`.`user_id` = `user`.`id`;
+[2025-05-12T04:47:00.122Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T04:47:00.124Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T04:47:00.132Z] info: Executing (default): SELECT `id`, `name`, `base_price`, `createdAt`, `updatedAt` FROM `packages` AS `Package`;
+[2025-05-12T04:47:00.134Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T04:47:00.135Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-12T04:47:00.365Z] info: Executing (default): SELECT `id`, `name`, `email` FROM `users` AS `User`;
+[2025-05-12T04:47:00.369Z] info: Executing (default): SELECT `Booking`.`id`, `Booking`.`user_id`, `Booking`.`event_id`, `Booking`.`venue_id`, `Booking`.`shift_id`, `Booking`.`package_id`, `Booking`.`event_date`, `Booking`.`guest_count`, `Booking`.`selected_menus`, `Booking`.`total_fare`, `Booking`.`status`, `Booking`.`createdAt`, `Booking`.`updatedAt`, `event`.`id` AS `event.id`, `event`.`name` AS `event.name`, `event`.`createdAt` AS `event.createdAt`, `event`.`updatedAt` AS `event.updatedAt`, `venue`.`id` AS `venue.id`, `venue`.`name` AS `venue.name`, `venue`.`image` AS `venue.image`, `venue`.`capacity` AS `venue.capacity`, `venue`.`createdAt` AS `venue.createdAt`, `venue`.`updatedAt` AS `venue.updatedAt`, `shift`.`id` AS `shift.id`, `shift`.`name` AS `shift.name`, `shift`.`createdAt` AS `shift.createdAt`, `shift`.`updatedAt` AS `shift.updatedAt`, `package`.`id` AS `package.id`, `package`.`name` AS `package.name`, `package`.`base_price` AS `package.base_price`, `package`.`createdAt` AS `package.createdAt`, `package`.`updatedAt` AS `package.updatedAt`, `user`.`id` AS `user.id`, `user`.`name` AS `user.name`, `user`.`email` AS `user.email`, `user`.`password` AS `user.password`, `user`.`email_verified` AS `user.email_verified`, `user`.`verification_token` AS `user.verification_token`, `user`.`verification_token_expires` AS `user.verification_token_expires`, `user`.`reset_password_token` AS `user.reset_password_token`, `user`.`reset_password_expires` AS `user.reset_password_expires`, `user`.`createdAt` AS `user.createdAt`, `user`.`updatedAt` AS `user.updatedAt` FROM `bookings` AS `Booking` LEFT OUTER JOIN `Events` AS `event` ON `Booking`.`event_id` = `event`.`id` LEFT OUTER JOIN `venues` AS `venue` ON `Booking`.`venue_id` = `venue`.`id` LEFT OUTER JOIN `shifts` AS `shift` ON `Booking`.`shift_id` = `shift`.`id` LEFT OUTER JOIN `packages` AS `package` ON `Booking`.`package_id` = `package`.`id` LEFT OUTER JOIN `users` AS `user` ON `Booking`.`user_id` = `user`.`id`;
+[2025-05-12T04:47:00.370Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T04:47:00.372Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T04:47:00.372Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-12T04:47:00.374Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T04:47:00.375Z] info: Executing (default): SELECT `id`, `name`, `base_price`, `createdAt`, `updatedAt` FROM `packages` AS `Package`;
+[2025-05-12T04:47:00.384Z] info: Executing (default): SELECT `id`, `name`, `email` FROM `users` AS `User`;
+[2025-05-12T04:47:00.387Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T04:47:00.389Z] info: Executing (default): SELECT `Booking`.`id`, `Booking`.`user_id`, `Booking`.`event_id`, `Booking`.`venue_id`, `Booking`.`shift_id`, `Booking`.`package_id`, `Booking`.`event_date`, `Booking`.`guest_count`, `Booking`.`selected_menus`, `Booking`.`total_fare`, `Booking`.`status`, `Booking`.`createdAt`, `Booking`.`updatedAt`, `event`.`id` AS `event.id`, `event`.`name` AS `event.name`, `event`.`createdAt` AS `event.createdAt`, `event`.`updatedAt` AS `event.updatedAt`, `venue`.`id` AS `venue.id`, `venue`.`name` AS `venue.name`, `venue`.`image` AS `venue.image`, `venue`.`capacity` AS `venue.capacity`, `venue`.`createdAt` AS `venue.createdAt`, `venue`.`updatedAt` AS `venue.updatedAt`, `shift`.`id` AS `shift.id`, `shift`.`name` AS `shift.name`, `shift`.`createdAt` AS `shift.createdAt`, `shift`.`updatedAt` AS `shift.updatedAt`, `package`.`id` AS `package.id`, `package`.`name` AS `package.name`, `package`.`base_price` AS `package.base_price`, `package`.`createdAt` AS `package.createdAt`, `package`.`updatedAt` AS `package.updatedAt`, `user`.`id` AS `user.id`, `user`.`name` AS `user.name`, `user`.`email` AS `user.email`, `user`.`password` AS `user.password`, `user`.`email_verified` AS `user.email_verified`, `user`.`verification_token` AS `user.verification_token`, `user`.`verification_token_expires` AS `user.verification_token_expires`, `user`.`reset_password_token` AS `user.reset_password_token`, `user`.`reset_password_expires` AS `user.reset_password_expires`, `user`.`createdAt` AS `user.createdAt`, `user`.`updatedAt` AS `user.updatedAt` FROM `bookings` AS `Booking` LEFT OUTER JOIN `Events` AS `event` ON `Booking`.`event_id` = `event`.`id` LEFT OUTER JOIN `venues` AS `venue` ON `Booking`.`venue_id` = `venue`.`id` LEFT OUTER JOIN `shifts` AS `shift` ON `Booking`.`shift_id` = `shift`.`id` LEFT OUTER JOIN `packages` AS `package` ON `Booking`.`package_id` = `package`.`id` LEFT OUTER JOIN `users` AS `user` ON `Booking`.`user_id` = `user`.`id`;
+[2025-05-12T04:47:00.390Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T04:47:00.401Z] info: Executing (default): SELECT `id`, `name`, `base_price`, `createdAt`, `updatedAt` FROM `packages` AS `Package`;
+[2025-05-12T04:47:00.403Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T04:47:00.404Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-12T04:47:01.090Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T04:47:01.090Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-12T04:47:01.096Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T04:47:01.097Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-12T04:47:01.409Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T04:47:01.410Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-12T04:47:01.419Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T04:47:01.419Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-12T04:47:02.596Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T04:47:02.609Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T04:47:02.871Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T04:47:02.874Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T04:47:03.736Z] info: Executing (default): SELECT `id`, `name`, `base_price`, `createdAt`, `updatedAt` FROM `packages` AS `Package`;
+[2025-05-12T04:47:03.749Z] info: Executing (default): SELECT `id`, `name`, `base_price`, `createdAt`, `updatedAt` FROM `packages` AS `Package`;
+[2025-05-12T04:47:04.022Z] info: Executing (default): SELECT `id`, `name`, `base_price`, `createdAt`, `updatedAt` FROM `packages` AS `Package`;
+[2025-05-12T04:47:04.026Z] info: Executing (default): SELECT `id`, `name`, `base_price`, `createdAt`, `updatedAt` FROM `packages` AS `Package`;
+[2025-05-12T04:47:06.574Z] info: Executing (default): SELECT `Menu`.`id`, `Menu`.`package_id`, `Menu`.`name`, `Menu`.`items`, `Menu`.`free_limit`, `Menu`.`createdAt`, `Menu`.`updatedAt`, `package`.`id` AS `package.id`, `package`.`name` AS `package.name`, `package`.`base_price` AS `package.base_price`, `package`.`createdAt` AS `package.createdAt`, `package`.`updatedAt` AS `package.updatedAt` FROM `menus` AS `Menu` LEFT OUTER JOIN `packages` AS `package` ON `Menu`.`package_id` = `package`.`id`;
+[2025-05-12T04:47:06.580Z] info: Executing (default): SELECT `id`, `name`, `base_price`, `createdAt`, `updatedAt` FROM `packages` AS `Package`;
+[2025-05-12T04:47:06.593Z] info: Executing (default): SELECT `id`, `name`, `base_price`, `createdAt`, `updatedAt` FROM `packages` AS `Package`;
+[2025-05-12T04:47:06.628Z] info: Executing (default): SELECT `Menu`.`id`, `Menu`.`package_id`, `Menu`.`name`, `Menu`.`items`, `Menu`.`free_limit`, `Menu`.`createdAt`, `Menu`.`updatedAt`, `package`.`id` AS `package.id`, `package`.`name` AS `package.name`, `package`.`base_price` AS `package.base_price`, `package`.`createdAt` AS `package.createdAt`, `package`.`updatedAt` AS `package.updatedAt` FROM `menus` AS `Menu` LEFT OUTER JOIN `packages` AS `package` ON `Menu`.`package_id` = `package`.`id`;
+[2025-05-12T04:47:06.839Z] info: Executing (default): SELECT `Menu`.`id`, `Menu`.`package_id`, `Menu`.`name`, `Menu`.`items`, `Menu`.`free_limit`, `Menu`.`createdAt`, `Menu`.`updatedAt`, `package`.`id` AS `package.id`, `package`.`name` AS `package.name`, `package`.`base_price` AS `package.base_price`, `package`.`createdAt` AS `package.createdAt`, `package`.`updatedAt` AS `package.updatedAt` FROM `menus` AS `Menu` LEFT OUTER JOIN `packages` AS `package` ON `Menu`.`package_id` = `package`.`id`;
+[2025-05-12T04:47:06.840Z] info: Executing (default): SELECT `id`, `name`, `base_price`, `createdAt`, `updatedAt` FROM `packages` AS `Package`;
+[2025-05-12T04:47:06.845Z] info: Executing (default): SELECT `Menu`.`id`, `Menu`.`package_id`, `Menu`.`name`, `Menu`.`items`, `Menu`.`free_limit`, `Menu`.`createdAt`, `Menu`.`updatedAt`, `package`.`id` AS `package.id`, `package`.`name` AS `package.name`, `package`.`base_price` AS `package.base_price`, `package`.`createdAt` AS `package.createdAt`, `package`.`updatedAt` AS `package.updatedAt` FROM `menus` AS `Menu` LEFT OUTER JOIN `packages` AS `package` ON `Menu`.`package_id` = `package`.`id`;
+[2025-05-12T04:47:06.847Z] info: Executing (default): SELECT `id`, `name`, `base_price`, `createdAt`, `updatedAt` FROM `packages` AS `Package`;
+[2025-05-12T04:47:08.508Z] info: Executing (default): SELECT `id`, `name`, `email` FROM `users` AS `User`;
+[2025-05-12T04:47:08.514Z] info: Executing (default): SELECT `id`, `name`, `email` FROM `users` AS `User`;
+[2025-05-12T04:47:08.806Z] info: Executing (default): SELECT `id`, `name`, `email` FROM `users` AS `User`;
+[2025-05-12T04:47:08.808Z] info: Executing (default): SELECT `id`, `name`, `email` FROM `users` AS `User`;
+[2025-05-12T04:48:46.328Z] info: Executing (default): SELECT `id`, `name`, `email` FROM `users` AS `User`;
+[2025-05-12T04:48:46.334Z] info: Executing (default): SELECT `id`, `name`, `email` FROM `users` AS `User`;
+[2025-05-12T04:50:29.512Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `email_verified`, `verification_token`, `verification_token_expires`, `reset_password_token`, `reset_password_expires`, `createdAt`, `updatedAt` FROM `users` AS `User` WHERE `User`.`email` = 'sahn0075@gmail.com';
+[2025-05-12T04:50:34.987Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `email_verified`, `verification_token`, `verification_token_expires`, `reset_password_token`, `reset_password_expires`, `createdAt`, `updatedAt` FROM `users` AS `User` WHERE `User`.`id` = '20';
+[2025-05-12T04:50:34.992Z] info: Executing (default): SELECT `Booking`.`id`, `Booking`.`user_id`, `Booking`.`event_id`, `Booking`.`venue_id`, `Booking`.`shift_id`, `Booking`.`package_id`, `Booking`.`event_date`, `Booking`.`guest_count`, `Booking`.`selected_menus`, `Booking`.`total_fare`, `Booking`.`status`, `Booking`.`createdAt`, `Booking`.`updatedAt`, `event`.`id` AS `event.id`, `event`.`name` AS `event.name`, `event`.`createdAt` AS `event.createdAt`, `event`.`updatedAt` AS `event.updatedAt`, `venue`.`id` AS `venue.id`, `venue`.`name` AS `venue.name`, `venue`.`image` AS `venue.image`, `venue`.`capacity` AS `venue.capacity`, `venue`.`createdAt` AS `venue.createdAt`, `venue`.`updatedAt` AS `venue.updatedAt`, `shift`.`id` AS `shift.id`, `shift`.`name` AS `shift.name`, `shift`.`createdAt` AS `shift.createdAt`, `shift`.`updatedAt` AS `shift.updatedAt`, `package`.`id` AS `package.id`, `package`.`name` AS `package.name`, `package`.`base_price` AS `package.base_price`, `package`.`createdAt` AS `package.createdAt`, `package`.`updatedAt` AS `package.updatedAt` FROM `bookings` AS `Booking` LEFT OUTER JOIN `Events` AS `event` ON `Booking`.`event_id` = `event`.`id` LEFT OUTER JOIN `venues` AS `venue` ON `Booking`.`venue_id` = `venue`.`id` LEFT OUTER JOIN `shifts` AS `shift` ON `Booking`.`shift_id` = `shift`.`id` LEFT OUTER JOIN `packages` AS `package` ON `Booking`.`package_id` = `package`.`id` WHERE `Booking`.`user_id` = '20';
+[2025-05-12T04:50:35.009Z] info: Executing (default): SELECT `id`, `name`, `email`, `password`, `email_verified`, `verification_token`, `verification_token_expires`, `reset_password_token`, `reset_password_expires`, `createdAt`, `updatedAt` FROM `users` AS `User` WHERE `User`.`id` = '20';
+[2025-05-12T04:50:35.013Z] info: Executing (default): SELECT `Booking`.`id`, `Booking`.`user_id`, `Booking`.`event_id`, `Booking`.`venue_id`, `Booking`.`shift_id`, `Booking`.`package_id`, `Booking`.`event_date`, `Booking`.`guest_count`, `Booking`.`selected_menus`, `Booking`.`total_fare`, `Booking`.`status`, `Booking`.`createdAt`, `Booking`.`updatedAt`, `event`.`id` AS `event.id`, `event`.`name` AS `event.name`, `event`.`createdAt` AS `event.createdAt`, `event`.`updatedAt` AS `event.updatedAt`, `venue`.`id` AS `venue.id`, `venue`.`name` AS `venue.name`, `venue`.`image` AS `venue.image`, `venue`.`capacity` AS `venue.capacity`, `venue`.`createdAt` AS `venue.createdAt`, `venue`.`updatedAt` AS `venue.updatedAt`, `shift`.`id` AS `shift.id`, `shift`.`name` AS `shift.name`, `shift`.`createdAt` AS `shift.createdAt`, `shift`.`updatedAt` AS `shift.updatedAt`, `package`.`id` AS `package.id`, `package`.`name` AS `package.name`, `package`.`base_price` AS `package.base_price`, `package`.`createdAt` AS `package.createdAt`, `package`.`updatedAt` AS `package.updatedAt` FROM `bookings` AS `Booking` LEFT OUTER JOIN `Events` AS `event` ON `Booking`.`event_id` = `event`.`id` LEFT OUTER JOIN `venues` AS `venue` ON `Booking`.`venue_id` = `venue`.`id` LEFT OUTER JOIN `shifts` AS `shift` ON `Booking`.`shift_id` = `shift`.`id` LEFT OUTER JOIN `packages` AS `package` ON `Booking`.`package_id` = `package`.`id` WHERE `Booking`.`user_id` = '20';
+[2025-05-12T04:50:40.143Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T04:50:40.148Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-12T04:50:40.154Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T04:50:40.154Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-12T04:50:51.365Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T04:50:51.374Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T04:50:59.178Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T04:50:59.185Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-12T04:50:59.197Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T04:50:59.198Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-12T04:51:10.598Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T04:51:10.610Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T04:52:10.215Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T04:55:39.964Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T04:56:54.217Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T04:58:07.978Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T04:58:07.983Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T05:00:05.233Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T05:00:27.644Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T05:00:27.650Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T05:00:32.633Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T05:00:32.639Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-12T05:00:32.656Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T05:00:32.657Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-12T05:01:47.647Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T05:01:47.652Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T05:02:09.443Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T05:02:09.445Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-12T05:02:09.456Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T05:02:09.457Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-12T05:58:48.749Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-12T05:58:48.752Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'users' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T05:58:48.758Z] info: Executing (default): SHOW INDEX FROM `users`
+[2025-05-12T05:58:48.764Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'admins' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T05:58:48.766Z] info: Executing (default): SHOW INDEX FROM `admins`
+[2025-05-12T05:58:48.769Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T05:58:48.771Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-12T05:58:48.774Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'venues' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T05:58:48.776Z] info: Executing (default): SHOW INDEX FROM `venues`
+[2025-05-12T05:58:48.778Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'shifts' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T05:58:48.780Z] info: Executing (default): SHOW INDEX FROM `shifts`
+[2025-05-12T05:58:48.781Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'packages' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T05:58:48.783Z] info: Executing (default): SHOW INDEX FROM `packages`
+[2025-05-12T05:58:48.785Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'menus' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T05:58:48.787Z] info: Executing (default): SHOW INDEX FROM `menus`
+[2025-05-12T05:58:48.790Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T05:58:48.792Z] info: Executing (default): SHOW INDEX FROM `bookings`
+[2025-05-12T05:58:57.307Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T05:58:57.316Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T05:58:57.330Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-12T05:58:57.347Z] info: Executing (default): SELECT `id`, `name` FROM `Events` AS `Event`;
+[2025-05-12T05:58:57.353Z] info: Executing (default): SELECT `id`, `name` FROM `venues` AS `Venue`;
+[2025-05-12T05:58:57.360Z] info: Executing (default): SELECT `id`, `name` FROM `shifts` AS `Shift`;
+[2025-05-12T05:58:57.363Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T05:58:57.375Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T05:58:57.379Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-12T05:58:57.390Z] info: Executing (default): SELECT `id`, `name` FROM `Events` AS `Event`;
+[2025-05-12T05:58:57.395Z] info: Executing (default): SELECT `id`, `name` FROM `venues` AS `Venue`;
+[2025-05-12T05:58:57.397Z] info: Executing (default): SELECT `id`, `name` FROM `shifts` AS `Shift`;
+[2025-05-12T06:03:56.203Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-12T06:03:56.208Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'users' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T06:03:56.214Z] info: Executing (default): SHOW INDEX FROM `users`
+[2025-05-12T06:03:56.220Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'admins' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T06:03:56.223Z] info: Executing (default): SHOW INDEX FROM `admins`
+[2025-05-12T06:03:56.227Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T06:03:56.231Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-12T06:03:56.235Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'venues' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T06:03:56.238Z] info: Executing (default): SHOW INDEX FROM `venues`
+[2025-05-12T06:03:56.243Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'shifts' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T06:03:56.246Z] info: Executing (default): SHOW INDEX FROM `shifts`
+[2025-05-12T06:03:56.249Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'packages' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T06:03:56.252Z] info: Executing (default): SHOW INDEX FROM `packages`
+[2025-05-12T06:03:56.255Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'menus' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T06:03:56.258Z] info: Executing (default): SHOW INDEX FROM `menus`
+[2025-05-12T06:03:56.262Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T06:03:56.264Z] info: Executing (default): SHOW INDEX FROM `bookings`
+[2025-05-12T06:04:08.045Z] info: Executing (default): SELECT 1+1 AS result
+[2025-05-12T06:04:08.049Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'users' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T06:04:08.052Z] info: Executing (default): SHOW INDEX FROM `users`
+[2025-05-12T06:04:08.058Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'admins' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T06:04:08.059Z] info: Executing (default): SHOW INDEX FROM `admins`
+[2025-05-12T06:04:08.062Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Events' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T06:04:08.064Z] info: Executing (default): SHOW INDEX FROM `Events`
+[2025-05-12T06:04:08.066Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'venues' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T06:04:08.069Z] info: Executing (default): SHOW INDEX FROM `venues`
+[2025-05-12T06:04:08.071Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'shifts' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T06:04:08.072Z] info: Executing (default): SHOW INDEX FROM `shifts`
+[2025-05-12T06:04:08.074Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'packages' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T06:04:08.075Z] info: Executing (default): SHOW INDEX FROM `packages`
+[2025-05-12T06:04:08.077Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'menus' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T06:04:08.079Z] info: Executing (default): SHOW INDEX FROM `menus`
+[2025-05-12T06:04:08.081Z] info: Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'bookings' AND TABLE_SCHEMA = 'venue_booking_system'
+[2025-05-12T06:04:08.083Z] info: Executing (default): SHOW INDEX FROM `bookings`
+[2025-05-12T06:05:50.221Z] info: Executing (default): SELECT `id`, `name` FROM `Events` AS `Event`;
+[2025-05-12T06:05:50.226Z] info: Executing (default): SELECT `id`, `name` FROM `venues` AS `Venue`;
+[2025-05-12T06:05:50.229Z] info: Executing (default): SELECT `id`, `name` FROM `shifts` AS `Shift`;
+[2025-05-12T06:05:50.238Z] info: Executing (default): SELECT `id`, `name` FROM `Events` AS `Event`;
+[2025-05-12T06:05:50.241Z] info: Executing (default): SELECT `id`, `name` FROM `venues` AS `Venue`;
+[2025-05-12T06:05:50.243Z] info: Executing (default): SELECT `id`, `name` FROM `shifts` AS `Shift`;
+[2025-05-12T06:06:01.186Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:06:01.188Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue`;
+[2025-05-12T06:06:01.191Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T06:06:01.209Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:06:01.210Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue`;
+[2025-05-12T06:06:01.211Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T06:06:25.552Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:06:25.553Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue`;
+[2025-05-12T06:06:25.555Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T06:06:25.561Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:06:25.563Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue`;
+[2025-05-12T06:06:25.564Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T06:07:16.947Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:07:16.949Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue`;
+[2025-05-12T06:07:16.951Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T06:07:16.985Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:07:16.987Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue`;
+[2025-05-12T06:07:16.988Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T06:07:27.777Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:07:27.778Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue`;
+[2025-05-12T06:07:27.780Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T06:07:27.787Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:07:27.788Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue`;
+[2025-05-12T06:07:27.790Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T06:07:30.670Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T06:07:30.674Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-12T06:07:30.680Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T06:07:30.681Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-12T06:07:31.538Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:07:31.540Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue`;
+[2025-05-12T06:07:31.542Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T06:07:31.547Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:07:31.551Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue`;
+[2025-05-12T06:07:31.552Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T06:07:38.083Z] info: Executing (default): SELECT count(*) AS `count` FROM `bookings` AS `Booking` WHERE `Booking`.`event_date` = '2025-05-14';
+[2025-05-12T06:07:46.789Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T06:07:46.797Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 100;
+[2025-05-12T06:07:46.816Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T06:07:46.819Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 100;
+[2025-05-12T06:07:52.535Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T06:07:52.536Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 100;
+[2025-05-12T06:07:52.550Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T06:07:52.551Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 100;
+[2025-05-12T06:07:54.807Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T06:07:54.808Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-12T06:07:54.840Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T06:07:54.842Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-12T06:07:58.233Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T06:07:58.234Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 100;
+[2025-05-12T06:07:58.249Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T06:07:58.251Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 100;
+[2025-05-12T06:08:13.189Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:08:13.194Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:08:18.199Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:08:18.209Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:08:18.214Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue`;
+[2025-05-12T06:08:18.224Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:08:18.231Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T06:08:23.398Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:08:23.401Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue`;
+[2025-05-12T06:08:23.403Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T06:08:23.411Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:08:23.413Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue`;
+[2025-05-12T06:08:23.414Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T06:08:25.620Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:08:25.630Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:08:26.529Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T06:08:26.530Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 100;
+[2025-05-12T06:08:26.545Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T06:08:26.546Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 100;
+[2025-05-12T06:08:28.015Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T06:08:28.016Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-12T06:08:28.039Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T06:08:28.040Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 10;
+[2025-05-12T06:30:29.264Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:30:29.265Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue`;
+[2025-05-12T06:30:29.266Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T06:30:29.272Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:30:29.273Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue`;
+[2025-05-12T06:30:29.275Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T06:33:40.369Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:33:40.370Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue`;
+[2025-05-12T06:33:40.371Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T06:33:40.375Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:33:40.377Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue`;
+[2025-05-12T06:33:40.378Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T06:36:27.855Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:36:27.857Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue`;
+[2025-05-12T06:36:27.859Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T06:36:27.885Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:36:27.886Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue`;
+[2025-05-12T06:36:27.888Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T06:36:33.261Z] info: Executing (default): SELECT count(*) AS `count` FROM `bookings` AS `Booking` WHERE `Booking`.`event_date` = '2025-05-14';
+[2025-05-12T06:36:34.488Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:36:34.508Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:36:37.121Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:36:37.122Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue`;
+[2025-05-12T06:36:37.124Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T06:36:37.129Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:36:37.130Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue`;
+[2025-05-12T06:36:37.132Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T06:36:39.948Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:36:39.960Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:36:42.306Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T06:36:42.312Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 100;
+[2025-05-12T06:36:42.335Z] info: Executing (default): SELECT count(*) AS `count` FROM `venues` AS `Venue`;
+[2025-05-12T06:36:42.338Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue` LIMIT 0, 100;
+[2025-05-12T06:36:45.823Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:36:45.836Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:38:26.579Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:38:26.580Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue`;
+[2025-05-12T06:38:26.582Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;
+[2025-05-12T06:38:26.586Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `Events` AS `Event`;
+[2025-05-12T06:38:26.589Z] info: Executing (default): SELECT `id`, `name`, `image`, `capacity`, `createdAt`, `updatedAt` FROM `venues` AS `Venue`;
+[2025-05-12T06:38:26.591Z] info: Executing (default): SELECT `id`, `name`, `createdAt`, `updatedAt` FROM `shifts` AS `Shift`;

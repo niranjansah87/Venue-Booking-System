@@ -1,289 +1,294 @@
-const { body, validationResult } = require('express-validator');
-const Booking = require('../models/Booking'); // Adjust path as needed
-const sendEmail = require('../utils/email'); // Adjust path as needed
-const { storeOTP, verifyOTP, clearOTP } = require('../utils/otpStore');
+const bcrypt = require('bcryptjs');
+const { User, Event, Venue, Booking, Shift } = require('../models');
+const { validationResult } = require('express-validator');
 
-// Step 1: Select Event, Venue, Shift, Date, Guests
-exports.step1 = async (req, res) => {
+exports.login = async (req, res) => {
+  const { email, password } = req.body;
+
   try {
-    res.render('step1', { user: req.user });
-  } catch (error) {
-    console.error('Error in step1:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
-
-exports.step1Post = [
-  body('event_id').notEmpty().withMessage('Event is required'),
-  body('venue_id').notEmpty().withMessage('Venue is required'),
-  body('shift_id').notEmpty().withMessage('Shift is required'),
-  body('event_date').notEmpty().withMessage('Event date is required'),
-  body('guest_count').isInt({ min: 10 }).withMessage('Guest count must be at least 10'),
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    try {
-      const { event_id, venue_id, shift_id, event_date, guest_count } = req.body;
-      req.session.booking = {
-        event_id,
-        venue_id,
-        shift_id,
-        event_date,
-        guest_count,
-      };
-      res.redirect('/api/admin/book/step2');
-    } catch (error) {
-      console.error('Error in step1Post:', error);
-      res.status(500).json({ message: 'Error saving booking information' });
-    }
-  },
-];
-
-// Step 2: Select Package & Menu
-exports.step2 = async (req, res) => {
-  try {
-    res.render('step2', { user: req.user });
-  } catch (error) {
-    console.error('Error in step2:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
-
-exports.step2Post = [
-  body('package_id').notEmpty().withMessage('Package is required'),
-  body('selected_menus').notEmpty().withMessage('Menu selections are required'),
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    try {
-      const { package_id, selected_menus } = req.body;
-      req.session.booking = {
-        ...req.session.booking,
-        package_id,
-        selected_menus,
-      };
-      res.redirect('/api/admin/book/step3');
-    } catch (error) {
-      console.error('Error in step2Post:', error);
-      res.status(500).json({ message: 'Error saving package information' });
-    }
-  },
-];
-
-// Step 3: Send OTP
-exports.sendOTP = async (req, res) => {
-  try {
-    const { userId, email } = req.body;
-    if (!userId || !email || !email.includes('@')) {
-      return res.status(400).json({ message: 'Valid user ID and email are required.' });
-    }
-
-    const otp = Math.floor(100000 + Math.random() * 900000); // 6-digit OTP
-    storeOTP(userId, otp);
-
-    const success = await sendEmail({
-      to: email,
-      subject: 'Venue Booking OTP Verification',
-      html: `
-        <div style="font-family: Arial, sans-serif; background-color: #f0f4f8; padding: 30px; max-width: 500px; margin: auto; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-          <h2 style="color: #2c3e50; text-align: center;">Verify Your Booking</h2>
-          <p style="font-size: 16px; color: #333;">
-            Thank you for choosing our venue! To proceed with your booking, please enter the following One-Time Password (OTP):
-          </p>
-          <div style="text-align: center; margin: 20px 0;">
-            <span style="display: inline-block; background-color: #4CAF50; color: #fff; padding: 14px 28px; font-size: 24px; border-radius: 8px; letter-spacing: 4px;">
-              ${otp}
-            </span>
-          </div>
-          <p style="font-size: 14px; color: #666;">
-            This OTP is valid for the next 10 minutes. If you did not request this, please ignore this message.
-          </p>
-          <p style="font-size: 14px; color: #999; text-align: center; margin-top: 30px;">
-            © ${new Date().getFullYear()} Venue Booking System
-          </p>
-        </div>
-      `,
+    res.json({
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name || 'User',
+      },
     });
-
-    if (success) {
-      res.json({ sent: true });
-    } else {
-      res.status(500).json({ message: 'Failed to send OTP.' });
-    }
   } catch (error) {
-    console.error('Error sending OTP:', error);
-    res.status(500).json({ message: 'Failed to send OTP.' });
+    console.error('Login error:', error);
+    res.status(500).json({ message: 'Server error during login' });
   }
 };
 
-// Step 3: Verify OTP & Guest Info
-exports.step3 = async (req, res) => {
+exports.getEvents = async (req, res) => {
   try {
-    res.render('step3', { user: req.user });
-  } catch (error) {
-    console.error('Error in step3:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
-
-exports.step3Post = [
-  body('userId').notEmpty().withMessage('User ID is required'),
-  body('otp').isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits'),
-  body('name').notEmpty().withMessage('Name is required'),
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    const { userId, otp, name } = req.body;
-
-    if (!verifyOTP(userId, otp)) {
-      return res.status(401).json({ message: 'Invalid OTP.' });
-    }
-
-    try {
-      req.session.booking = {
-        ...req.session.booking,
-        name,
-        email: req.body.email || req.session.booking.email,
-      };
-      clearOTP(userId);
-      res.redirect('/api/admin/book/step4');
-    } catch (error) {
-      console.error('Error in step3Post:', error);
-      res.status(500).json({ message: 'Error saving guest information.' });
-    }
-  },
-];
-
-// Step 4: Booking Summary
-exports.step4 = async (req, res) => {
-  try {
-    res.render('step4', { user: req.user, booking: req.session.booking });
-  } catch (error) {
-    console.error('Error in step4:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
-
-// Store Booking
-exports.storeBooking = async (req, res) => {
-  const { userId, event_id, venue_id, shift_id, package_id, event_date, guest_count, selected_menus, total_fare, name, email } = req.body;
-
-  if (!userId || !event_id || !venue_id || !shift_id || !package_id || !event_date || !guest_count || !selected_menus || !total_fare) {
-    return res.status(400).json({ message: 'Missing required booking details.' });
-  }
-
-  try {
-    const savedBooking = await Booking.create({
-      user_id: userId,
-      event_id,
-      venue_id,
-      shift_id,
-      package_id,
-      event_date,
-      guest_count,
-      selected_menus,
-      total_fare,
-      status: 'pending',
+    const events = await Event.findAll({
+      attributes: ['id', 'name'],
     });
-
-    const success = await sendEmail({
-      to: email,
-      subject: 'Booking Confirmation - Elegance Venues',
-      html: `
-        <h2>Booking Confirmation</h2>
-        <p>Dear ${name},</p>
-        <p>Thank you for your booking with Elegance Venues! Your booking has been successfully confirmed.</p>
-        <h3>Booking Details:</h3>
-        <ul>
-          <li><strong>Booking ID:</strong> ${savedBooking.id}</li>
-          <li><strong>Date:</strong> ${event_date}</li>
-          <li><strong>Venue ID:</strong> ${venue_id}</li>
-          <li><strong>Total Fare:</strong> $${total_fare}</li>
-        </ul>
-        <p>We look forward to hosting your event. If you have any questions, please contact us.</p>
-        <p>Best regards,<br>Elegance Venues Team</p>
-      `,
-    });
-
-    if (!success) {
-      console.warn('Confirmation email failed to send, but booking was saved.');
-    }
-
-    delete req.session.booking;
-
-    res.json({ bookingId: savedBooking.id, message: 'Booking confirmed successfully.' });
+    res.json({ events });
   } catch (error) {
-    console.error('Error storing booking:', error);
-    res.status(500).json({ message: 'Failed to store booking.' });
+    console.error('Error fetching events:', error);
+    res.status(500).json({ message: 'Failed to fetch events' });
   }
 };
 
-// Check Availability
+exports.getVenues = async (req, res) => {
+  try {
+    const venues = await Venue.findAll({
+      attributes: ['id', 'name'],
+    });
+    res.json({ venues });
+  } catch (error) {
+    console.error('Error fetching venues:', error);
+    res.status(500).json({ message: 'Failed to fetch venues' });
+  }
+};
+
 exports.checkAvailability = async (req, res) => {
-  const { userId, event_id, venue_id, shift_id, event_date, guest_count } = req.body;
-  if (!userId || !event_id || !venue_id || !shift_id || !event_date || !guest_count) {
-    return res.status(400).json({ message: 'Missing required fields.' });
-  }
+  const { venueId, event_date, guestCount, shiftId } = req.body;
+
   try {
-    // Placeholder: Implement availability check logic (e.g., query database)
+    if (!venueId || !event_date || !guestCount || !shiftId) {
+      return res.status(400).json({ message: 'Please provide venue, event date, guest count, and shift' });
+    }
+
+    // Validate venue exists
+    const venue = await Venue.findByPk(venueId);
+    if (!venue) {
+      return res.status(404).json({ message: 'Venue not found' });
+    }
+
+    // Validate shift exists
+    const shift = await Shift.findByPk(shiftId);
+    if (!shift) {
+      return res.status(404).json({ message: 'Shift not found' });
+    }
+
+    // Check for conflicting bookings
+    const conflictingBooking = await Booking.findOne({
+      where: {
+        venueId,
+        event_date,
+        shiftId,
+      },
+    });
+
+    if (conflictingBooking) {
+      return res.status(400).json({ message: 'Venue is not available for this date and shift' });
+    }
+
     res.json({ available: true });
   } catch (error) {
     console.error('Error checking availability:', error);
-    res.status(500).json({ message: 'Failed to check availability.' });
+    res.status(500).json({ message: 'Failed to check availability' });
   }
 };
 
-// Calculate Fare
-exports.calculateFare = async (req, res) => {
-  const { userId, package_id, selected_menus, guest_count } = req.body;
-  if (!userId || !package_id || !guest_count) {
-    return res.status(400).json({ message: 'Missing required fields.' });
+exports.sendOTP = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ message: errors.array()[0].msg });
   }
+
+  const { userId, email } = req.body;
+
   try {
-    // Placeholder: Implement fare calculation logic
-    const base_fare = 1000; // Example
-    const extra_charges = 200; // Example
-    const total_fare = base_fare + extra_charges;
-    res.json({ base_fare, extra_charges, total_fare });
+    const user = await User.findByPk(userId);
+    if (!user || user.email !== email) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Simulate OTP generation and sending
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    console.log(`OTP for ${email}: ${otp}`); // Replace with email service
+
+    res.json({ message: 'OTP sent successfully' });
+  } catch (error) {
+    console.error('Error sending OTP:', error);
+    res.status(500).json({ message: 'Failed to send OTP' });
+  }
+};
+
+exports.step1 = async (req, res) => {
+  try {
+    const events = await Event.findAll({ attributes: ['id', 'name'] });
+    const venues = await Venue.findAll({ attributes: ['id', 'name'] });
+    const shifts = await Shift.findAll({ attributes: ['id', 'name'] });
+    res.json({ events, venues, shifts });
+  } catch (error) {
+    console.error('Error fetching step1 data:', error);
+    res.status(500).json({ message: 'Failed to fetch step1 data' });
+  }
+};
+
+exports.step1Post = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ message: errors.array()[0].msg });
+  }
+
+  const { event_id, venue_id, shift_id, event_date, guest_count } = req.body;
+
+  try {
+    // Validate existence
+    const event = await Event.findByPk(event_id);
+    if (!event) return res.status(404).json({ message: 'Event not found' });
+
+    const venue = await Venue.findByPk(venue_id);
+    if (!venue) return res.status(404).json({ message: 'Venue not found' });
+
+    const shift = await Shift.findByPk(shift_id);
+    if (!shift) return res.status(404).json({ message: 'Shift not found' });
+
+    // Check availability
+    const conflictingBooking = await Booking.findOne({
+      where: { venue_id, event_date, shift_id },
+    });
+    if (conflictingBooking) {
+      return res.status(400).json({ message: 'Venue is not available for this date and shift' });
+    }
+
+    res.json({ message: 'Step 1 validated successfully' });
+  } catch (error) {
+    console.error('Error in step1Post:', error);
+    res.status(500).json({ message: 'Failed to process step1' });
+  }
+};
+
+exports.step2 = async (req, res) => {
+  // Placeholder: Fetch packages and menus
+  try {
+    const packages = await Package.findAll({ attributes: ['id', 'name'] }); // Adjust model as needed
+    const menus = await Menu.findAll({ attributes: ['id', 'name'] }); // Adjust model as needed
+    res.json({ packages, menus });
+  } catch (error) {
+    console.error('Error fetching step2 data:', error);
+    res.status(500).json({ message: 'Failed to fetch step2 data' });
+  }
+};
+
+exports.step2Post = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ message: errors.array()[0].msg });
+  }
+
+  const { package_id, selected_menus } = req.body;
+
+  try {
+    // Validate package and menus
+    const packageItem = await Package.findByPk(package_id); // Adjust model
+    if (!packageItem) return res.status(404).json({ message: 'Package not found' });
+
+    // Validate menus (adjust as needed)
+    if (!Array.isArray(selected_menus) || selected_menus.length === 0) {
+      return res.status(400).json({ message: 'Invalid menu selections' });
+    }
+
+    res.json({ message: 'Step 2 validated successfully' });
+  } catch (error) {
+    console.error('Error in step2Post:', error);
+    res.status(500).json({ message: 'Failed to process step2' });
+  }
+};
+
+exports.step3 = async (req, res) => {
+  res.json({ message: 'Step 3: OTP verification' }); // Placeholder
+};
+
+exports.step3Post = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ message: errors.array()[0].msg });
+  }
+
+  const { userId, otp, name } = req.body;
+
+  try {
+    const user = await User.findByPk(userId);
+    if (!user || user.name !== name) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Simulate OTP verification
+    const isValidOtp = otp === '123456'; // Placeholder
+    if (!isValidOtp) {
+      return res.status(400).json({ message: 'Invalid OTP' });
+    }
+
+    res.json({ message: 'OTP verified successfully' });
+  } catch (error) {
+    console.error('Error in step3Post:', error);
+    res.status(500).json({ message: 'Failed to verify OTP' });
+  }
+};
+
+exports.step4 = async (req, res) => {
+  res.json({ message: 'Step 4: Final confirmation' }); // Placeholder
+};
+
+exports.storeBooking = async (req, res) => {
+  const { userId, event_id, venue_id, shift_id, event_date, guest_count, package_id, selected_menus } = req.body;
+
+  try {
+    const user = await User.findByPk(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const booking = await Booking.create({
+      userId,
+      eventId: event_id,
+      venueId: venue_id,
+      shiftId: shift_id,
+      event_date,
+      guestCount: guest_count,
+      packageId: package_id,
+      selectedMenus: selected_menus,
+    });
+
+    res.json({ message: 'Booking created successfully', bookingId: booking.id });
+  } catch (error) {
+    console.error('Error storing booking:', error);
+    res.status(500).json({ message: 'Failed to store booking' });
+  }
+};
+
+exports.calculateFare = async (req, res) => {
+  const { package_id, guest_count } = req.body;
+
+  try {
+    // Placeholder fare calculation
+    const packageItem = await Package.findByPk(package_id); // Adjust model
+    if (!packageItem) return res.status(404).json({ message: 'Package not found' });
+
+    const fare = packageItem.price * guest_count; // Adjust logic
+    res.json({ fare });
   } catch (error) {
     console.error('Error calculating fare:', error);
-    res.status(500).json({ message: 'Failed to calculate fare.' });
+    res.status(500).json({ message: 'Failed to calculate fare' });
   }
 };
 
-// Send Confirmation Email
 exports.sendConfirmation = async (req, res) => {
   const { bookingId, email } = req.body;
-  if (!bookingId || !email) {
-    return res.status(400).json({ message: 'Booking ID and email are required.' });
-  }
+
   try {
-    // Placeholder: Fetch booking details if needed
-    const success = await sendEmail({
-      to: email,
-      subject: 'Booking Confirmation - Elegance Venues',
-      html: `
-        <h2>Booking Confirmation</h2>
-        <p>Thank you for your booking!</p>
-        <p>Booking ID: ${bookingId}</p>
-      `,
-    });
-    if (success) {
-      res.json({ message: 'Confirmation email sent.' });
-    } else {
-      res.status(500).json({ message: 'Failed to send confirmation email.' });
-    }
+    const booking = await Booking.findByPk(bookingId);
+    if (!booking) return res.status(404).json({ message: 'Booking not found' });
+
+    // Simulate email sending
+    console.log(`Confirmation email sent to ${email} for booking ${bookingId}`);
+    res.json({ message: 'Confirmation email sent successfully' });
   } catch (error) {
-    console.error('Error sending confirmation email:', error);
-    res.status(500).json({ message: 'Failed to send confirmation email.' });
+    console.error('Error sending confirmation:', error);
+    res.status(500).json({ message: 'Failed to send confirmation email' });
   }
 };

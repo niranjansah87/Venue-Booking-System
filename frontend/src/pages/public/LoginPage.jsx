@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import api from '../../services/api'; 
+import { Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import { toast } from 'react-toastify';
 
 function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,19 +16,13 @@ function LoginPage() {
     setError('');
 
     try {
-      const response = await api.post('/api/login', { email, password }, {
-        withCredentials: true,
-      });
-
-     
-       const { user } = response.data;
-      localStorage.setItem('user', JSON.stringify(user));
-      // console.log('Stored in localStorage:', localStorage.getItem('user'));
-
-      navigate('/dashboard');
+      await login(email, password);
+      // No need for manual localStorage or navigation; handled by AuthContext
     } catch (err) {
       console.error('Login error:', err);
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+      const errorMessage = err.response?.data?.message || 'Login failed. Please try again.';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -43,11 +38,17 @@ function LoginPage() {
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && <div className="text-red-400 text-sm text-center bg-white/10 p-3 rounded-lg">{error}</div>}
+          {error && (
+            <div className="text-red-400 text-sm text-center bg-white/10 p-3 rounded-lg">
+              {error}
+            </div>
+          )}
 
           <div className="space-y-4">
             <div>
-              <label htmlFor="email-address" className="sr-only">Email address</label>
+              <label htmlFor="email-address" className="sr-only">
+                Email address
+              </label>
               <input
                 id="email-address"
                 name="email"
@@ -61,7 +62,9 @@ function LoginPage() {
               />
             </div>
             <div>
-              <label htmlFor="password" className="sr-only">Password</label>
+              <label htmlFor="password" className="sr-only">
+                Password
+              </label>
               <input
                 id="password"
                 name="password"
@@ -87,7 +90,10 @@ function LoginPage() {
           </div>
 
           <div className="text-sm text-center">
-            <Link to="/register" className="font-medium text-indigo-300 hover:text-indigo-200 transition-all">
+            <Link
+              to="/register"
+              className="font-medium text-indigo-300 hover:text-indigo-200 transition-all"
+            >
               Don't have an account? Sign up
             </Link>
           </div>
