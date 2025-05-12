@@ -30,7 +30,7 @@ const steps = [
 
 const BookingWizard = () => {
   const navigate = useNavigate();
-  const { user, sendOtp, verifyOtp, sendBookingConfirmationEmail } = useAuth();
+  const { user, sendOtp, verifyOtp, sendConfirmation } = useAuth(); // Updated to use sendConfirmation
 
   const getInitialUserData = () => {
     const storedUser = localStorage.getItem('user');
@@ -176,7 +176,7 @@ const BookingWizard = () => {
 
       // Map frontend keys to backend expected keys
       const payload = {
-        user_id: user.id, // Add user_id from AuthContext
+        user_id: user.id,
         event_id: bookingData.event_id,
         venue_id: bookingData.venueId,
         shift_id: bookingData.shiftId,
@@ -191,11 +191,11 @@ const BookingWizard = () => {
         total_fare: bookingData.totalFare,
       };
 
-      console.log('Sending store booking request:', payload); // Debug
+      console.log('Sending store booking request:', payload);
 
       const response = await api.post('/api/admin/bookings/store', payload);
       setBookingId(response.data.bookingId);
-      await sendBookingConfirmationEmail(response.data.bookingId, bookingData.email);
+      await sendConfirmation(response.data.bookingId, bookingData.email); // Updated to sendConfirmation
       setIsComplete(true);
       setCurrentStep(steps.length - 1);
     } catch (error) {
@@ -283,7 +283,6 @@ const BookingWizard = () => {
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: -50 }}
         transition={{ duration: 0.3 }}
-        
         className="bg-white rounded-lg shadow-lg p-6"
       >
         <CurrentStepComponent

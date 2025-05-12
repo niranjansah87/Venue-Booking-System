@@ -72,7 +72,7 @@ export const AuthProvider = ({ children }) => {
     }
     try {
       const response = await api.post('/api/admin/book/send-otp', { email: user.email });
-      console.log('OTP sent to:', user.email); // Debug
+      console.log('OTP sent to:', user.email);
       toast.success('OTP sent to your email!');
       return response.data;
     } catch (error) {
@@ -84,10 +84,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   const verifyOtp = async (otp) => {
-   
     try {
       const response = await api.post('/api/admin/book/verify-otp', { otp });
-      console.log('OTP verified:', otp); // Debug
+      console.log('OTP verified:', otp);
       toast.success('OTP verified successfully!');
       return response.data;
     } catch (error) {

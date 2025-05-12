@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Mail, Loader } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useAuth } from '../../../contexts/AuthContext'; // Import useAuth
+import { useAuth } from '../../../contexts/AuthContext';
 import { toast } from 'react-toastify';
 
 const OtpVerification = ({ email, verifyOtp, submitting }) => {
@@ -9,13 +9,13 @@ const OtpVerification = ({ email, verifyOtp, submitting }) => {
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [sendingOtp, setSendingOtp] = useState(false);
   const [error, setError] = useState(null);
-  const { sendOtp } = useAuth(); // Use sendOtp from AuthContext
+  const { sendOtp } = useAuth();
 
   useEffect(() => {
     let isMounted = true;
 
     const sendOtpToEmail = async () => {
-      if (!email || isOtpSent || !isMounted) return; // Prevent duplicate sends
+      if (!email || isOtpSent || sendingOtp || !isMounted) return;
       try {
         setSendingOtp(true);
         await sendOtp(email);
@@ -38,9 +38,9 @@ const OtpVerification = ({ email, verifyOtp, submitting }) => {
     sendOtpToEmail();
 
     return () => {
-      isMounted = false; // Cleanup to prevent state updates after unmount
+      isMounted = false;
     };
-  }, [email, isOtpSent, sendOtp]);
+  }, [email, sendOtp]); // Removed isOtpSent from dependencies to prevent re-triggering
 
   const handleOtpSubmit = async () => {
     try {

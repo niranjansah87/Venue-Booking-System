@@ -1,13 +1,4 @@
 
-
-
-
-
-
-
-
-
-
 import api from './api';
 
 // Check date availability
@@ -123,9 +114,9 @@ export const deleteBooking = async (bookingId) => {
 
 
 // Send confirmation email
-export const sendConfirmation = async (bookingId,email) => {
+export const sendConfirmation = async (bookingId, email) => {
   try {
-    const response = await api.post('/api/admin/book/send-confirmation', { bookingId,email });
+    const response = await api.post('/api/admin/book/send-confirmation', { bookingId, email });
     return response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || 'Failed to send confirmation';
