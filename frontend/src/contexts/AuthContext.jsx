@@ -71,8 +71,9 @@ export const AuthProvider = ({ children }) => {
       throw new Error('User details not found');
     }
     try {
+      console.log(`Sending OTP request for email: ${email}`);
       const response = await api.post('/api/admin/book/send-otp', { email: user.email });
-      console.log('OTP sent to:', user.email);
+      console.log('OTP sent to:', user.email, 'Response:', response.data);
       toast.success('OTP sent to your email!');
       return response.data;
     } catch (error) {

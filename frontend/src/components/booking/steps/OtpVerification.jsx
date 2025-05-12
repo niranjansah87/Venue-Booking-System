@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Mail, Loader } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -10,46 +10,75 @@ const OtpVerification = ({ email, verifyOtp, submitting }) => {
   const [sendingOtp, setSendingOtp] = useState(false);
   const [error, setError] = useState(null);
   const { sendOtp } = useAuth();
+  const hasSentOtp = useRef(false);
+  const hasShownToast = useRef(false);
+  const mountCount = useRef(0);
 
-  useEffect(() => {
-    let isMounted = true;
-
-    const sendOtpToEmail = async () => {
-      if (!email || isOtpSent || sendingOtp || !isMounted) return;
-      try {
-        setSendingOtp(true);
-        await sendOtp(email);
-        if (isMounted) {
-          setIsOtpSent(true);
-          toast.success('OTP sent to your email.');
-        }
-      } catch (error) {
-        if (isMounted) {
-          setError('Failed to send OTP.');
-          toast.error('Failed to send OTP.');
-        }
-      } finally {
-        if (isMounted) {
-          setSendingOtp(false);
-        }
+  // Debounce sendOtp to prevent rapid calls
+  const debounceSendOtp = useCallback((fn) => {
+    let timeout;
+    return (...args) => {
+      if (!timeout) {
+        timeout = setTimeout(() => {
+          fn(...args);
+          timeout = null;
+        }, 100);
       }
     };
+  }, []);
+
+  const sendOtpToEmail = useCallback(
+    debounceSendOtp(async () => {
+      if (!email || isOtpSent || sendingOtp || hasSentOtp.current) {
+        console.log('Skipping OTP send:', { email, isOtpSent, sendingOtp, hasSentOtp: hasSentOtp.current });
+        return;
+      }
+      try {
+        setSendingOtp(true);
+        console.log('Sending OTP to:', email);
+        await sendOtp(email);
+        hasSentOtp.current = true;
+        setIsOtpSent(true);
+        if (!hasShownToast.current) {
+          console.log('Triggering toast for OTP sent');
+          toast.success('OTP sent to your email.', { toastId: 'otp-sent' });
+          hasShownToast.current = true;
+        }
+      } catch (error) {
+        setError('Failed to send OTP.');
+        toast.error('Failed to send OTP.', { toastId: 'otp-error' });
+      } finally {
+        setSendingOtp(false);
+      }
+    }),
+    [email, isOtpSent, sendingOtp, sendOtp]
+  );
+
+  useEffect(() => {
+    mountCount.current += 1;
+    console.log(`OtpVerification mounted ${mountCount.current} times, email: ${email}`);
 
     sendOtpToEmail();
 
     return () => {
-      isMounted = false;
+      console.log('OtpVerification unmounting');
     };
-  }, [email, sendOtp]); // Removed isOtpSent from dependencies to prevent re-triggering
+  }, [sendOtpToEmail]);
 
   const handleOtpSubmit = async () => {
     try {
       await verifyOtp(otp);
-      toast.success('OTP verified successfully.');
+      toast.success('OTP verified successfully.', { toastId: 'otp-verified' });
     } catch (error) {
       setError('Invalid OTP.');
-      toast.error('Invalid OTP.');
+      toast.error('Invalid OTP.', { toastId: 'otp-invalid' });
     }
+  };
+
+  const handleResendOtp = async () => {
+    hasSentOtp.current = false;
+    hasShownToast.current = false; // Allow toast for resend
+    await sendOtpToEmail();
   };
 
   if (sendingOtp) {
@@ -110,6 +139,15 @@ const OtpVerification = ({ email, verifyOtp, submitting }) => {
             'Verify OTP'
           )}
         </button>
+        <div className="mt-4 text-center">
+          <button
+            onClick={handleResendOtp}
+            disabled={sendingOtp}
+            className="text-primary-600 hover:text-primary-700 disabled:text-gray-400"
+          >
+            Resend OTP
+          </button>
+        </div>
       </div>
 
       <motion.div
@@ -129,4 +167,4 @@ const OtpVerification = ({ email, verifyOtp, submitting }) => {
   );
 };
 
-export default OtpVerification;
+export default React.memo(OtpVerification);
