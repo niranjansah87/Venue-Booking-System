@@ -30,7 +30,7 @@ const steps = [
 
 const BookingWizard = () => {
   const navigate = useNavigate();
-  const { user, sendOtp, verifyOtp, sendBookingConfirmationEmail } = useAuth();
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [bookingData, setBookingData] = useState({
     date: null,
@@ -52,20 +52,13 @@ const BookingWizard = () => {
   const [bookingId, setBookingId] = useState(null);
   const [isComplete, setIsComplete] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [sessionId, setSessionId] = useState(null);
 
   useEffect(() => {
-    const initiateBooking = async () => {
-      try {
-        const response = await api.get('/api/admin/bookings/initiate');
-        setSessionId(response.data.sessionId);
-      } catch (error) {
-        console.error('Error initiating booking:', error);
-        toast.error('Failed to initiate booking.');
-      }
-    };
-    initiateBooking();
-  }, []);
+    if (!user) {
+      toast.error('Please log in to create a booking.');
+      navigate('/login');
+    }
+  }, [user, navigate]);
 
   const updateBookingData = (key, value) => {
     setBookingData((prev) => ({
@@ -78,21 +71,24 @@ const BookingWizard = () => {
   };
 
   const checkAvailability = async () => {
-    const { date, venueId, shiftId } = bookingData;
-    if (!date || !venueId || !shiftId) {
-      toast.error('Please select date, venue, and shift.');
+    const { date, venueId, shiftId, event_id, guestCount } = bookingData;
+    if (!date || !venueId || !shiftId || !event_id || !guestCount) {
+      toast.error('Please select date, event type, venue, shift, and guest count.');
       return;
     }
     setIsCheckingAvailability(true);
     try {
       const formattedDate = date.toISOString().split('T')[0];
       await api.post('/api/admin/bookings/check-availability', {
-        event_date: formattedDate,
+        userId: user.id,
+        event_id,
         venue_id: venueId,
         shift_id: shiftId,
-        sessionId,
+        event_date: formattedDate,
+        guest_count: guestCount,
       });
       setIsAvailable(true);
+      toast.success('Slot is available!');
     } catch (error) {
       console.error('Error checking availability:', error);
       toast.error('Selected slot is not available.');
@@ -111,10 +107,10 @@ const BookingWizard = () => {
     setIsCalculating(true);
     try {
       const response = await api.post('/api/admin/bookings/calculate-fare', {
+        userId: user.id,
         package_id: packageId,
         selected_menus: selectedMenus,
         guest_count: guestCount,
-        sessionId,
       });
       const { base_fare, extra_charges, total_fare } = response.data;
       setBookingData((prev) => ({
@@ -123,6 +119,7 @@ const BookingWizard = () => {
         extraCharges: extra_charges,
         totalFare: total_fare,
       }));
+      toast.success('Fare calculated successfully!');
     } catch (error) {
       console.error('Error calculating fare:', error);
       toast.error('Failed to calculate fare.');
@@ -135,16 +132,24 @@ const BookingWizard = () => {
   const handleVerifyOtp = async (otp) => {
     setSubmitting(true);
     try {
-      await verifyOtp(otp, sessionId);
-      const response = await api.post('/api/admin/bookings/store', {
+      await api.post('/api/admin/book/step3', {
+        userId: user.id,
+        otp,
+        name: bookingData.name,
+      });
+      const response = await api.post('/api/admin/book/store', {
+        userId: user.id,
         ...bookingData,
         event_date: bookingData.date.toISOString().split('T')[0],
-        sessionId,
       });
       setBookingId(response.data.bookingId);
-      await sendBookingConfirmationEmail(response.data.bookingId, bookingData.email);
+      await api.post('/api/admin/bookings/send-confirmation', {
+        bookingId: response.data.bookingId,
+        email: bookingData.email,
+      });
       setIsComplete(true);
       setCurrentStep(steps.length - 1);
+      toast.success('Booking confirmed!');
     } catch (error) {
       console.error('Error storing booking:', error);
       toast.error('Failed to store booking.');
@@ -156,7 +161,6 @@ const BookingWizard = () => {
 
   const handleNext = () => {
     if (currentStep === steps.length - 2 && !isComplete) {
-      // OTP step requires verification
       return;
     }
     if (currentStep === steps.findIndex((s) => s.id === 'venue') && !isAvailable) {
@@ -183,6 +187,10 @@ const BookingWizard = () => {
       navigate('/');
     }
   };
+
+  if (!user) {
+    return null; // Redirect handled in useEffect
+  }
 
   const CurrentStepComponent = steps[currentStep].component;
 
@@ -240,7 +248,6 @@ const BookingWizard = () => {
           submitting={submitting}
           bookingId={bookingId}
           isComplete={isComplete}
-          sessionId={sessionId}
         />
       </motion.div>
 

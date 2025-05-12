@@ -89,7 +89,7 @@ const HomePage = () => {
               capacity: typeof venue.capacity === 'number' ? venue.capacity : 0,
               location: venue.location || 'Location TBD',
               rating: typeof venue.rating === 'number' ? venue.rating : 0,
-              description: venue.description || 'Description coming soon'
+              
             };
           }).filter(Boolean); // Remove any null values
 

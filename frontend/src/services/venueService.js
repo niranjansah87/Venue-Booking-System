@@ -1,10 +1,14 @@
 import api from './api';
 
-// Fetch all venues with optional pagination
-export const getAllVenues = async (page = 1, limit = 10) => {
+// Fetch all venues with optional pagination, guest count, and session ID
+export const getAllVenues = async (guestCount = null, sessionId = null, page = 1, limit = 10) => {
   try {
+    const params = { page, limit };
+    if (guestCount) params.guestCount = guestCount;
+    if (sessionId) params.sessionId = sessionId;
+
     const response = await api.get('/api/admin/venues', {
-      params: { page, limit },
+      params,
       withCredentials: true,
     });
     return response.data;
@@ -35,7 +39,7 @@ export const updateVenue = async (id, venueData) => {
   try {
     const response = await api.put(`/api/admin/venues/update/${id}`, venueData, {
       withCredentials: true,
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: { ' licencia-Type': 'multipart/form-data' },
     });
     return response.data;
   } catch (error) {
@@ -53,6 +57,21 @@ export const deleteVenue = async (id) => {
   } catch (error) {
     const errorMessage = error.response?.data?.message || `Failed to delete venue with ID ${id}`;
     console.error(`Error deleting venue with ID ${id}:`, errorMessage, error.response?.data);
+    throw new Error(errorMessage);
+  }
+};
+
+// Check availability for a venue
+export const checkAvailability = async (venueId, date, shiftId, sessionId) => {
+  try {
+    const response = await api.get('/api/admin/bookings/check-availability', {
+      params: { venueId, date, shiftId, sessionId },
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || 'Failed to check availability';
+    console.error('Error checking availability:', errorMessage, error);
     throw new Error(errorMessage);
   }
 };

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Plus, Edit, Trash2, XCircle, CheckCircle, AlertCircle, Image as ImageIcon } from 'lucide-react';
@@ -23,29 +24,32 @@ const VenuesManagement = () => {
     { id: 3, name: 'Grand Ballroom', image: DEFAULT_IMAGE, capacity: 300 },
   ];
 
-  useEffect(() => {
-    const fetchVenues = async () => {
-      try {
-        setLoading(true);
-        const data = await getAllVenues();
-        if (!data.venues || data.venues.length === 0) {
-          setVenues(mockVenues);
-        } else {
-          setVenues(
-            data.venues.map((venue) => ({
-              ...venue,
-              image: venue.image ? `${IMAGE_BASE_URL}${venue.image}` : DEFAULT_IMAGE,
-            }))
-          );
-        }
-      } catch (error) {
-        console.error('Error fetching venues:', error);
-        setError('Failed to load venues');
+  const fetchVenues = async () => {
+    try {
+      setLoading(true);
+      const data = await getAllVenues();
+      console.log('Fetch venues response:', data);
+      const venuesData = data.venues || data.data || data.results || data || [];
+      if (!venuesData.length) {
         setVenues(mockVenues);
-      } finally {
-        setLoading(false);
+      } else {
+        setVenues(
+          venuesData.map((venue) => ({
+            ...venue,
+            image: venue.image ? `${IMAGE_BASE_URL}${venue.image}` : DEFAULT_IMAGE,
+          }))
+        );
       }
-    };
+    } catch (error) {
+      console.error('Error fetching venues:', error);
+      setError('Failed to load venues');
+      setVenues(mockVenues);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchVenues();
   }, []);
 
@@ -81,42 +85,28 @@ const VenuesManagement = () => {
       if (formData.image) {
         venueData.append('image', formData.image);
       } else if (formData.id && imagePreview) {
-        venueData.append('image', imagePreview.replace(IMAGE_BASE_URL, '')); // Send existing image path
+        venueData.append('image', imagePreview.replace(IMAGE_BASE_URL, ''));
       }
 
       let response;
       if (formData.id) {
         response = await updateVenue(formData.id, venueData);
-        setVenues((prev) =>
-          prev.map((venue) =>
-            venue.id === formData.id
-              ? {
-                  ...venue,
-                  name: response.name,
-                  capacity: parseInt(response.capacity),
-                  image: response.image ? `${IMAGE_BASE_URL}${response.image}` : venue.image,
-                }
-              : venue
-          )
-        );
+        console.log('Update venue response:', response);
         toast.success('Venue updated successfully');
       } else {
         response = await createVenue(venueData);
-        setVenues((prev) => [
-          ...prev,
-          {
-            ...response,
-            image: response.image ? `${IMAGE_BASE_URL}${response.image}` : DEFAULT_IMAGE,
-          },
-        ]);
+        console.log('Create venue response:', response);
         toast.success('Venue created successfully');
       }
 
+      // Re-fetch venues to ensure state is in sync with backend
+      await fetchVenues();
       resetForm();
     } catch (error) {
       console.error('Error saving venue:', error.message, error.response?.data);
-      setError(error.message || 'Failed to save venue');
-      toast.error(error.message || 'Failed to save venue');
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to save venue';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -142,8 +132,9 @@ const VenuesManagement = () => {
       toast.success('Venue deleted successfully');
     } catch (error) {
       console.error('Error deleting venue:', error.message);
-      setError(error.message || 'Failed to delete venue');
-      toast.error(error.message || 'Failed to delete venue');
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to delete venue';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

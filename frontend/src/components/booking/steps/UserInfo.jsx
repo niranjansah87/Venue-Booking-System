@@ -2,8 +2,11 @@ import React, { useState } from 'react';
 import { User, Mail } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
+import { toast } from 'react-toastify';
+import { useAuth } from '../../../contexts/AuthContext';
 
-const UserInfo = ({ name, email, otp, otpSent, updateBookingData, sendOtp }) => {
+const UserInfo = ({ name, email, updateBookingData }) => {
+  const { sendOtp } = useAuth();
   const {
     register,
     handleSubmit,
@@ -13,39 +16,33 @@ const UserInfo = ({ name, email, otp, otpSent, updateBookingData, sendOtp }) => 
     defaultValues: {
       name: name || '',
       email: email || '',
-      otp: otp || '',
     },
   });
 
-  const [localOtpSent, setLocalOtpSent] = useState(otpSent);
+  const [otpSent, setOtpSent] = useState(false);
 
-  // Watch form values for real-time updates
   const watchedValues = watch();
 
-  // Update booking data when form values change
   React.useEffect(() => {
     if (watchedValues.name) {
       updateBookingData('name', watchedValues.name);
     }
-    if (watchedValues.otp) {
-      updateBookingData('otp', watchedValues.otp);
-    }
-  }, [watchedValues.name, watchedValues.otp, updateBookingData]);
+  }, [watchedValues.name, updateBookingData]);
 
   const onSendOtp = async () => {
     try {
       await sendOtp();
-      setLocalOtpSent(true);
+      setOtpSent(true);
+      toast.success('OTP sent to your email!');
     } catch (error) {
       console.error('Error sending OTP:', error);
+      toast.error('Failed to send OTP.');
     }
   };
 
   const onSubmit = (data) => {
     updateBookingData('name', data.name);
     updateBookingData('email', data.email);
-    updateBookingData('otp', data.otp);
-    // Submission is handled by BookingWizard's nextStep
   };
 
   return (
@@ -57,7 +54,6 @@ const UserInfo = ({ name, email, otp, otpSent, updateBookingData, sendOtp }) => 
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-6">
-          {/* Name Field */}
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
               Full Name
@@ -95,7 +91,6 @@ const UserInfo = ({ name, email, otp, otpSent, updateBookingData, sendOtp }) => 
             )}
           </div>
 
-          {/* Email Field (Disabled) */}
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
               Email Address
@@ -117,56 +112,20 @@ const UserInfo = ({ name, email, otp, otpSent, updateBookingData, sendOtp }) => 
             </p>
           </div>
 
-          {/* OTP Button */}
           <div>
             <button
               type="button"
               onClick={onSendOtp}
-              disabled={localOtpSent}
+              disabled={otpSent}
               className={`px-6 py-3 rounded-md ${
-                localOtpSent
+                otpSent
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   : 'bg-primary-600 text-white hover:bg-primary-700'
               }`}
             >
-              {localOtpSent ? 'OTP Sent' : 'Send OTP'}
+              {otpSent ? 'OTP Sent' : 'Send OTP'}
             </button>
           </div>
-
-          {/* OTP Field (Shown after OTP sent) */}
-          {localOtpSent && (
-            <div>
-              <label htmlFor="otp" className="block text-sm font-medium text-gray-700 mb-1">
-                OTP
-              </label>
-              <input
-                id="otp"
-                type="text"
-                {...register('otp', {
-                  required: 'OTP is required',
-                  pattern: {
-                    value: /^[0-9]{6}$/,
-                    message: 'Please enter a valid 6-digit OTP',
-                  },
-                })}
-                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
-                  errors.otp
-                    ? 'border-error-300 focus:border-error-500 focus:ring-error-200'
-                    : 'border-gray-300 focus:border-primary-500 focus:ring-primary-200'
-                }`}
-                placeholder="Enter 6-digit OTP"
-              />
-              {errors.otp && (
-                <motion.p
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-1 text-sm text-error-600"
-                >
-                  {errors.otp.message}
-                </motion.p>
-              )}
-            </div>
-          )}
         </div>
       </form>
     </div>
