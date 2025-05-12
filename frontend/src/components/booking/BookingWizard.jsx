@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
@@ -52,20 +52,6 @@ const BookingWizard = () => {
   const [bookingId, setBookingId] = useState(null);
   const [isComplete, setIsComplete] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [sessionId, setSessionId] = useState(null);
-
-  useEffect(() => {
-    const initiateBooking = async () => {
-      try {
-        const response = await api.get('/api/admin/bookings/initiate');
-        setSessionId(response.data.sessionId);
-      } catch (error) {
-        console.error('Error initiating booking:', error);
-        toast.error('Failed to initiate booking.');
-      }
-    };
-    initiateBooking();
-  }, []);
 
   const updateBookingData = (key, value) => {
     setBookingData((prev) => ({
@@ -78,24 +64,26 @@ const BookingWizard = () => {
   };
 
   const checkAvailability = async () => {
-    const { date, venueId, shiftId } = bookingData;
-    if (!date || !venueId || !shiftId) {
-      toast.error('Please select date, venue, and shift.');
+    const { date, venueId, shiftId, event_id, guestCount } = bookingData;
+    if (!date || !venueId || !shiftId || !event_id || !guestCount) {
+      toast.error('Please select date, event type, guest count, venue, and shift.');
       return;
     }
     setIsCheckingAvailability(true);
     try {
       const formattedDate = date.toISOString().split('T')[0];
       await api.post('/api/admin/bookings/check-availability', {
-        event_date: formattedDate,
+        event_id,
         venue_id: venueId,
         shift_id: shiftId,
-        sessionId,
+        event_date: formattedDate,
+        guest_count: guestCount,
       });
       setIsAvailable(true);
+      toast.success('Slot is available!');
     } catch (error) {
       console.error('Error checking availability:', error);
-      toast.error('Selected slot is not available.');
+      toast.error(error.response?.data?.message || 'Selected slot is not available.');
       throw error;
     } finally {
       setIsCheckingAvailability(false);
@@ -114,7 +102,6 @@ const BookingWizard = () => {
         package_id: packageId,
         selected_menus: selectedMenus,
         guest_count: guestCount,
-        sessionId,
       });
       const { base_fare, extra_charges, total_fare } = response.data;
       setBookingData((prev) => ({
@@ -125,7 +112,7 @@ const BookingWizard = () => {
       }));
     } catch (error) {
       console.error('Error calculating fare:', error);
-      toast.error('Failed to calculate fare.');
+      toast.error(error.response?.data?.message || 'Failed to calculate fare.');
       throw error;
     } finally {
       setIsCalculating(false);
@@ -135,11 +122,10 @@ const BookingWizard = () => {
   const handleVerifyOtp = async (otp) => {
     setSubmitting(true);
     try {
-      await verifyOtp(otp, sessionId);
+      await verifyOtp(otp);
       const response = await api.post('/api/admin/bookings/store', {
         ...bookingData,
         event_date: bookingData.date.toISOString().split('T')[0],
-        sessionId,
       });
       setBookingId(response.data.bookingId);
       await sendBookingConfirmationEmail(response.data.bookingId, bookingData.email);
@@ -147,7 +133,7 @@ const BookingWizard = () => {
       setCurrentStep(steps.length - 1);
     } catch (error) {
       console.error('Error storing booking:', error);
-      toast.error('Failed to store booking.');
+      toast.error(error.response?.data?.message || 'Failed to store booking.');
       throw error;
     } finally {
       setSubmitting(false);
@@ -159,8 +145,8 @@ const BookingWizard = () => {
       // OTP step requires verification
       return;
     }
-    if (currentStep === steps.findIndex((s) => s.id === 'venue') && !isAvailable) {
-      toast.error('Please check venue availability.');
+    if (currentStep === steps.findIndex((s) => s.id === 'venue') && !bookingData.venueId) {
+      toast.error('Please select a venue.');
       return;
     }
     if (currentStep === steps.findIndex((s) => s.id === 'shift') && !isAvailable) {
@@ -240,7 +226,6 @@ const BookingWizard = () => {
           submitting={submitting}
           bookingId={bookingId}
           isComplete={isComplete}
-          sessionId={sessionId}
         />
       </motion.div>
 
@@ -255,7 +240,7 @@ const BookingWizard = () => {
           <button
             onClick={handleNext}
             disabled={
-              (currentStep === steps.findIndex((s) => s.id === 'venue') && !isAvailable) ||
+              (currentStep === steps.findIndex((s) => s.id === 'venue') && !bookingData.venueId) ||
               (currentStep === steps.findIndex((s) => s.id === 'shift') && !isAvailable) ||
               (currentStep === steps.findIndex((s) => s.id === 'fare') && bookingData.totalFare === 0)
             }

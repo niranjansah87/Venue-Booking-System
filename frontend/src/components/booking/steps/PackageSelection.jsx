@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Check, Package } from 'lucide-react';
+import { Package, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { getAllPackages } from '../../../services/packageService';
 import { toast } from 'react-toastify';
@@ -102,6 +102,24 @@ const PackageSelection = ({ packageId, updateBookingData }) => {
           </motion.div>
         ))}
       </div>
+
+      {selectedPackage && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-8 p-5 bg-primary-50 border border-primary-100 rounded-md flex items-center"
+        >
+          <Package className="h-8 w-8 text-primary-500 mr-4" />
+          <div>
+            <p className="text-lg font-medium text-primary-800">
+              {packages.find((p) => p.id === selectedPackage)?.name} Selected
+            </p>
+            <p className="text-primary-600 mt-1">
+              Proceed to select menu options.
+            </p>
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 };

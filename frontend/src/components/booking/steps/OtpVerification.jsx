@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, CheckCircle, Loader } from 'lucide-react';
+import { Mail, Loader } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { sendOTP } from '../../../services/bookingService';
 import { toast } from 'react-toastify';
 
-const OtpVerification = ({ email, name, verifyOtp, submitting }) => {
+const OtpVerification = ({ email, verifyOtp, submitting }) => {
   const [otp, setOtp] = useState('');
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [sendingOtp, setSendingOtp] = useState(false);
@@ -99,17 +99,19 @@ const OtpVerification = ({ email, name, verifyOtp, submitting }) => {
         </button>
       </div>
 
-      {isOtpSent && (
-        <div className="mt-8 p-5 bg-primary-50 border border-primary-100 rounded-md flex items-start">
-          <Mail className="h-8 w-8 text-primary-500 mr-4 flex-shrink-0 mt-1" />
-          <div>
-            <p className="text-lg font-medium text-primary-800">OTP Sent</p>
-            <p className="text-primary-600 mt-1">
-              Check your email ({email}) for the OTP.
-            </p>
-          </div>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mt-8 p-5 bg-primary-50 border border-primary-100 rounded-md flex items-start"
+      >
+        <Mail className="h-8 w-8 text-primary-500 mr-4 flex-shrink-0 mt-1" />
+        <div>
+          <p className="text-lg font-medium text-primary-800">OTP Sent</p>
+          <p className="text-primary-600 mt-1">
+            Check your email ({email}) for the OTP.
+          </p>
         </div>
-      )}
+      </motion.div>
     </div>
   );
 };

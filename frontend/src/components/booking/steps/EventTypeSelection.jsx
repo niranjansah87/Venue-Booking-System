@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Check, Calendar } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { getAllEvents } from '../../../services/eventService';
 import { toast } from 'react-toastify';
@@ -10,32 +10,21 @@ const EventTypeSelection = ({ event_id, updateBookingData }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-useEffect(() => {
-  const fetchEvents = async () => {
-    try {
-      setLoading(true);
-      const res = await getAllEvents();
-      console.log("Raw event response:", res);
-
-      const data = Array.isArray(res) ? res : res?.data;
-
-      if (!Array.isArray(data)) {
-        throw new Error('Invalid events data received');
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        setLoading(true);
+        const data = await getAllEvents();
+        setEvents(data);
+      } catch (error) {
+        setError('Failed to load event types.');
+        toast.error('Failed to load event types.');
+      } finally {
+        setLoading(false);
       }
-
-      setEvents(data);
-    } catch (error) {
-      console.error("Error fetching events:", error);
-      setError('Failed to load event types.');
-      toast.error('Failed to load event types.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchEvents();
-}, []);
-
+    };
+    fetchEvents();
+  }, []);
 
   const handleEventSelect = (eventId) => {
     setSelectedEvent(eventId);
@@ -75,8 +64,8 @@ useEffect(() => {
         {events.map((event) => (
           <motion.div
             key={event.id}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ y: -3 }}
+            whileTap={{ y: 1 }}
             onClick={() => handleEventSelect(event.id)}
             className={`p-6 rounded-md border-2 cursor-pointer transition-all ${
               selectedEvent === event.id
@@ -84,18 +73,31 @@ useEffect(() => {
                 : 'border-gray-200 hover:border-primary-200 hover:bg-gray-50'
             }`}
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <Calendar
-                  className={`h-6 w-6 mr-3 ${selectedEvent === event.id ? 'text-primary-600' : 'text-gray-400'}`}
-                />
-                <h3 className="text-lg font-medium text-gray-800">{event.name}</h3>
-              </div>
-              {selectedEvent === event.id && <Check className="h-6 w-6 text-primary-600" />}
+            <div className="flex items-center">
+              <Calendar className={`h-6 w-6 mr-3 ${selectedEvent === event.id ? 'text-primary-600' : 'text-gray-400'}`} />
+              <h3 className="text-lg font-medium text-gray-800">{event.name}</h3>
             </div>
           </motion.div>
         ))}
       </div>
+
+      {selectedEvent && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-8 p-5 bg-primary-50 border border-primary-100 rounded-md flex items-center"
+        >
+          <Calendar className="h-8 w-8 text-primary-500 mr-4" />
+          <div>
+            <p className="text-lg font-medium text-primary-800">
+              {events.find((e) => e.id === selectedEvent)?.name} Selected
+            </p>
+            <p className="text-primary-600 mt-1">
+              Proceed to select guest count.
+            </p>
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 };

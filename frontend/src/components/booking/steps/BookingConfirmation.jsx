@@ -3,7 +3,7 @@ import { CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
-const BookingConfirmation = ({ bookingId, date, event_id, venueId, shiftId, guestCount, totalFare, email }) => {
+const BookingConfirmation = ({ bookingId, date, guestCount, totalFare, email }) => {
   const navigate = useNavigate();
 
   const handleBackToHome = () => {
@@ -39,7 +39,11 @@ const BookingConfirmation = ({ bookingId, date, event_id, venueId, shiftId, gues
         </div>
       </div>
 
-      <div className="mt-8 p-5 bg-primary-50 border border-primary-100 rounded-md flex items-start">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mt-8 p-5 bg-primary-50 border border-primary-100 rounded-md flex items-start"
+      >
         <CheckCircle className="h-8 w-8 text-primary-500 mr-4 flex-shrink-0 mt-1" />
         <div>
           <p className="text-lg font-medium text-primary-800">Thank You!</p>
@@ -47,7 +51,7 @@ const BookingConfirmation = ({ bookingId, date, event_id, venueId, shiftId, gues
             Your event is booked. You'll receive a confirmation email soon.
           </p>
         </div>
-      </div>
+      </motion.div>
 
       <div className="mt-8 flex justify-center">
         <button

@@ -121,7 +121,7 @@ const MenuSelection = ({ packageId, selectedMenus, updateBookingData }) => {
                   ?.items.map((item, index) => (
                     <motion.div
                       key={index}
-                      whileHover={{ y: -2 }}
+                      whileHover={{ y: -3 }}
                       className={`p-4 border rounded-md flex items-center justify-between transition-all ${
                         isItemSelected(activeMenu, index)
                           ? 'border-primary-500 bg-primary-50'
@@ -153,6 +153,22 @@ const MenuSelection = ({ packageId, selectedMenus, updateBookingData }) => {
           )}
         </div>
       </div>
+
+      {Object.keys(selectedMenus).length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-8 p-5 bg-primary-50 border border-primary-100 rounded-md flex items-center"
+        >
+          <Utensils className="h-8 w-8 text-primary-500 mr-4" />
+          <div>
+            <p className="text-lg font-medium text-primary-800">Menu Items Selected</p>
+            <p className="text-primary-600 mt-1">
+              Proceed to review fare summary.
+            </p>
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 };

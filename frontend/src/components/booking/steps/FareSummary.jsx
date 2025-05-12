@@ -1,45 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { DollarSign, CheckCircle } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { DollarSign } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 
 const FareSummary = ({ baseFare, extraCharges, totalFare, calculateFare, isCalculating }) => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
   useEffect(() => {
     const fetchFare = async () => {
       try {
-        setLoading(true);
         await calculateFare();
       } catch (error) {
-        setError('Failed to calculate fare.');
         toast.error('Failed to calculate fare.');
-      } finally {
-        setLoading(false);
       }
     };
     fetchFare();
   }, [calculateFare]);
 
-  if (loading || isCalculating) {
+  if (isCalculating) {
     return (
       <div className="flex justify-center items-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="py-8 text-center">
-        <p className="text-red-500 mb-4">{error}</p>
-        <button
-          className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
-          onClick={() => window.location.reload()}
-        >
-          Try Again
-        </button>
       </div>
     );
   }
@@ -69,7 +48,11 @@ const FareSummary = ({ baseFare, extraCharges, totalFare, calculateFare, isCalcu
         </div>
       </div>
 
-      <div className="mt-8 p-5 bg-primary-50 border border-primary-100 rounded-md flex items-start">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mt-8 p-5 bg-primary-50 border border-primary-100 rounded-md flex items-start"
+      >
         <DollarSign className="h-8 w-8 text-primary-500 mr-4 flex-shrink-0 mt-1" />
         <div>
           <p className="text-lg font-medium text-primary-800">Fare Summary</p>
@@ -77,7 +60,7 @@ const FareSummary = ({ baseFare, extraCharges, totalFare, calculateFare, isCalcu
             Your total estimated cost is ${totalFare.toLocaleString()}.
           </p>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

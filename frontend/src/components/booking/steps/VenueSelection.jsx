@@ -86,11 +86,12 @@ const VenueSelection = ({
             onClick={() => handleVenueSelect(venue.id)}
           >
             <img
-              src={venue.image?.replace('public\\', '/')} // Correct path for browser
+              src={`http://localhost:5000/${venue.image.replace(/\\/g, '/')}`}
+
               alt={venue.name}
               className="w-full h-48 object-cover"
               onError={(e) => {
-                e.target.src = 'https://via.placeholder.com/400x200';
+                e.target.src = './default_venue.jpg';
               }}
             />
             <div className="p-6">

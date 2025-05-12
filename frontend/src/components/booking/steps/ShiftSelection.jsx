@@ -64,7 +64,7 @@ const ShiftSelection = ({ shiftId, updateBookingData, isAvailable, isCheckingAva
         {shifts.map((shift) => (
           <motion.div
             key={shift.id}
-            whileHover={{ y: -2 }}
+            whileHover={{ y: -3 }}
             whileTap={{ y: 1 }}
             className={`p-4 border-2 rounded-md cursor-pointer transition-all ${
               selectedShift === shift.id ? 'border-primary-500 bg-primary-50' : 'border-gray-200 hover:border-primary-200 hover:bg-gray-50'
