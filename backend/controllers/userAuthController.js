@@ -28,6 +28,55 @@ exports.verifyEmail = async (req, res) => {
   }
 };
 
+
+
+
+
+
+// exports.verifyEmail = async (req, res) => {
+//   try {
+//     const { token, email } = req.query;
+//     if (!token || !email) {
+//       return res.render('verify-email', {
+//         status: 'error',
+//         message: 'Missing token or email.',
+//         email: decodeURIComponent(email || ''),
+//       });
+//     }
+//     const hashedToken = require('crypto').createHash('sha256').update(token).digest('hex');
+//     const user = await User.findOne({
+//       where: {
+//         email: decodeURIComponent(email),
+//         verification_token: hashedToken,
+//         verification_token_expires: { [Op.gt]: new Date() },
+//       },
+//     });
+//     if (!user) {
+//       return res.render('verify-email', {
+//         status: 'error',
+//         message: 'Invalid or expired verification token.',
+//         email: decodeURIComponent(email),
+//       });
+//     }
+//     await user.update({ email_verified: true, verification_token: null, verification_token_expires: null });
+//     res.render('verify-email', {
+//       status: 'success',
+//       message: 'Email verified successfully!',
+//       email: decodeURIComponent(email),
+//     });
+//   } catch (err) {
+//     console.error('Verify email error:', err);
+//     res.render('verify-email', {
+//       status: 'error',
+//       message: 'An error occurred during verification.',
+//       email: decodeURIComponent(req.query.email || ''),
+//     });
+//   }
+// };
+
+
+
+
 exports.signup = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -392,3 +441,99 @@ exports.deleteUser = async (req, res) => {
     }
 };
 
+exports.verifyEmail = async (req, res) => {
+  try {
+    const { token, email } = req.query;
+    if (!token || !email) {
+      return res.render('verify-email', {
+        status: 'error',
+        message: 'Missing token or email.',
+        email: decodeURIComponent(email || ''),
+      });
+    }
+    const hashedToken = require('crypto').createHash('sha256').update(token).digest('hex');
+    const user = await User.findOne({
+      where: {
+        email: decodeURIComponent(email),
+        verification_token: hashedToken,
+        verification_token_expires: { [Op.gt]: new Date() },
+      },
+    });
+    if (!user) {
+      return res.render('verify-email', {
+        status: 'error',
+        message: 'Invalid or expired verification token.',
+        email: decodeURIComponent(email),
+      });
+    }
+    await user.update({ email_verified: true, verification_token: null, verification_token_expires: null });
+    res.render('verify-email', {
+      status: 'success',
+      message: 'Email verified successfully!',
+      email: decodeURIComponent(email),
+    });
+  } catch (err) {
+    console.error('Verify email error:', err);
+    res.render('verify-email', {
+      status: 'error',
+      message: 'An error occurred during verification.',
+      email: decodeURIComponent(req.query.email || ''),
+    });
+  }
+};
+
+
+
+
+
+exports.resendVerification = async (req, res) => {
+  const { email } = req.query;
+  const user = await User.findOne({ where: { email: decodeURIComponent(email) } });
+  if (!user) {
+    return res.render('verify-email', {
+      status: 'error',
+      message: 'Email not found.',
+      email: decodeURIComponent(email),
+    });
+  }
+  const { raw, hash } = generateToken();
+  const expires = new Date(Date.now() + 1000 * 60 * 60);
+  await user.update({
+    verification_token: hash,
+    verification_token_expires: expires,
+  });
+  const link = `${req.protocol}://${req.get('host')}/api/verify-email?token=${raw}&email=${encodeURIComponent(email)}`;
+  await sendEmail({
+    to: email,
+    subject: 'Verify your email - A One Cafe',
+    html: `
+      <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 30px; border-radius: 10px; max-width: 600px; margin: auto;">
+        <h2 style="color: #4CAF50;">Email Verification Required - A One Cafe</h2>
+        <p style="font-size: 16px; color: #333;">
+          Hello,
+        </p>
+        <p style="font-size: 16px; color: #333;">
+          Welcome to A One Cafe! Please click the button below to verify your email address:
+        </p>
+        <p style="text-align: center; margin: 30px 0;">
+          <a href="${link}" style="display: inline-block; background-color: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            Verify Email
+          </a>
+        </p>
+        <p style="font-size: 14px; color: #666;">
+          Or copy and paste this link into your browser:<br>
+          <a href="${link}" style="color: #4CAF50;">${link}</a>
+        </p>
+        <hr style="margin: 30px 0;">
+        <p style="font-size: 12px; color: #999;">
+          If you didn’t sign up for A One Cafe, please ignore this email or contact our support at <a href="mailto:support@aonecafe.com">support@aonecafe.com</a>.
+        </p>
+      </div>
+    `,
+  });
+  res.render('verify-email', {
+    status: 'success',
+    message: 'Verification link resent. Please check your email.',
+    email: decodeURIComponent(email),
+  });
+};

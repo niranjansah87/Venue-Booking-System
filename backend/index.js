@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const db = require('./config/db');
 const { User, Admin, Event, Venue, Shift, Package, Menu, Booking } = require('./models');
+const path = require('path');
 
 dotenv.config(); // Load environment variables
 
@@ -16,7 +17,8 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/public', express.static('public'));
-
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 // CORS
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:5173',
