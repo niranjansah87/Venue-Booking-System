@@ -123,9 +123,9 @@ export const deleteBooking = async (bookingId) => {
 
 
 // Send confirmation email
-export const sendConfirmation = async (bookingId) => {
+export const sendConfirmation = async (bookingId,email) => {
   try {
-    const response = await api.post('/api/admin/bookings/send-confirmation', { bookingId });
+    const response = await api.post('/api/admin/book/send-confirmation', { bookingId,email });
     return response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || 'Failed to send confirmation';
@@ -134,29 +134,7 @@ export const sendConfirmation = async (bookingId) => {
   }
 };
 
-// Send OTP
-export const sendOTP = async (email) => {
-  try {
-    const response = await api.post('/api/admin/book/send-otp', { email });
-    return response.data;
-  } catch (error) {
-    const errorMessage = error.response?.data?.message || 'Failed to send OTP';
-    console.error('Error sending OTP:', errorMessage, error);
-    throw new Error(errorMessage);
-  }
-};
 
-// Verify OTP
-export const verifyOTP = async (otp) => {
-  try {
-    const response = await api.post('/api/admin/book/verify-otp', { otp });
-    return response.data;
-  } catch (error) {
-    const errorMessage = error.response?.data?.message || 'Failed to verify OTP';
-    console.error('Error verifying OTP:', errorMessage, error);
-    throw new Error(errorMessage);
-  }
-};
 
 // Create user
 export const createUser = async (userData) => {

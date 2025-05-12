@@ -84,10 +84,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const verifyOtp = async (otp) => {
-    if (!user?.id || !user?.email) {
-      toast.error('Please log in to verify OTP.');
-      throw new Error('User details not found');
-    }
+   
     try {
       const response = await api.post('/api/admin/book/verify-otp', { otp });
       console.log('OTP verified:', otp); // Debug
@@ -103,7 +100,7 @@ export const AuthProvider = ({ children }) => {
 
   const sendConfirmation = async (bookingId, email) => {
     try {
-      await api.post('/api/bookings/confirmation-email', { bookingId, email });
+      await api.post('/api/admin/book/send-confirmation', { bookingId, email });
       toast.success('Confirmation email sent!');
     } catch (error) {
       console.error('Error sending confirmation:', error);

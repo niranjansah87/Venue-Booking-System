@@ -38,15 +38,16 @@ const BookingWizard = () => {
       try {
         const parsedUser = JSON.parse(storedUser);
         return {
+          id: parsedUser.id || null,
           name: parsedUser.name || '',
           email: parsedUser.email || '',
         };
       } catch (error) {
         console.error('Error parsing user from local storage:', error);
-        return { name: '', email: '' };
+        return { id: null, name: '', email: '' };
       }
     }
-    return { name: '', email: '' };
+    return { id: null, name: '', email: '' };
   };
 
   const [currentStep, setCurrentStep] = useState(0);
@@ -77,8 +78,8 @@ const BookingWizard = () => {
       toast.error('Please log in to create a booking.');
       navigate('/login');
     } else {
-      console.log('BookingWizard user:', user);
-      console.log('BookingWizard bookingData:', bookingData);
+      // console.log('BookingWizard user:', user);
+      // console.log('BookingWizard bookingData:', bookingData);
     }
   }, [user, navigate]);
 
@@ -163,15 +164,19 @@ const BookingWizard = () => {
     try {
       await verifyOtp(otp);
 
-      // Validate bookingData
+      // Validate bookingData and user
       const requiredFields = ['date', 'event_id', 'venueId', 'shiftId', 'packageId', 'guestCount', 'name', 'email'];
       const missingFields = requiredFields.filter((field) => !bookingData[field] || bookingData[field] === null);
       if (missingFields.length > 0) {
         throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
       }
+      if (!user?.id) {
+        throw new Error('User ID not found. Please log in again.');
+      }
 
       // Map frontend keys to backend expected keys
       const payload = {
+        user_id: user.id, // Add user_id from AuthContext
         event_id: bookingData.event_id,
         venue_id: bookingData.venueId,
         shift_id: bookingData.shiftId,
@@ -278,6 +283,7 @@ const BookingWizard = () => {
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: -50 }}
         transition={{ duration: 0.3 }}
+        
         className="bg-white rounded-lg shadow-lg p-6"
       >
         <CurrentStepComponent

@@ -1,8 +1,13 @@
 const bcrypt = require('bcryptjs');
-const { User, Event, Venue, Booking, Shift,Otp } = require('../models');
-const { validationResult } = require('express-validator');
+const { Booking, User, Event, Venue, Shift, Package,Otp } = require('../models');
+const { validationResult,check } = require('express-validator');
 const sendEmail = require('../utils/sendEmail');
 const { Op } = require('sequelize');
+
+
+
+
+
 exports.login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -149,7 +154,7 @@ exports.sendOTP = async (req, res) => {
       return res.status(500).json({ message: 'Failed to send OTP email' });
     }
 
-    console.log(`OTP for ${email}: ${otp}`); // Keep for debugging
+    // console.log(`OTP for ${email}: ${otp}`); 
     res.json({ message: 'OTP sent successfully' });
   } catch (error) {
     console.error('Error sending OTP:', error);
@@ -316,22 +321,6 @@ exports.calculateFare = async (req, res) => {
   }
 };
 
-exports.sendConfirmation = async (req, res) => {
-  const { bookingId, email } = req.body;
-
-  try {
-    const booking = await Booking.findByPk(bookingId);
-    if (!booking) return res.status(404).json({ message: 'Booking not found' });
-
-    // Simulate email sending
-    console.log(`Confirmation email sent to ${email} for booking ${bookingId}`);
-    res.json({ message: 'Confirmation email sent successfully' });
-  } catch (error) {
-    console.error('Error sending confirmation:', error);
-    res.status(500).json({ message: 'Failed to send confirmation email' });
-  }
-};
-
 
 
 
@@ -365,3 +354,154 @@ exports.verifyOTP = async (req, res) => {
     res.status(500).json({ message: 'Failed to verify OTP' });
   }
 };
+
+
+
+
+
+
+
+exports.sendConfirmation = [
+  // Validate request body
+  check('bookingId').notEmpty().withMessage('Booking ID is required').isInt().withMessage('Booking ID must be an integer'),
+  check('email').notEmpty().withMessage('Email is required').isEmail().withMessage('Email must be valid'),
+
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      console.log('Validation errors:', JSON.stringify(errors.array(), null, 2));
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { bookingId, email } = req.body;
+
+    try {
+      // Fetch booking with related data, including aliases
+      const booking = await Booking.findByPk(bookingId, {
+        include: [
+          { model: Event, as: 'event', attributes: ['name'] },
+          { model: Venue, as: 'venue', attributes: ['name'] },
+          { model: Shift, as: 'shift', attributes: ['name'] },
+          { model: Package, as: 'package', attributes: ['name'] },
+        ],
+      });
+
+      if (!booking) {
+        return res.status(404).json({ message: 'Booking not found' });
+      }
+
+      // Log selected_menus for debugging
+      console.log('Raw selected_menus:', booking.selected_menus);
+
+      // Handle selected_menus (Sequelize JSON fields are auto-parsed)
+      let selectedMenus = booking.selected_menus || {};
+      if (typeof selectedMenus === 'string') {
+        try {
+          selectedMenus = JSON.parse(selectedMenus);
+        } catch (parseError) {
+          console.error('Failed to parse selected_menus:', parseError);
+          selectedMenus = {};
+        }
+      }
+
+      // Validate selectedMenus is an object
+      if (!selectedMenus || typeof selectedMenus !== 'object') {
+        console.warn('selectedMenus is invalid, defaulting to {}');
+        selectedMenus = {};
+      }
+
+      // Format selected menus for email
+      const menuItemsHtml = Object.entries(selectedMenus)
+        .map(([menuId, items]) => {
+          if (!Array.isArray(items)) return '';
+          return `
+            <h3>Menu ${menuId}</h3>
+            <ul style="list-style-type: disc; margin-left: 20px;">
+              ${items.map((item) => `<li>${item}</li>`).join('')}
+            </ul>
+          `;
+        })
+        .filter(Boolean)
+        .join('');
+
+      // Construct HTML email with correct alias references
+      const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+          <h2 style="color: #1a73e8; text-align: center;">Booking Confirmation - A One Cafe</h2>
+          <p style="color: #333; font-size: 16px;">Dear ${booking.customer_name},</p>
+          <p style="color: #333; font-size: 16px;">Thank you for booking with A One Cafe! Below are the details of your event:</p>
+          <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+            <tr>
+              <td style="padding: 8px; border: 1px solid #e0e0e0; font-weight: bold;">Booking ID</td>
+              <td style="padding: 8px; border: 1px solid #e0e0e0;">${booking.id}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #e0e0e0; font-weight: bold;">Event Type</td>
+              <td style="padding: 8px; border: 1px solid #e0e0e0;">${booking.event?.name || 'N/A'}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #e0e0e0; font-weight: bold;">Venue</td>
+              <td style="padding: 8px; border: 1px solid #e0e0e0;">${booking.venue?.name || 'N/A'}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #e0e0e0; font-weight: bold;">Date</td>
+              <td style="padding: 8px; border: 1px solid #e0e0e0;">${booking.event_date}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #e0e0e0; font-weight: bold;">Time Slot</td>
+              <td style="padding: 8px; border: 1px solid #e0e0e0;">${booking.shift?.name || 'N/A'} </td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #e0e0e0; font-weight: bold;">Package</td>
+              <td style="padding: 8px; border: 1px solid #e0e0e0;">${booking.package?.name || 'N/A'}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #e0e0e0; font-weight: bold;">Guest Count</td>
+              <td style="padding: 8px; border: 1px solid #e0e0e0;">${booking.guest_count}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #e0e0e0; font-weight: bold;">Selected Menus</td>
+              <td style="padding: 8px; border: 1px solid #e0e0e0;">
+                ${menuItemsHtml || 'None'}
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #e0e0e0; font-weight: bold;">Base Fare</td>
+              <td style="padding: 8px; border: 1px solid #e0e0e0;">$${booking.base_fare || 0}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #e0e0e0; font-weight: bold;">Extra Charges</td>
+              <td style="padding: 8px; border: 1px solid #e0e0e0;">$${booking.extra_charges || 0}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #e0e0e0; font-weight: bold;">Total Fare</td>
+              <td style="padding: 8px; border: 1px solid #e0e0e0;">$${booking.total_fare || 0}</td>
+            </tr>
+          </table>
+          <p style="color: #333; font-size: 16px;">We look forward to hosting your event! If you have any questions, please contact us at <a href="mailto:${process.env.EMAIL_USER}" style="color: #1a73e8;">${process.env.EMAIL_USER}</a>.</p>
+          <p style="color: #333; font-size: 16px;">Best regards,<br>The A One Cafe Team</p>
+        </div>
+      `;
+
+      // console.log('Preparing to send confirmation email to:', email);
+      // console.log('Email HTML:', html);
+
+      // Send email
+      const emailSent = await sendEmail({
+        to: email,
+        subject: 'A One Cafe Booking Confirmation',
+        html,
+      });
+
+      if (!emailSent) {
+        console.error('Email sending failed for booking:', bookingId);
+        return res.status(500).json({ message: 'Failed to send confirmation email' });
+      }
+
+      res.json({ message: 'Confirmation email sent successfully' });
+    } catch (error) {
+      console.error('Error sending confirmation:', error);
+      res.status(500).json({ message: 'Failed to send confirmation email' });
+    }
+  },
+];

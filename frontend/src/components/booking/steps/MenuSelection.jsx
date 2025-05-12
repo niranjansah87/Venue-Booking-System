@@ -56,22 +56,25 @@ const MenuSelection = ({ packageId, selectedMenus, updateBookingData }) => {
     fetchMenus();
   }, [packageId]);
 
-  const handleMenuItemToggle = (menuId, itemIndex) => {
+  const handleMenuItemToggle = (menuId, itemName) => {
     const currentMenuItems = selectedMenus[menuId] || [];
-    const updatedMenuItems = currentMenuItems.includes(itemIndex)
-      ? currentMenuItems.filter((index) => index !== itemIndex)
-      : [...currentMenuItems, itemIndex];
+    const updatedMenuItems = currentMenuItems.includes(itemName)
+      ? currentMenuItems.filter((name) => name !== itemName)
+      : [...currentMenuItems, itemName];
 
-    updateBookingData('selectedMenus', {
+    const updatedSelectedMenus = {
       ...selectedMenus,
       [menuId]: updatedMenuItems,
-    });
+    };
+
+    console.log('Updated selectedMenus:', updatedSelectedMenus); // Debug
+    updateBookingData('selectedMenus', updatedSelectedMenus);
   };
 
   const getSelectedItemsCount = (menuId) => selectedMenus[menuId]?.length || 0;
 
-  const isItemSelected = (menuId, itemIndex) =>
-    selectedMenus[menuId]?.includes(itemIndex) || false;
+  const isItemSelected = (menuId, itemName) =>
+    selectedMenus[menuId]?.includes(itemName) || false;
 
   if (loading) {
     return (
@@ -159,10 +162,10 @@ const MenuSelection = ({ packageId, selectedMenus, updateBookingData }) => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {(menus.find((m) => m.id === activeMenu)?.items || []).map((item, index) => (
                   <motion.div
-                    key={index}
+                    key={item.name || index} // Use name as key for uniqueness
                     whileHover={{ y: -3 }}
                     className={`p-4 border rounded-md flex items-center justify-between transition-all ${
-                      isItemSelected(activeMenu, index)
+                      isItemSelected(activeMenu, item.name)
                         ? 'border-primary-500 bg-primary-50'
                         : 'border-gray-200 hover:border-primary-200'
                     }`}
@@ -171,14 +174,14 @@ const MenuSelection = ({ packageId, selectedMenus, updateBookingData }) => {
                       <h4 className="text-gray-800 font-medium">{item.name || 'Unnamed Item'}</h4>
                     </div>
                     <button
-                      onClick={() => handleMenuItemToggle(activeMenu, index)}
+                      onClick={() => handleMenuItemToggle(activeMenu, item.name)}
                       className={`p-2 rounded-full transition-colors ${
-                        isItemSelected(activeMenu, index)
+                        isItemSelected(activeMenu, item.name)
                           ? 'bg-primary-600 text-white'
                           : 'bg-gray-200 text-gray-600 hover:bg-primary-200 hover:text-primary-600'
                       }`}
                     >
-                      {isItemSelected(activeMenu, index) ? (
+                      {isItemSelected(activeMenu, item.name) ? (
                         <MinusCircle className="h-5 w-5" />
                       ) : (
                         <PlusCircle className="h-5 w-5" />
