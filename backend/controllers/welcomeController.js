@@ -1,7 +1,8 @@
 const bcrypt = require('bcryptjs');
-const { User, Event, Venue, Booking, Shift } = require('../models');
+const { User, Event, Venue, Booking, Shift,Otp } = require('../models');
 const { validationResult } = require('express-validator');
-
+const sendEmail = require('../utils/sendEmail');
+const { Op } = require('sequelize');
 exports.login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -93,24 +94,62 @@ exports.checkAvailability = async (req, res) => {
   }
 };
 
+
+
 exports.sendOTP = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ message: errors.array()[0].msg });
   }
 
-  const { userId, email } = req.body;
+  const { email } = req.body;
 
   try {
-    const user = await User.findByPk(userId);
-    if (!user || user.email !== email) {
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Simulate OTP generation and sending
+    // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    console.log(`OTP for ${email}: ${otp}`); // Replace with email service
+    
+    // Set OTP expiration (5 minutes)
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
+    // Store OTP in database
+    await Otp.create({
+      user_id: user.id,
+      otp_code: otp,
+      expires_at: expiresAt,
+    });
+
+    // Send OTP via email
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #1a202c;">Your OTP Code</h2>
+        <p style="color: #4a5568;">Hello ${user.name || 'User'},</p>
+        <p style="color: #4a5568;">
+          Your One-Time Password (OTP) for A One Cafe booking verification is:
+        </p>
+        <h3 style="color: #2b6cb0; font-size: 24px; margin: 20px 0;">${otp}</h3>
+        <p style="color: #4a5568;">
+          This OTP is valid for 5 minutes. Please do not share it with anyone.
+        </p>
+        <p style="color: #4a5568;">Thank you,<br />A One Cafe Team</p>
+      </div>
+    `;
+
+    const emailSent = await sendEmail({
+      to: email,
+      subject: 'Your A One Cafe OTP Code',
+      html,
+    });
+
+    if (!emailSent) {
+      return res.status(500).json({ message: 'Failed to send OTP email' });
+    }
+
+    console.log(`OTP for ${email}: ${otp}`); // Keep for debugging
     res.json({ message: 'OTP sent successfully' });
   } catch (error) {
     console.error('Error sending OTP:', error);
@@ -290,5 +329,37 @@ exports.sendConfirmation = async (req, res) => {
   } catch (error) {
     console.error('Error sending confirmation:', error);
     res.status(500).json({ message: 'Failed to send confirmation email' });
+  }
+};
+
+
+
+
+exports.verifyOTP = async (req, res) => {
+  
+  
+
+  const { otp } = req.body;
+
+  try {
+    const otpRecord = await Otp.findOne({
+      where: {
+        otp_code: otp,
+        expires_at: { [Op.gt]: new Date() }, // Not expired
+      },
+      include: [{ model: User }],
+    });
+
+    if (!otpRecord) {
+      return res.status(400).json({ message: 'Invalid or expired OTP' });
+    }
+
+    // Optional: Delete OTP after verification
+    await otpRecord.destroy();
+
+    res.json({ message: 'OTP verified successfully' });
+  } catch (error) {
+    console.error('Error verifying OTP:', error);
+    res.status(500).json({ message: 'Failed to verify OTP' });
   }
 };

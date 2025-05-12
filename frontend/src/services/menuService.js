@@ -3,7 +3,7 @@ import api from './api';
 // Fetch all menus
 export const getAllMenus = async () => {
   try {
-    const response = await api.get('/api/admin/menu', { withCredentials: true });
+    const response = await api.get('/api/admin/menu');
     return response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || 'Failed to fetch menus';
@@ -15,7 +15,7 @@ export const getAllMenus = async () => {
 // Fetch menus by package ID
 export const getMenusByPackageId = async (packageId) => {
   try {
-    const response = await api.get(`/api/admin/bookings/package/${packageId}/menus`, { withCredentials: true });
+    const response = await api.get(`/api/admin/menus/package/${packageId}`, { withCredentials: true });
     return response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || `Failed to fetch menus for package ID ${packageId}`;
@@ -27,7 +27,7 @@ export const getMenusByPackageId = async (packageId) => {
 // Fetch a single menu by ID
 export const getMenuById = async (id) => {
   try {
-    const response = await api.get(`/api/admin/menu/${id}`, { withCredentials: true });
+    const response = await api.get(`/api/admin/menus/${id}`, { withCredentials: true });
     return response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || `Failed to fetch menu with ID ${id}`;

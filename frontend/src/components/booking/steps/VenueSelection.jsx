@@ -22,7 +22,7 @@ const VenueSelection = ({
       try {
         setLoading(true);
         const res = await getAllVenues(guestCount);
-        console.log('Raw venue data:', res);
+        // console.log('Raw venue data:', res);
 
         const data = res?.venues;
         if (!Array.isArray(data)) {

@@ -30,10 +30,16 @@ router.get('/step3', welcomeController.step3);
 router.post(
   '/send-otp',
   [
-    body('userId').notEmpty().withMessage('User ID is required'),
+    
     body('email').isEmail().withMessage('Invalid email'),
   ],
   welcomeController.sendOTP
+);
+
+
+router.get(
+  '/verify-otp',
+  welcomeController.verifyOTP
 );
 router.post(
   '/step3',

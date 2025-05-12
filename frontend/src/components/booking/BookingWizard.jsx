@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
@@ -31,6 +31,25 @@ const steps = [
 const BookingWizard = () => {
   const navigate = useNavigate();
   const { user, sendOtp, verifyOtp, sendBookingConfirmationEmail } = useAuth();
+
+  // Fetch user data from local storage
+  const getInitialUserData = () => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        return {
+          name: parsedUser.name || '',
+          email: parsedUser.email || '',
+        };
+      } catch (error) {
+        console.error('Error parsing user from local storage:', error);
+        return { name: '', email: '' };
+      }
+    }
+    return { name: '', email: '' };
+  };
+
   const [currentStep, setCurrentStep] = useState(0);
   const [bookingData, setBookingData] = useState({
     date: null,
@@ -43,8 +62,8 @@ const BookingWizard = () => {
     baseFare: 0,
     extraCharges: 0,
     totalFare: 0,
-    name: user?.name || '',
-    email: user?.email || '',
+    name: user?.name || getInitialUserData().name,
+    email: user?.email || getInitialUserData().email,
   });
   const [isAvailable, setIsAvailable] = useState(false);
   const [isCheckingAvailability, setIsCheckingAvailability] = useState(false);
@@ -53,6 +72,18 @@ const BookingWizard = () => {
   const [isComplete, setIsComplete] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
+  // Redirect if not logged in
+  useEffect(() => {
+    if (!user) {
+      console.log('No user logged in, redirecting to login.');
+      toast.error('Please log in to create a booking.');
+      navigate('/login');
+    } else {
+      console.log('BookingWizard user:', user);
+      console.log('BookingWizard bookingData:', bookingData);
+    }
+  }, [user, navigate]);
+
   const updateBookingData = (key, value) => {
     setBookingData((prev) => ({
       ...prev,
@@ -60,6 +91,14 @@ const BookingWizard = () => {
     }));
     if (key === 'venueId' || key === 'shiftId') {
       setIsAvailable(false);
+    }
+    if (key === 'packageId' || key === 'selectedMenus' || key === 'guestCount') {
+      setBookingData((prev) => ({
+        ...prev,
+        baseFare: 0,
+        extraCharges: 0,
+        totalFare: 0,
+      }));
     }
   };
 
@@ -90,7 +129,7 @@ const BookingWizard = () => {
     }
   };
 
-  const calculateFare = async () => {
+  const calculateFare = useCallback(async () => {
     const { packageId, selectedMenus, guestCount } = bookingData;
     if (!packageId || !guestCount) {
       toast.error('Please select a package and guest count.');
@@ -98,11 +137,13 @@ const BookingWizard = () => {
     }
     setIsCalculating(true);
     try {
+      console.log('Sending calculate-fare request:', { package_id: packageId, selected_menus: selectedMenus, guest_count: guestCount });
       const response = await api.post('/api/admin/bookings/calculate-fare', {
         package_id: packageId,
         selected_menus: selectedMenus,
         guest_count: guestCount,
       });
+      console.log('Calculate-fare response:', response.data);
       const { base_fare, extra_charges, total_fare } = response.data;
       setBookingData((prev) => ({
         ...prev,
@@ -117,7 +158,7 @@ const BookingWizard = () => {
     } finally {
       setIsCalculating(false);
     }
-  };
+  }, [bookingData]);
 
   const handleVerifyOtp = async (otp) => {
     setSubmitting(true);

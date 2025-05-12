@@ -106,3 +106,45 @@ exports.deleteMenu = async (req, res) => {
     res.status(500).json({ error: 'Error deleting menu' });
   }
 };
+
+
+exports.getMenuById = async (req, res) => {
+  try {
+    const menuId = req.params.id;
+
+    const menu = await Menu.findByPk(menuId, {
+      include: [{ model: Package, as: 'package' }]
+    });
+
+    if (!menu) {
+      return res.status(404).json({ error: 'Menu not found' });
+    }
+
+    res.json(menu);
+  } catch (err) {
+    console.error('Error fetching menu by ID:', err);
+    res.status(500).json({ error: 'Error fetching menu' });
+  }
+};
+
+
+exports.getMenuByPackageId = async (req, res) => {
+  try {
+    const packageId = req.params.package_id;
+
+    // Fetch menus that belong to the specified package
+    const menus = await Menu.findAll({
+      where: { package_id: packageId },
+      include: [{ model: Package, as: 'package' }]
+    });
+
+    if (menus.length === 0) {
+      return res.status(404).json({ error: 'No menus found for the specified package' });
+    }
+
+    res.json(menus);
+  } catch (err) {
+    console.error('Error fetching menus by package ID:', err);
+    res.status(500).json({ error: 'Error fetching menus by package ID' });
+  }
+};

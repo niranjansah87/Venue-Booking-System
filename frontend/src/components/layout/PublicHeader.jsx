@@ -35,8 +35,10 @@ const PublicHeader = ({ isScrolled }) => {
   const handleLogout = async () => {
     try {
       await logout();
+      localStorage.removeItem('user'); // Clear user data from local storage
       setMobileMenuOpen(false);
       setDropdownOpen(false);
+      toast.success('Logged out successfully.');
     } catch (error) {
       console.error('Logout error:', error);
       toast.error('Failed to log out.');

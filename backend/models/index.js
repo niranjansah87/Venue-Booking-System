@@ -15,7 +15,7 @@ db.Shift = require('./shift')(sequelize, Sequelize.DataTypes);
 db.Package = require('./package')(sequelize, Sequelize.DataTypes);
 db.Menu = require('./menu')(sequelize, Sequelize.DataTypes);
 db.Booking = require('./booking')(sequelize, Sequelize.DataTypes);
-
+db.Otp = require('./otp')(sequelize, Sequelize.DataTypes);
 // If any associations (e.g., belongsTo, hasMany), define them here
 Object.values(db).forEach(model => {
   if (model.associate) {

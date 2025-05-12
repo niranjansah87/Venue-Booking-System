@@ -80,10 +80,12 @@ router.delete('/bookings/:bookingId', bookingController.deleteBooking);
 
 // Menu Routes
 router.get('/menu', menuController.displayMenus);
-// router.get('/menu/:id', menuController.getMenuById);
+router.get('/menu/:id', menuController.getMenuById);
 router.post('/menu/create', menuController.createMenu);
 router.put('/menu/:package_id/:id', menuController.updateMenu);
 router.delete('/menu/delete/:id', menuController.deleteMenu);
+router.get('/menus/package/:package_id', menuController.getMenuByPackageId);
+router.get('/menus/:id', menuController.getMenuById);
 
 // Package Routes
 router.get('/package', packageController.listPackages);

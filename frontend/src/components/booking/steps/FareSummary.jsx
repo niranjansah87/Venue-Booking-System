@@ -6,14 +6,21 @@ import { toast } from 'react-toastify';
 const FareSummary = ({ baseFare, extraCharges, totalFare, calculateFare, isCalculating }) => {
   useEffect(() => {
     const fetchFare = async () => {
+      if (totalFare !== 0) {
+        console.log('Fare already calculated, skipping fetch:', { baseFare, extraCharges, totalFare });
+        return;
+      }
       try {
+        console.log('Fetching fare...');
         await calculateFare();
+        console.log('Fare calculated successfully:', { baseFare, extraCharges, totalFare });
       } catch (error) {
+        console.error('Error calculating fare in FareSummary:', error);
         toast.error('Failed to calculate fare.');
       }
     };
     fetchFare();
-  }, [calculateFare]);
+  }, [calculateFare, totalFare]);
 
   if (isCalculating) {
     return (

@@ -11,7 +11,7 @@ export const getAllVenues = async (guestCount = null, page = 1, limit = 10) => {
       params,
       withCredentials: true,
     });
-    console.log(response.data);
+    // console.log(response.data);
     return response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || 'Failed to fetch venues';

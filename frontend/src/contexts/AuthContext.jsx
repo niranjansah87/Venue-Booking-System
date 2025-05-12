@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await api.post('/api/admin/login', { email, password });
+      const response = await api.post('/api/login', { email, password });
       const { user } = response.data;
 
       if (!user || typeof user !== 'object') {
