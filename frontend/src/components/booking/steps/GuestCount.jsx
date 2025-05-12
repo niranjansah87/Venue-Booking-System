@@ -4,15 +4,14 @@ import { motion } from 'framer-motion';
 import { getAllVenues } from '../../../services/venueService';
 import { toast } from 'react-toastify';
 
-const GuestCount = ({ guestCount, updateBookingData, sessionId }) => {
+const GuestCount = ({ guestCount, updateBookingData }) => {
   const [minGuests, setMinGuests] = useState(10);
   const [maxGuests, setMaxGuests] = useState(500);
 
   useEffect(() => {
     const fetchVenueCapacities = async () => {
       try {
-        const response = await getAllVenues(null, sessionId, 1, 100);
-        const venues = Array.isArray(response.venues) ? response.venues : [];
+        const venues = await getAllVenues();
         if (venues.length > 0) {
           const capacities = venues.map((venue) => venue.capacity);
           setMinGuests(Math.min(...capacities, 10));
@@ -21,12 +20,11 @@ const GuestCount = ({ guestCount, updateBookingData, sessionId }) => {
           toast.warn('No venues available.');
         }
       } catch (error) {
-        console.error('Error fetching venue capacities:', error);
         toast.error('Failed to load venue capacities.');
       }
     };
     fetchVenueCapacities();
-  }, [sessionId]);
+  }, []);
 
   const handleIncrement = () => {
     updateBookingData('guestCount', Math.min(guestCount + 10, maxGuests));
@@ -43,18 +41,11 @@ const GuestCount = ({ guestCount, updateBookingData, sessionId }) => {
     }
   };
 
-  const getGuestCountDescription = (count) => {
-    if (count < 50) return 'Small, intimate gathering';
-    if (count < 100) return 'Medium-sized event';
-    if (count < 200) return 'Large celebration';
-    return 'Grand event';
-  };
-
   return (
-    <div>
+    <div className="p-6">
       <h2 className="text-2xl font-heading font-semibold text-gray-800 mb-6">Guest Count</h2>
       <p className="text-gray-600 mb-8">
-        Please indicate how many guests you expect for your event with Surbhi Venues. This helps us recommend the perfect venue.
+        Indicate how many guests you expect for your event.
       </p>
 
       <div className="flex flex-col items-center">
@@ -70,29 +61,15 @@ const GuestCount = ({ guestCount, updateBookingData, sessionId }) => {
             <Minus className="h-5 w-5" />
           </motion.button>
 
-          <div className="flex flex-col items-center mx-6 sm:mx-10">
-            <div className="relative">
-              <input
-                type="number"
-                value={guestCount}
-                onChange={handleInputChange}
-                min={minGuests}
-                max={maxGuests}
-                className="w-24 h-16 text-center text-4xl font-semibold text-gray-800 border-b-2 border-primary-300 focus:border-primary-500 focus:outline-none"
-              />
-              <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                <motion.div
-                  key={guestCount}
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className="absolute -top-3 left-full ml-2 bg-primary-500 text-white text-xs px-2 py-1 rounded"
-                >
-                  guests
-                </motion.div>
-              </div>
-            </div>
-            <p className="text-sm text-gray-500 mt-2">{getGuestCountDescription(guestCount)}</p>
+          <div className="mx-6">
+            <input
+              type="number"
+              value={guestCount}
+              onChange={handleInputChange}
+              min={minGuests}
+              max={maxGuests}
+              className="w-24 h-16 text-center text-4xl font-semibold text-gray-800 border-b-2 border-primary-300 focus:border-primary-500 focus:outline-none"
+            />
           </div>
 
           <motion.button
@@ -110,27 +87,24 @@ const GuestCount = ({ guestCount, updateBookingData, sessionId }) => {
         <div className="w-full max-w-md">
           <div className="bg-gray-100 h-2 rounded-full w-full mt-4">
             <div
-              className="bg-primary-500 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${Math.min(((guestCount - minGuests) / (maxGuests - minGuests)) * 100, 100)}%` }}
+              className="bg-primary-600 h-2 rounded-full transition-all duration-300"
+              style={{ width: `${((guestCount - minGuests) / (maxGuests - minGuests)) * 100}%` }}
             />
           </div>
           <div className="flex justify-between mt-2 text-xs text-gray-500">
             <span>{minGuests}</span>
-            <span>{Math.round(maxGuests / 5)}</span>
-            <span>{Math.round(maxGuests / 2)}</span>
-            <span>{Math.round((maxGuests * 3) / 4)}</span>
             <span>{maxGuests}</span>
           </div>
         </div>
-      </div>
 
-      <div className="mt-12 p-5 bg-primary-50 border border-primary-100 rounded-lg flex items-center">
-        <Users className="h-10 w-10 text-primary-500 mr-4" />
-        <div>
-          <p className="text-gray-800 font-medium">Capacity Planning with Surbhi Venues</p>
-          <p className="text-sm text-gray-600">
-            Our venues can accommodate from {minGuests} to {maxGuests} guests comfortably, perfect for any event, from intimate gatherings to grand Indian celebrations.
-          </p>
+        <div className="mt-8 p-5 bg-primary-50 border border-primary-100 rounded-md flex items-center">
+          <Users className="h-8 w-8 text-primary-500 mr-4" />
+          <div>
+            <p className="text-primary-800 font-medium">{guestCount} Guests Selected</p>
+            <p className="text-primary-600 text-sm mt-1">
+              Suitable for {guestCount < 50 ? 'small gatherings' : guestCount < 100 ? 'medium events' : 'large celebrations'}.
+            </p>
+          </div>
         </div>
       </div>
     </div>

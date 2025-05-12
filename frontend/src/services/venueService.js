@@ -1,16 +1,17 @@
 import api from './api';
 
 // Fetch all venues with optional pagination, guest count, and session ID
-export const getAllVenues = async (guestCount = null, sessionId = null, page = 1, limit = 10) => {
+export const getAllVenues = async (guestCount = null, page = 1, limit = 10) => {
   try {
     const params = { page, limit };
     if (guestCount) params.guestCount = guestCount;
-    if (sessionId) params.sessionId = sessionId;
+    
 
     const response = await api.get('/api/admin/venues', {
       params,
       withCredentials: true,
     });
+    console.log(response.data);
     return response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || 'Failed to fetch venues';
@@ -18,6 +19,9 @@ export const getAllVenues = async (guestCount = null, sessionId = null, page = 1
     throw new Error(errorMessage);
   }
 };
+
+
+
 
 // Create a new venue
 export const createVenue = async (venueData) => {

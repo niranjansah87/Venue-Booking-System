@@ -1,211 +1,63 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { CheckCircle, Calendar, MapPin, Users, Clock, Package } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
-import api from '../../../services/api';
+import { useNavigate } from 'react-router-dom';
 
-const BookingConfirmation = ({ bookingId, bookingData, isComplete }) => {
-  const {
-    date,
-    venueId,
-    guestCount,
-    packageId,
-    shiftId,
-    totalFare,
-    name,
-    email,
-  } = bookingData;
+const BookingConfirmation = ({ bookingId, date, event_id, venueId, shiftId, guestCount, totalFare, email }) => {
+  const navigate = useNavigate();
 
-  const [venue, setVenue] = React.useState({ name: 'Selected Venue' });
-  const [shift, setShift] = React.useState({ name: 'Selected Shift' });
-  const [pkg, setPkg] = React.useState({ name: 'Selected Package' });
-
-  // Fetch venue, shift, package details
-  React.useEffect(() => {
-    const fetchDetails = async () => {
-      try {
-        const [venueRes, shiftRes, pkgRes] = await Promise.all([
-          api.get(`/api/admin/bookings/venue/${venueId}`),
-          api.get(`/api/admin/bookings/shift/${shiftId}`),
-          api.get(`/api/admin/bookings/package/${packageId}`),
-        ]);
-        setVenue(venueRes.data);
-        setShift(shiftRes.data);
-        setPkg(pkgRes.data);
-      } catch (error) {
-        console.error('Error fetching details:', error);
-      }
-    };
-    if (venueId && shiftId && packageId) fetchDetails();
-  }, [venueId, shiftId, packageId]);
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { when: 'beforeChildren', staggerChildren: 0.2 } },
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { y: 0, opacity: 1 },
-  };
-
-  if (!isComplete) {
-    return (
-      <div className="flex flex-col items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600 mb-4"></div>
-        <p className="text-gray-700">Processing your booking...</p>
-      </div>
-    );
-  }
-
-  const handleDownload = () => {
-    // Implement PDF generation or backend endpoint
-    console.log('Download PDF for booking:', bookingId);
-  };
-
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: 'Booking Confirmation',
-        text: `Booking ID: ${bookingId} confirmed for ${name}`,
-        url: window.location.href,
-      }).catch(console.error);
-    } else {
-      navigator.clipboard.writeText(`Booking ID: ${bookingId} for ${name}`);
-      alert('Booking ID copied to clipboard!');
-    }
+  const handleBackToHome = () => {
+    navigate('/');
   };
 
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="max-w-2xl mx-auto"
-    >
-      <div className="text-center mb-8">
-        <motion.div variants={itemVariants} className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-success-100 mb-6">
-          <CheckCircle className="h-10 w-10 text-success-500" />
-        </motion.div>
-        <motion.h2 variants={itemVariants} className="text-3xl font-heading font-bold text-gray-800 mb-4">
-          Booking Confirmed!
-        </motion.h2>
-        <motion.p variants={itemVariants} className="text-xl text-gray-600">
-          Your booking has been successfully submitted and is awaiting confirmation.
-        </motion.p>
-        <motion.div variants={itemVariants} className="mt-4">
-          <p className="text-lg font-medium text-primary-700">
-            Booking ID: <span className="font-bold">{bookingId}</span>
-          </p>
-        </motion.div>
+    <div className="p-6">
+      <h2 className="text-2xl font-heading font-semibold text-gray-800 mb-6">Booking Confirmed!</h2>
+      <p className="text-gray-600 mb-8">
+        Your event booking has been successfully confirmed. We've sent a confirmation email to {email}.
+      </p>
+
+      <div className="bg-gray-50 p-6 rounded-md border border-gray-200">
+        <h3 className="text-lg font-medium text-gray-800 mb-4">Booking Details</h3>
+        <div className="space-y-4">
+          <div className="flex justify-between text-gray-600">
+            <span>Booking ID</span>
+            <span>{bookingId}</span>
+          </div>
+          <div className="flex justify-between text-gray-600">
+            <span>Date</span>
+            <span>{date?.toLocaleDateString()}</span>
+          </div>
+          <div className="flex justify-between text-gray-600">
+            <span>Guest Count</span>
+            <span>{guestCount}</span>
+          </div>
+          <div className="flex justify-between text-gray-600">
+            <span>Total Cost</span>
+            <span>${totalFare.toLocaleString()}</span>
+          </div>
+        </div>
       </div>
 
-      <motion.div variants={itemVariants} className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 mb-8">
-        <div className="bg-primary-50 px-6 py-4 border-b border-primary-100">
-          <h3 className="text-xl font-semibold text-primary-800">Booking Details</h3>
+      <div className="mt-8 p-5 bg-primary-50 border border-primary-100 rounded-md flex items-start">
+        <CheckCircle className="h-8 w-8 text-primary-500 mr-4 flex-shrink-0 mt-1" />
+        <div>
+          <p className="text-lg font-medium text-primary-800">Thank You!</p>
+          <p className="text-primary-600 mt-1">
+            Your event is booked. You'll receive a confirmation email soon.
+          </p>
         </div>
-        <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div className="flex items-center">
-                <Calendar className="h-5 w-5 text-primary-500 mr-3" />
-                <div>
-                  <p className="text-sm text-gray-500">Event Date</p>
-                  <p className="text-base font-medium text-gray-800">
-                    {date ? date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'Not specified'}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center">
-                <MapPin className="h-5 w-5 text-primary-500 mr-3" />
-                <div>
-                  <p className="text-sm text-gray-500">Venue</p>
-                  <p className="text-base font-medium text-gray-800">{venue.name}</p>
-                </div>
-              </div>
-              <div className="flex items-center">
-                <Clock className="h-5 w-5 text-primary-500 mr-3" />
-                <div>
-                  <p className="text-sm text-gray-500">Shift</p>
-                  <p className="text-base font-medium text-gray-800">{shift.name}</p>
-                </div>
-              </div>
-            </div>
-            <div className="space-y-4">
-              <div className="flex items-center">
-                <Users className="h-5 w-5 text-primary-500 mr-3" />
-                <div>
-                  <p className="text-sm text-gray-500">Guest Count</p>
-                  <p className="text-base font-medium text-gray-800">{guestCount || 0} guests</p>
-                </div>
-              </div>
-              <div className="flex items-center">
-                <Package className="h-5 w-5 text-primary-500 mr-3" />
-                <div>
-                  <p className="text-sm text-gray-500">Package</p>
-                  <p className="text-base font-medium text-gray-800">{pkg.name}</p>
-                </div>
-              </div>
-              <div className="flex items-start">
-                <div className="flex h-5 items-center mt-1">
-                  <span className="text-xl font-medium text-primary-500 mr-3">$</span>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Total Amount</p>
-                  <p className="text-lg font-bold text-gray-800">${totalFare?.toLocaleString() || '0'}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
-              <div className="mb-4 sm:mb-0">
-                <p className="text-sm text-gray-500">Contact Information</p>
-                <p className="text-base font-medium text-gray-800">{name}</p>
-                <p className="text-base text-gray-700">{email}</p>
-              </div>
-              <div className="flex space-x-3">
-                <button onClick={handleDownload} className="flex items-center px-4 py-2 bg-primary-50 text-primary-700 rounded-md hover:bg-primary-100 transition-colors">
-                  <Download className="h-4 w-4 mr-2" />
-                  Download
-                </button>
-                <button onClick={handleShare} className="flex items-center px-4 py-2 bg-secondary-50 text-secondary-700 rounded-md hover:bg-secondary-100 transition-colors">
-                  <Share2 className="h-4 w-4 mr-2" />
-                  Share
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </motion.div>
+      </div>
 
-      <motion.div variants={itemVariants} className="bg-gray-50 rounded-lg p-6 mb-8">
-        <h3 className="text-lg font-medium text-gray-800 mb-4">What Happens Next?</h3>
-        <ol className="space-y-4">
-          <li className="flex items-start">
-            <div className="flex-shrink-0 h-6 w-6 rounded-full bg-primary-100 text-primary-800 flex items-center justify-center mr-3 mt-0.5">1</div>
-            <p className="text-gray-700">Our team will review your booking details and verify availability.</p>
-          </li>
-          <li className="flex items-start">
-            <div className="flex-shrink-0 h-6 w-6 rounded-full bg-primary-100 text-primary-800 flex items-center justify-center mr-3 mt-0.5">2</div>
-            <p className="text-gray-700">You'll receive a confirmation email within 24 hours.</p>
-          </li>
-          <li className="flex items-start">
-            <div className="flex-shrink-0 h-6 w-6 rounded-full bg-primary-100 text-primary-800 flex items-center justify-center mr-3 mt-0.5">3</div>
-            <p className="text-gray-700">Once confirmed, you'll need to make a partial payment to secure your booking.</p>
-          </li>
-        </ol>
-      </motion.div>
-
-      <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 justify-center">
-        <Link to="/" className="px-6 py-3 bg-white border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors text-center">
-          Return to Home
-        </Link>
-        <Link to="/contact" className="px-6 py-3 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors text-center">
-          Contact Support
-        </Link>
-      </motion.div>
-    </motion.div>
+      <div className="mt-8 flex justify-center">
+        <button
+          onClick={handleBackToHome}
+          className="px-6 py-3 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
+        >
+          Back to Home
+        </button>
+      </div>
+    </div>
   );
 };
 

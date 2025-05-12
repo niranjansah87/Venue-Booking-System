@@ -1,4 +1,57 @@
+
+
+
+
+
+
+
+
+
+
 import api from './api';
+
+// Check date availability
+export const checkDateAvailability = async (eventDate) => {
+  try {
+    const response = await api.post('/api/admin/bookings/check-date', { event_date: eventDate });
+    return response.data;
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || 'Failed to check date availability';
+    console.error('Error checking date availability:', errorMessage, error);
+    throw new Error(errorMessage);
+  }
+};
+
+// Check booking availability
+export const checkAvailability = async (eventId, venueId, shiftId, eventDate, guestCount) => {
+  try {
+    const response = await api.post('/api/admin/bookings/check-availability', {
+      event_id: eventId,
+      venue_id: venueId,
+      shift_id: shiftId,
+      event_date: eventDate,
+      guest_count: guestCount,
+    });
+    return response.data;
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || 'Failed to check availability';
+    console.error('Error checking availability:', errorMessage, error);
+    throw new Error(errorMessage);
+  }
+};
+
+// Calculate booking fare
+export const calculateFare = async (bookingData) => {
+  try {
+    const response = await api.post('/api/admin/bookings/calculate-fare', bookingData);
+    return response.data;
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || 'Failed to calculate fare';
+    console.error('Error calculating fare:', errorMessage, error);
+    throw new Error(errorMessage);
+  }
+};
+
 
 // Get all bookings
 export const getAllBookings = async () => {
@@ -29,33 +82,7 @@ export const getUserBookings = async (userId) => {
 
 
 
-// Check venue availability for a specific date, venue, and shift
-export const checkAvailability = async (eventId, venueId, shiftId, eventDate, guestCount, sessionId) => {
-  try {
-    const response = await api.post(
-      '/api/admin/bookings/check-availability',
-      { event_id: eventId, venue_id: venueId, shift_id: shiftId, event_date: eventDate, guest_count: guestCount, sessionId },
-      { withCredentials: true }
-    );
-    return response.data;
-  } catch (error) {
-    const errorMessage = error.response?.data?.message || 'Failed to check availability';
-    console.error('Error checking availability:', errorMessage, error);
-    throw new Error(errorMessage);
-  }
-};
 
-// Calculate booking fare
-export const calculateFare = async (bookingData) => {
-  try {
-    const response = await api.post('/api/admin/bookings/calculate-fare', bookingData, { withCredentials: true });
-    return response.data;
-  } catch (error) {
-    const errorMessage = error.response?.data?.message || 'Failed to calculate fare';
-    console.error('Error calculating fare:', errorMessage, error);
-    throw new Error(errorMessage);
-  }
-};
 
 // Create a new booking
 export const createBooking = async (bookingData) => {
@@ -89,6 +116,56 @@ export const deleteBooking = async (bookingId) => {
   } catch (error) {
     const errorMessage = error.response?.data?.message || `Failed to delete booking with ID ${bookingId}`;
     console.error('Error deleting booking:', errorMessage, error);
+    throw new Error(errorMessage);
+  }
+};
+
+
+
+// Send confirmation email
+export const sendConfirmation = async (bookingId) => {
+  try {
+    const response = await api.post('/api/admin/bookings/send-confirmation', { bookingId });
+    return response.data;
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || 'Failed to send confirmation';
+    console.error('Error sending confirmation:', errorMessage, error);
+    throw new Error(errorMessage);
+  }
+};
+
+// Send OTP
+export const sendOTP = async (email) => {
+  try {
+    const response = await api.post('/api/admin/book/send-otp', { email });
+    return response.data;
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || 'Failed to send OTP';
+    console.error('Error sending OTP:', errorMessage, error);
+    throw new Error(errorMessage);
+  }
+};
+
+// Verify OTP
+export const verifyOTP = async (otp, name) => {
+  try {
+    const response = await api.post('/api/admin/book/step3', { otp, name });
+    return response.data;
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || 'Failed to verify OTP';
+    console.error('Error verifying OTP:', errorMessage, error);
+    throw new Error(errorMessage);
+  }
+};
+
+// Create user
+export const createUser = async (userData) => {
+  try {
+    const response = await api.post('/api/admin/users/create', userData);
+    return response.data;
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || 'Failed to create user';
+    console.error('Error creating user:', errorMessage, error);
     throw new Error(errorMessage);
   }
 };

@@ -1,45 +1,50 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, CheckCircle, AlertCircle, Loader } from 'lucide-react';
+import { MapPin, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { getAllVenues, checkAvailability } from '../../../services/venueService';
+import { getAllVenues } from '../../../services/venueService';
 import { toast } from 'react-toastify';
 
-const VenueSelection = ({ selectedVenue, updateBookingData, isAvailable, isCheckingAvailability, sessionId, guestCount, date }) => {
+const VenueSelection = ({
+  venueId,
+  guestCount,
+  updateBookingData,
+  isAvailable,
+  checkAvailability,
+  isCheckingAvailability
+}) => {
   const [venues, setVenues] = useState([]);
+  const [selectedVenue, setSelectedVenue] = useState(venueId || null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
   useEffect(() => {
     const fetchVenues = async () => {
       try {
         setLoading(true);
-        const data = await getAllVenues(guestCount, sessionId, 1, 10);
-        setVenues(Array.isArray(data.venues) ? data.venues : []);
+        const res = await getAllVenues(guestCount);
+        console.log('Raw venue data:', res);
+
+        const data = res?.venues;
+        if (!Array.isArray(data)) {
+          throw new Error('Invalid venues data received');
+        }
+
+        setVenues(data);
       } catch (error) {
         console.error('Error fetching venues:', error);
-        setError('Failed to load venues. Please try again.');
+        setError('Failed to load venues.');
         toast.error('Failed to load venues.');
       } finally {
         setLoading(false);
       }
     };
+
     fetchVenues();
-  }, [guestCount, sessionId]);
+  }, [guestCount]);
 
   const handleVenueSelect = (venueId) => {
+    setSelectedVenue(venueId);
     updateBookingData('venueId', venueId);
-  };
-
-  const handleCheckAvailability = async (shiftId) => {
-    try {
-      updateBookingData('shiftId', shiftId);
-      await checkAvailability(selectedVenue, date, shiftId, sessionId);
-      toast.success('Venue is available!');
-    } catch (error) {
-      console.error('Error checking availability:', error);
-      toast.error('Selected venue is not available.');
-    }
   };
 
   if (loading) {
@@ -53,7 +58,7 @@ const VenueSelection = ({ selectedVenue, updateBookingData, isAvailable, isCheck
   if (error) {
     return (
       <div className="py-8 text-center">
-        <p className="text-error-500 mb-4">{error}</p>
+        <p className="text-red-500 mb-4">{error}</p>
         <button
           className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
           onClick={() => window.location.reload()}
@@ -65,93 +70,54 @@ const VenueSelection = ({ selectedVenue, updateBookingData, isAvailable, isCheck
   }
 
   return (
-    <div>
+    <div className="p-6">
       <h2 className="text-2xl font-heading font-semibold text-gray-800 mb-6">Select a Venue</h2>
-      <p className="text-gray-600 mb-8">
-        Choose a venue that suits your event. Ensure the venue can accommodate your guest count.
-      </p>
+      <p className="text-gray-600 mb-8">Choose a venue that suits your event needs.</p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {venues.map((venue) => (
           <motion.div
             key={venue.id}
-            whileHover={{ y: -3, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)' }}
-            className={`relative rounded-lg border-2 overflow-hidden transition-all ${
+            whileHover={{ y: -3 }}
+            whileTap={{ y: 1 }}
+            className={`rounded-md border-2 overflow-hidden transition-all ${
               selectedVenue === venue.id ? 'border-primary-500' : 'border-gray-200 hover:border-primary-200'
             }`}
             onClick={() => handleVenueSelect(venue.id)}
           >
-            <div className="h-48 overflow-hidden">
-              <img
-                src={venue.image ? `${BACKEND_URL}/${venue.image}` : 'https://images.pexels.com/photos/169193/pexels-photo-169193.jpeg'}
-                alt={venue.name}
-                className="w-full h-full object-cover"
-              />
-            </div>
+            <img
+              src={venue.image?.replace('public\\', '/')} // Correct path for browser
+              alt={venue.name}
+              className="w-full h-48 object-cover"
+              onError={(e) => {
+                e.target.src = 'https://via.placeholder.com/400x200';
+              }}
+            />
             <div className="p-6">
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">{venue.name}</h3>
-              <p className="text-gray-500 text-sm mb-4">{venue.description}</p>
-              <div className="flex items-center text-sm text-gray-600 mb-4">
-                <MapPin className="h-4 w-4 mr-2 text-primary-500" />
-                Capacity: {venue.capacity} guests
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-800">{venue.name}</h3>
+                  <p className="text-gray-500 text-sm mt-1">Capacity: {venue.capacity} guests</p>
+                </div>
+                {selectedVenue === venue.id && <Check className="h-6 w-6 text-primary-600" />}
               </div>
-              <button
-                className={`w-full py-2 rounded-md font-medium transition-colors ${
-                  selectedVenue === venue.id ? 'bg-primary-600 text-white' : 'bg-primary-500 text-white hover:bg-primary-600'
-                }`}
-              >
-                {selectedVenue === venue.id ? 'Selected' : 'Select Venue'}
-              </button>
+              <div className="flex items-center text-gray-600">
+                <MapPin className="h-5 w-5 text-primary-500 mr-2" />
+                <span>Venue Location</span>
+              </div>
             </div>
           </motion.div>
         ))}
       </div>
 
       {selectedVenue && (
-        <div className="mt-8 p-5 bg-gray-50 border border-gray-200 rounded-lg">
-          <h3 className="text-lg font-medium text-gray-800 mb-4">Check Availability</h3>
-          <p className="text-gray-600 mb-4">
-            Verify if your selected venue is available for the chosen date and shift.
-          </p>
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-wrap gap-4">
-              {['Morning', 'Afternoon', 'Evening'].map((shift, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleCheckAvailability(index + 1)}
-                  disabled={isCheckingAvailability || isAvailable || !date}
-                  className={`px-4 py-2 rounded-md transition-colors ${
-                    isAvailable
-                      ? 'bg-success-500 text-white cursor-default'
-                      : isCheckingAvailability || !date
-                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                      : 'bg-secondary-500 text-white hover:bg-secondary-600'
-                  }`}
-                >
-                  {shift}
-                </button>
-              ))}
-            </div>
-            <div className="flex items-center">
-              {isCheckingAvailability ? (
-                <div className="flex items-center text-gray-500">
-                  <Loader className="animate-spin h-5 w-5 mr-2" />
-                  Checking...
-                </div>
-              ) : isAvailable ? (
-                <div className="flex items-center text-success-700 bg-success-50 px-4 py-2 rounded-md">
-                  <CheckCircle className="h-5 w-5 mr-2" />
-                  <span>Great! This venue is available.</span>
-                </div>
-              ) : (
-                selectedVenue && (
-                  <div className="text-gray-500 flex items-center">
-                    <AlertCircle className="h-5 w-5 mr-2 text-warning-500" />
-                    <span>Please select a shift and check availability</span>
-                  </div>
-                )
-              )}
-            </div>
+        <div className="mt-8 p-5 bg-primary-50 border border-primary-100 rounded-md flex items-start">
+          <MapPin className="h-8 w-8 text-primary-500 mr-4 flex-shrink-0 mt-1" />
+          <div>
+            <p className="text-lg font-medium text-primary-800">
+              {venues.find((v) => v.id === selectedVenue)?.name} Selected
+            </p>
+            <p className="text-primary-600 mt-1">Please check availability in the next step.</p>
           </div>
         </div>
       )}

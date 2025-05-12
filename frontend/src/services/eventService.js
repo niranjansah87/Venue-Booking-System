@@ -1,29 +1,19 @@
 import api from './api';
 
-// Fetch all events
-// export const getAllEvents = async () => {
-//   try {
-//     const response = await api.get('/api/admin/events');
-//     return response.data;
-    
-//   } catch (error) {
-//     const errorMessage = error.response?.data?.message || 'Failed to fetch events';
-//     console.error('Error fetching events:', errorMessage, error);
-//     throw new Error(errorMessage);
-//   }
-// };
-
-
-export const getAllEvents = async (userId) => {
+//Fetch all events
+export const getAllEvents = async () => {
   try {
-    const response = await api.get('/api/admin/events', { params: { userId } });
-    return response.data.events; // Backend returns { events: [...] }
+    const response = await api.get('/api/admin/events');
+    return response.data;
+    
   } catch (error) {
     const errorMessage = error.response?.data?.message || 'Failed to fetch events';
     console.error('Error fetching events:', errorMessage, error);
     throw new Error(errorMessage);
   }
 };
+
+
 
 
 // Fetch a single event by ID

@@ -1,181 +1,114 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Lock, RefreshCw, CheckCircle, Loader } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Mail, CheckCircle, Loader } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useAuth } from '../../../contexts/AuthContext';
+import { sendOTP } from '../../../services/bookingService';
 import { toast } from 'react-toastify';
 
-const OtpVerification = ({ verifyOtp, submitting, sessionId }) => {
-  const { user, sendOtp } = useAuth();
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
-  const [resendDisabled, setResendDisabled] = useState(true);
-  const [countdown, setCountdown] = useState(30);
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [verificationError, setVerificationError] = useState('');
-  const [success, setSuccess] = useState(false);
-
-  const inputRefs = Array(6).fill().map(() => useRef(null));
+const OtpVerification = ({ email, name, verifyOtp, submitting }) => {
+  const [otp, setOtp] = useState('');
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [sendingOtp, setSendingOtp] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (countdown > 0 && resendDisabled) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-      return () => clearTimeout(timer);
-    } else if (countdown === 0) {
-      setResendDisabled(false);
+    const sendOtpToEmail = async () => {
+      try {
+        setSendingOtp(true);
+        await sendOTP(email);
+        setIsOtpSent(true);
+        toast.success('OTP sent to your email.');
+      } catch (error) {
+        setError('Failed to send OTP.');
+        toast.error('Failed to send OTP.');
+      } finally {
+        setSendingOtp(false);
+      }
+    };
+    if (email && !isOtpSent) {
+      sendOtpToEmail();
     }
-  }, [countdown, resendDisabled]);
+  }, [email, isOtpSent]);
 
-  useEffect(() => {
-    inputRefs[0].current?.focus();
-  }, []);
-
-  const handleOtpChange = (index, value) => {
-    if (!/^\d*$/.test(value)) return;
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-    if (verificationError) setVerificationError('');
-    if (value !== '' && index < 5) inputRefs[index + 1].current?.focus();
-    if (index === 5 && value !== '' && newOtp.every((digit) => digit !== '')) {
-      handleSubmit(newOtp.join(''));
-    }
-  };
-
-  const handleKeyDown = (index, e) => {
-    if (e.key === 'Backspace' && index > 0 && otp[index] === '') {
-      inputRefs[index - 1].current?.focus();
-    }
-  };
-
-  const handleResendOtp = async () => {
+  const handleOtpSubmit = async () => {
     try {
-      setResendDisabled(true);
-      setCountdown(30);
-      await sendOtp(sessionId);
-      setOtp(['', '', '', '', '', '']);
-      inputRefs[0].current?.focus();
-      setVerificationError('');
-      toast.success('OTP resent to your email!');
+      await verifyOtp(otp);
+      toast.success('OTP verified successfully.');
     } catch (error) {
-      console.error('Error resending OTP:', error);
-      setVerificationError('Failed to resend OTP.');
-      toast.error('Failed to resend OTP.');
-    }
-  };
-
-  const handleSubmit = async (otpValue) => {
-    try {
-      setIsVerifying(true);
-      setVerificationError('');
-      await verifyOtp(otpValue);
-      setSuccess(true);
-      toast.success('OTP verified successfully!');
-    } catch (error) {
-      setVerificationError('Invalid OTP. Please check and try again.');
+      setError('Invalid OTP.');
       toast.error('Invalid OTP.');
-    } finally {
-      setIsVerifying(false);
     }
   };
+
+  if (sendingOtp) {
+    return (
+      <div className="flex justify-center items-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="py-8 text-center">
+        <p className="text-red-500 mb-4">{error}</p>
+        <button
+          className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
+          onClick={() => window.location.reload()}
+        >
+          Try Again
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div>
+    <div className="p-6">
       <h2 className="text-2xl font-heading font-semibold text-gray-800 mb-6">Verify Your Email</h2>
+      <p className="text-gray-600 mb-8">
+        We've sent an OTP to {email}. Please enter it below to confirm your booking.
+      </p>
 
       <div className="max-w-md mx-auto">
-        <div className="bg-primary-50 rounded-lg p-6 mb-8 flex items-center">
-          <Lock className="h-8 w-8 text-primary-500 mr-4" />
-          <div>
-            <p className="text-primary-800 font-medium">We've sent a verification code to:</p>
-            <p className="text-primary-900 font-semibold mt-1">{user.email}</p>
-          </div>
+        <div className="mb-6">
+          <label className="block text-gray-700 font-medium mb-2">OTP</label>
+          <input
+            type="text"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+            className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-200 focus:border-primary-500"
+            placeholder="Enter OTP"
+          />
         </div>
-
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Enter the 6-digit verification code
-        </label>
-
-        <div className="flex justify-center gap-2 mb-6">
-          {otp.map((digit, index) => (
-            <input
-              key={index}
-              ref={inputRefs[index]}
-              type="text"
-              value={digit}
-              onChange={(e) => handleOtpChange(index, e.target.value)}
-              onKeyDown={(e) => handleKeyDown(index, e)}
-              maxLength={1}
-              className={`w-12 h-12 text-center text-2xl font-bold border-2 rounded-lg focus:outline-none focus:ring-2 ${
-                verificationError
-                  ? 'border-error-300 focus:border-error-500 focus:ring-error-200'
-                  : 'border-gray-300 focus:border-primary-500 focus:ring-primary-200'
-              }`}
-            />
-          ))}
-        </div>
-
-        {verificationError && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center text-error-600 mb-4"
-          >
-            {verificationError}
-          </motion.div>
-        )}
-
-        <div className="text-center mb-6">
-          <p className="text-gray-600 mb-2">Didn't receive a code?</p>
-          <button
-            onClick={handleResendOtp}
-            disabled={resendDisabled}
-            className={`flex items-center justify-center mx-auto ${
-              resendDisabled ? 'text-gray-400 cursor-not-allowed' : 'text-primary-600 hover:text-primary-800'
-            }`}
-          >
-            <RefreshCw className="h-4 w-4 mr-1" />
-            {resendDisabled ? `Resend in ${countdown}s` : 'Resend Code'}
-          </button>
-        </div>
-
         <button
-          onClick={() => handleSubmit(otp.join(''))}
-          disabled={otp.some((digit) => digit === '') || isVerifying || submitting || success}
-          className={`w-full py-3 rounded-lg font-medium flex items-center justify-center transition-colors ${
-            otp.some((digit) => digit === '') || isVerifying || submitting || success
+          onClick={handleOtpSubmit}
+          disabled={submitting || !otp}
+          className={`w-full py-3 rounded-md transition-colors flex items-center justify-center ${
+            submitting || !otp
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
               : 'bg-primary-600 text-white hover:bg-primary-700'
           }`}
         >
-          {isVerifying || submitting ? (
+          {submitting ? (
             <>
               <Loader className="animate-spin h-5 w-5 mr-2" />
-              {isVerifying ? 'Verifying...' : 'Processing...'}
-            </>
-          ) : success ? (
-            <>
-              <CheckCircle className="h-5 w-5 mr-2" />
-              Verified Successfully
+              Verifying...
             </>
           ) : (
-            'Verify & Continue'
+            'Verify OTP'
           )}
         </button>
       </div>
 
-      {success && (
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="flex flex-col items-center justify-center mt-8"
-        >
-          <div className="w-20 h-20 rounded-full bg-success-100 flex items-center justify-center mb-4">
-            <CheckCircle className="h-12 w-12 text-success-500" />
+      {isOtpSent && (
+        <div className="mt-8 p-5 bg-primary-50 border border-primary-100 rounded-md flex items-start">
+          <Mail className="h-8 w-8 text-primary-500 mr-4 flex-shrink-0 mt-1" />
+          <div>
+            <p className="text-lg font-medium text-primary-800">OTP Sent</p>
+            <p className="text-primary-600 mt-1">
+              Check your email ({email}) for the OTP.
+            </p>
           </div>
-          <h3 className="text-xl font-medium text-gray-800 mb-2">Email Verified!</h3>
-          <p className="text-gray-600 text-center">
-            Your email has been successfully verified. Please wait while we process your booking...
-          </p>
-        </motion.div>
+        </div>
       )}
     </div>
   );
