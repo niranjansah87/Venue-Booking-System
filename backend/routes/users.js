@@ -12,4 +12,5 @@ router.post('/update-password', authController.updatePassword);
 router.post('/request-reset', authController.requestReset);
 router.post('/reset-password', authController.resetPassword);
 router.post('/check-session', authController.checkSession);
+router.delete('/delete/:id', authController.deleteUser);
 module.exports = router;

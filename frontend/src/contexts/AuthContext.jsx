@@ -17,9 +17,12 @@ export const AuthProvider = ({ children }) => {
         try {
           const userData = JSON.parse(storedUser);
           if (!userData.id || !userData.email || !userData.name) {
-            throw new Error('Invalid user data in localStorage');
+            console.error('Invalid user data in localStorage:', userData);
+            localStorage.removeItem('user');
+            setUser(null);
+          } else {
+            setUser(userData);
           }
-          setUser(userData);
         } catch (error) {
           console.error('Error parsing user data:', error);
           localStorage.removeItem('user');
@@ -28,12 +31,13 @@ export const AuthProvider = ({ children }) => {
       } else {
         setUser(null);
       }
+      console.log('AuthContext: Initial user state:', { user, storedUser });
       setLoading(false);
     };
     checkUser();
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (email, password, redirect = true) => {
     try {
       const response = await api.post('/api/login', { email, password });
       const { user } = response.data;
@@ -46,7 +50,10 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('user', JSON.stringify(user));
       setUser(user);
       toast.success('Logged in successfully!');
-      navigate('/booking');
+      if (redirect) {
+        navigate('/booking');
+      }
+      return user;
     } catch (error) {
       console.error('Error logging in:', error);
       const errorMessage =
@@ -66,20 +73,16 @@ export const AuthProvider = ({ children }) => {
   };
 
   const sendOtp = async (email) => {
-    if (!user?.id || !user?.email) {
-      toast.error('Please log in to send OTP.');
-      throw new Error('User details not found');
-    }
     try {
       console.log(`Sending OTP request for email: ${email}`);
-      const response = await api.post('/api/admin/book/send-otp', { email: user.email });
-      console.log('OTP sent to:', user.email, 'Response:', response.data);
-      toast.success('OTP sent to your email!');
+      const response = await api.post('/api/admin/book/send-otp', { email });
+      console.log('OTP sent to:', email, 'Response:', response.data);
+      toast.success('OTP sent to your email!', { toastId: 'otp-sent' });
       return response.data;
     } catch (error) {
       console.error('Error sending OTP:', error);
       const errorMessage = error.response?.data?.message || 'Failed to send OTP';
-      toast.error(errorMessage);
+      toast.error(errorMessage, { toastId: 'otp-error' });
       throw new Error(errorMessage);
     }
   };
@@ -88,12 +91,12 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await api.post('/api/admin/book/verify-otp', { otp });
       console.log('OTP verified:', otp);
-      toast.success('OTP verified successfully!');
+      toast.success('OTP verified successfully!', { toastId: 'otp-verified' });
       return response.data;
     } catch (error) {
       console.error('Error verifying OTP:', error);
       const errorMessage = error.response?.data?.message || 'Invalid OTP';
-      toast.error(errorMessage);
+      toast.error(errorMessage, { toastId: 'otp-invalid' });
       throw new Error(errorMessage);
     }
   };
@@ -101,10 +104,12 @@ export const AuthProvider = ({ children }) => {
   const sendConfirmation = async (bookingId, email) => {
     try {
       await api.post('/api/admin/book/send-confirmation', { bookingId, email });
-      toast.success('Confirmation email sent!');
+      toast.success('Confirmation email sent!', { toastId: 'confirmation-sent' });
     } catch (error) {
       console.error('Error sending confirmation:', error);
-      toast.error(error.response?.data?.message || 'Failed to send confirmation email.');
+      toast.error(error.response?.data?.message || 'Failed to send confirmation email.', {
+        toastId: 'confirmation-error',
+      });
       throw error;
     }
   };

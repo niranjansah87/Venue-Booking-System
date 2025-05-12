@@ -1,18 +1,66 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Mail, Loader } from 'lucide-react';
+import { Mail, Loader, User, Lock } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useForm } from 'react-hook-form';
 import { useAuth } from '../../../contexts/AuthContext';
-import { toast } from 'react-toastify';
+import { showToast } from '../../../utils/toastUtils';
+import { Link } from 'react-router-dom';
 
-const OtpVerification = ({ email, verifyOtp, submitting }) => {
+const OtpVerification = ({ email, verifyOtp, submitting, updateBookingData }) => {
   const [otp, setOtp] = useState('');
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [sendingOtp, setSendingOtp] = useState(false);
   const [error, setError] = useState(null);
-  const { sendOtp } = useAuth();
+  const [emailExists, setEmailExists] = useState(false);
+  const [isVerifyingEmail, setIsVerifyingEmail] = useState(false);
+  const [signupCredentials, setSignupCredentials] = useState({ email: '', password: '' });
+  const { user, sendOtp, login } = useAuth();
   const hasSentOtp = useRef(false);
   const hasShownToast = useRef(false);
   const mountCount = useRef(0);
+
+  // Signup form
+  const {
+    register,
+    handleSubmit,
+    formState: { errors: signupErrors },
+    watch,
+    reset,
+  } = useForm();
+  const signupPassword = watch('password');
+
+  // Local email state for non-logged-in users after signup
+  const [localEmail, setLocalEmail] = useState('');
+
+  // Debug user state
+  useEffect(() => {
+    console.log('OtpVerification: user state:', {
+      user,
+      isLoggedIn: !!user,
+      emailProp: email,
+      localEmail,
+      isVerifyingEmail,
+    });
+  }, [user, email, localEmail, isVerifyingEmail]);
+
+  // Update bookingData.email when localEmail or user.email changes
+  useEffect(() => {
+    if (localEmail) {
+      updateBookingData('email', localEmail);
+    } else if (user?.email) {
+      updateBookingData('email', user.email);
+    } else {
+      updateBookingData('email', '');
+    }
+  }, [localEmail, user, updateBookingData]);
+
+  // Reset localEmail when user is null
+  useEffect(() => {
+    if (!user && localEmail) {
+      console.log('OtpVerification: Resetting localEmail as user is null');
+      setLocalEmail('');
+    }
+  }, [user, localEmail]);
 
   // Debounce sendOtp to prevent rapid calls
   const debounceSendOtp = useCallback((fn) => {
@@ -28,57 +76,152 @@ const OtpVerification = ({ email, verifyOtp, submitting }) => {
   }, []);
 
   const sendOtpToEmail = useCallback(
-    debounceSendOtp(async () => {
-      if (!email || isOtpSent || sendingOtp || hasSentOtp.current) {
-        console.log('Skipping OTP send:', { email, isOtpSent, sendingOtp, hasSentOtp: hasSentOtp.current });
+    debounceSendOtp(async (targetEmail) => {
+      if (!targetEmail || isOtpSent || sendingOtp || hasSentOtp.current) {
+        console.log('Skipping OTP send:', {
+          targetEmail,
+          isOtpSent,
+          sendingOtp,
+          hasSentOtp: hasSentOtp.current,
+        });
         return;
       }
       try {
         setSendingOtp(true);
-        console.log('Sending OTP to:', email);
-        await sendOtp(email);
+        console.log('Sending OTP to:', targetEmail);
+        const response = await sendOtp(targetEmail);
+        console.log('OTP send response:', response);
         hasSentOtp.current = true;
         setIsOtpSent(true);
         if (!hasShownToast.current) {
-          console.log('Triggering toast for OTP sent');
-          toast.success('OTP sent to your email.', { toastId: 'otp-sent' });
+          console.log('Triggering toast for OTP sent, attempt: 1');
+          showToast('OTP sent to your email.', {
+            toastId: 'otp-sent',
+            autoClose: 5000,
+            type: 'success',
+          });
           hasShownToast.current = true;
         }
       } catch (error) {
+        console.error('Error sending OTP:', error);
         setError('Failed to send OTP.');
-        toast.error('Failed to send OTP.', { toastId: 'otp-error' });
+        showToast('Failed to send OTP.', { toastId: 'otp-error', type: 'error' });
       } finally {
         setSendingOtp(false);
       }
     }),
-    [email, isOtpSent, sendingOtp, sendOtp]
+    [isOtpSent, sendingOtp, sendOtp]
   );
 
+  // Send OTP on mount for logged-in users or after email verification
   useEffect(() => {
     mountCount.current += 1;
-    console.log(`OtpVerification mounted ${mountCount.current} times, email: ${email}`);
+    console.log(`OtpVerification mounted ${mountCount.current} times, email: ${localEmail || user?.email}`);
 
-    sendOtpToEmail();
+    if ((user || localEmail) && !isVerifyingEmail && !isOtpSent) {
+      sendOtpToEmail(localEmail || user?.email);
+    }
 
     return () => {
       console.log('OtpVerification unmounting');
     };
-  }, [sendOtpToEmail]);
+  }, [sendOtpToEmail, user, localEmail, isVerifyingEmail, isOtpSent]);
+
+  // Handle signup form submission
+  const onSignup = async (data) => {
+    try {
+      console.log('OtpVerification: Submitting signup:', data);
+      const response = await fetch('http://localhost:5000/api/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          password: data.password,
+        }),
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        if (response.status === 409 || errorData.message.includes('email already exists')) {
+          setEmailExists(true);
+          showToast('Email already exists.', {
+            toastId: 'email-exists',
+            type: 'error',
+          });
+          return;
+        }
+        throw new Error(errorData.message || 'Signup failed');
+      }
+
+      console.log('OtpVerification: Signup successful');
+      // Store credentials for login
+      setSignupCredentials({ email: data.email, password: data.password });
+      // Update booking data and local email
+      updateBookingData('name', data.name);
+      setLocalEmail(data.email);
+      updateBookingData('email', data.email);
+      // Reset form and clear errors
+      reset();
+      setEmailExists(false);
+      setIsVerifyingEmail(true);
+      showToast('Signup successful! Please verify your email.', {
+        toastId: 'signup-success',
+        autoClose: 5000,
+        type: 'success',
+      });
+    } catch (error) {
+      console.error('OtpVerification: Error during signup:', error);
+      // Only show generic error if not already handled
+      if (!emailExists) {
+        showToast(error.message || 'Signup failed. Please try again.', {
+          toastId: 'signup-error',
+          type: 'error',
+        });
+      }
+    }
+  };
+
+  // Handle email verification via login
+  const onVerifyEmail = async () => {
+    try {
+      console.log('Verifying email via login:', signupCredentials.email);
+      await login(signupCredentials.email, signupCredentials.password, false);
+      setIsVerifyingEmail(false);
+      setIsOtpSent(false); // Reset to allow OTP send
+      hasSentOtp.current = false;
+      hasShownToast.current = false;
+      showToast('Email verified successfully.', {
+        toastId: 'email-verified',
+        type: 'success',
+      });
+      // Trigger OTP send
+      sendOtpToEmail(signupCredentials.email);
+    } catch (error) {
+      console.error('OtpVerification: Error during email verification:', error);
+      showToast('Email is still not verified.', {
+        toastId: 'email-not-verified',
+        type: 'error',
+      });
+    }
+  };
 
   const handleOtpSubmit = async () => {
     try {
       await verifyOtp(otp);
-      toast.success('OTP verified successfully.', { toastId: 'otp-verified' });
+      showToast('OTP verified successfully.', { toastId: 'otp-verified', type: 'success' });
     } catch (error) {
       setError('Invalid OTP.');
-      toast.error('Invalid OTP.', { toastId: 'otp-invalid' });
+      showToast('Invalid OTP.', { toastId: 'otp-invalid', type: 'error' });
     }
   };
 
   const handleResendOtp = async () => {
     hasSentOtp.current = false;
-    hasShownToast.current = false; // Allow toast for resend
-    await sendOtpToEmail();
+    hasShownToast.current = false;
+    setIsOtpSent(false);
+    await sendOtpToEmail(localEmail || user?.email);
   };
 
   if (sendingOtp) {
@@ -89,7 +232,7 @@ const OtpVerification = ({ email, verifyOtp, submitting }) => {
     );
   }
 
-  if (error) {
+  if (error && !emailExists) {
     return (
       <div className="py-8 text-center">
         <p className="text-red-500 mb-4">{error}</p>
@@ -103,11 +246,240 @@ const OtpVerification = ({ email, verifyOtp, submitting }) => {
     );
   }
 
+  // Email verification form
+  if (isVerifyingEmail) {
+    return (
+      <div className="p-6">
+        <h2 className="text-2xl font-heading font-semibold text-gray-800 mb-6">Verify Your Email</h2>
+        <p className="text-gray-600 mb-8">
+          Please verify the OTP sent to your registered email ({signupCredentials.email}).
+        </p>
+
+        <div className="max-w-md mx-auto">
+          <button
+            onClick={onVerifyEmail}
+            className="w-full py-3 rounded-md bg-primary-600 text-white hover:bg-primary-700 transition-colors"
+          >
+            Verified
+          </button>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-8 p-5 bg-primary-50 border border-primary-100 rounded-md flex items-start"
+        >
+          <Mail className="h-8 w-8 text-primary-500 mr-4 flex-shrink-0 mt-1" />
+          <div>
+            <p className="text-lg font-medium text-primary-800">Verification OTP Sent</p>
+            <p className="text-primary-600 mt-1">
+              Check your email ({signupCredentials.email}) for the verification OTP.
+            </p>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Signup form for non-logged-in users
+  if (!user && !localEmail) {
+    return (
+      <div className="p-6">
+        <h2 className="text-2xl font-heading font-semibold text-gray-800 mb-6">Sign Up</h2>
+        <p className="text-gray-600 mb-8">
+          Create an account to proceed with your booking. We'll send a verification OTP to your email.
+        </p>
+
+        {emailExists && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md"
+          >
+            <p className="text-red-600">
+              This email is already registered. Please{' '}
+              <Link to="/login" className="text-primary-600 hover:underline">
+                log in
+              </Link>{' '}
+              to continue.
+            </p>
+          </motion.div>
+        )}
+
+        <form onSubmit={handleSubmit(onSignup)} className="space-y-6 max-w-md mx-auto">
+          {/* Name Field */}
+          <div>
+            <label htmlFor="signup-name" className="block text-sm font-medium text-gray-700 mb-1">
+              Full Name
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <User className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                id="signup-name"
+                type="text"
+                {...register('name', {
+                  required: 'Name is required',
+                  minLength: {
+                    value: 2,
+                    message: 'Name should be at least 2 characters',
+                  },
+                })}
+                className={`pl-10 w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
+                  signupErrors.name
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-200'
+                    : 'border-gray-300 focus:border-primary-500 focus:ring-primary-200'
+                }`}
+                placeholder="Enter your full name"
+              />
+            </div>
+            {signupErrors.name && (
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-1 text-sm text-red-600"
+              >
+                {signupErrors.name.message}
+              </motion.p>
+            )}
+          </div>
+
+          {/* Email Field */}
+          <div>
+            <label htmlFor="signup-email" className="block text-sm font-medium text-gray-700 mb-1">
+              Email Address
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Mail className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                id="signup-email"
+                type="email"
+                {...register('email', {
+                  required: 'Email is required',
+                  pattern: {
+                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                    message: 'Enter a valid email address',
+                  },
+                })}
+                className={`pl-10 w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
+                  signupErrors.email
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-200'
+                    : 'border-gray-300 focus:border-primary-500 focus:ring-primary-200'
+                }`}
+                placeholder="Enter your email"
+              />
+            </div>
+            {signupErrors.email && (
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-1 text-sm text-red-600"
+              >
+                {signupErrors.email.message}
+              </motion.p>
+            )}
+          </div>
+
+          {/* Password Field */}
+          <div>
+            <label htmlFor="signup-password" className="block text-sm font-medium text-gray-700 mb-1">
+              Password
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Lock className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                id="signup-password"
+                type="password"
+                {...register('password', {
+                  required: 'Password is required',
+                  minLength: {
+                    value: 8,
+                    message: 'Password must be at least 8 characters',
+                  },
+                })}
+                className={`pl-10 w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
+                  signupErrors.password
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-200'
+                    : 'border-gray-300 focus:border-primary-500 focus:ring-primary-200'
+                }`}
+                placeholder="Enter your password"
+              />
+            </div>
+            {signupErrors.password && (
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-1 text-sm text-red-600"
+              >
+                {signupErrors.password.message}
+              </motion.p>
+            )}
+          </div>
+
+          {/* Confirm Password Field */}
+          <div>
+            <label
+              htmlFor="signup-confirm-password"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Confirm Password
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Lock className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                id="signup-confirm-password"
+                type="password"
+                {...register('confirmPassword', {
+                  required: 'Please confirm your password',
+                  validate: (value) =>
+                    value === signupPassword || 'Passwords do not match',
+                })}
+                className={`pl-10 w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
+                  signupErrors.confirmPassword
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-200'
+                    : 'border-gray-300 focus:border-primary-500 focus:ring-primary-200'
+                }`}
+                placeholder="Confirm your password"
+              />
+            </div>
+            {signupErrors.confirmPassword && (
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-1 text-sm text-red-600"
+              >
+                {signupErrors.confirmPassword.message}
+              </motion.p>
+            )}
+          </div>
+
+          {/* Submit Button */}
+          <div>
+            <button
+              type="submit"
+              className="w-full px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-200"
+            >
+              Sign Up
+            </button>
+          </div>
+        </form>
+      </div>
+    );
+  }
+
+  // OTP form for logged-in users or after email verification
   return (
     <div className="p-6">
       <h2 className="text-2xl font-heading font-semibold text-gray-800 mb-6">Verify Your Email</h2>
       <p className="text-gray-600 mb-8">
-        We've sent an OTP to {email}. Please enter it below to confirm your booking.
+        We've sent an OTP to {localEmail || user?.email}. Please enter it below to confirm your booking.
       </p>
 
       <div className="max-w-md mx-auto">
@@ -159,7 +531,7 @@ const OtpVerification = ({ email, verifyOtp, submitting }) => {
         <div>
           <p className="text-lg font-medium text-primary-800">OTP Sent</p>
           <p className="text-primary-600 mt-1">
-            Check your email ({email}) for the OTP.
+            Check your email ({localEmail || user?.email}) for the OTP.
           </p>
         </div>
       </motion.div>

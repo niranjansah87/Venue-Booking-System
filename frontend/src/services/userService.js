@@ -15,7 +15,7 @@ export const getAllUsers = async (page = 1, limit = 10) => {
 // Fetch a single user by ID
 export const createUser = async (id) => {
   try {
-    const response = await api.get(`/api/admin/users/create`, { withCredentials: true });
+    const response = await api.post(`/api/signup`, { withCredentials: true });
     return response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || `Failed to fetch user with ID ${id}`;
@@ -39,7 +39,7 @@ export const updateUser = async (id, userData) => {
 // Delete a user
 export const deleteUser = async (id) => {
   try {
-    const response = await api.delete(`/api/admin/users/${id}`, { withCredentials: true });
+    const response = await api.delete(`/api/delete/${id}`, { withCredentials: true });
     return response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || `Failed to delete user with ID ${id}`;

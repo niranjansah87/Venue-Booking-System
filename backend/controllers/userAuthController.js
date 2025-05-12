@@ -1,4 +1,4 @@
-const { User } = require('../models');
+const { User,Otp } = require('../models');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const { generateToken } = require('../utils/token');
@@ -358,3 +358,37 @@ exports.checkSession = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
+
+
+
+
+
+
+
+exports.deleteUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!id) {
+            return res.status(400).send('User ID is required');
+        }
+
+        // Find user
+        const user = await User.findByPk(id);
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        // Delete related OTPs
+        await Otp.destroy({ where: { user_id: id } });
+
+        // Now delete the user
+        await user.destroy();
+
+        res.status(200).json({ message: 'User and associated OTPs deleted successfully.' });
+    } catch (err) {
+        console.error('Delete user error:', err);
+        res.status(500).send('Error deleting user');
+    }
+};
+

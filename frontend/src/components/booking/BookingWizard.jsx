@@ -13,7 +13,7 @@ import FareSummary from './steps/FareSummary';
 import OtpVerification from './steps/OtpVerification';
 import BookingConfirmation from './steps/BookingConfirmation';
 import api from '../../services/api';
-import { toast } from 'react-toastify';
+import { showToast } from '../../utils/toastUtils';
 
 const steps = [
   { id: 'date', title: 'Select Date', component: DateSelection },
@@ -28,11 +28,13 @@ const steps = [
   { id: 'confirmation', title: 'Confirmation', component: BookingConfirmation },
 ];
 
+const OTP_STEP_ID = 'otp';
+
 const BookingWizard = () => {
   const navigate = useNavigate();
   const { user, sendOtp, verifyOtp, sendConfirmation } = useAuth();
 
-  // ✅ Fix: useMemo moved inside component
+  // Memoize components
   const MemoizedComponents = useMemo(
     () =>
       steps.reduce((acc, step) => {
@@ -47,18 +49,28 @@ const BookingWizard = () => {
     if (storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser);
+        if (!parsedUser.id || !parsedUser.email || !parsedUser.name) {
+          throw new Error('Invalid user data in localStorage');
+        }
         return {
           id: parsedUser.id || null,
           name: parsedUser.name || '',
           email: parsedUser.email || '',
         };
       } catch (error) {
-        console.error('Error parsing user from local storage:', error);
+        // console.error('Error parsing user from local storage:', error);
+        localStorage.removeItem('user'); // Clear invalid data
         return { id: null, name: '', email: '' };
       }
     }
     return { id: null, name: '', email: '' };
   }, []);
+
+  const initialUserData = useMemo(() => {
+    const data = getInitialUserData();
+    // console.log('BookingWizard: initialUserData:', data);
+    return data;
+  }, [getInitialUserData]);
 
   const [currentStep, setCurrentStep] = useState(0);
   const [bookingData, setBookingData] = useState({
@@ -72,8 +84,8 @@ const BookingWizard = () => {
     baseFare: 0,
     extraCharges: 0,
     totalFare: 0,
-    name: user?.name || getInitialUserData().name,
-    email: user?.email || getInitialUserData().email,
+    name: user?.name || initialUserData.name,
+    email: user?.email || initialUserData.email,
   });
   const [isAvailable, setIsAvailable] = useState(false);
   const [isCheckingAvailability, setIsCheckingAvailability] = useState(false);
@@ -82,15 +94,49 @@ const BookingWizard = () => {
   const [isComplete, setIsComplete] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
+  // Memoize bookingData to prevent prop changes
+  const memoizedBookingData = useMemo(() => ({ ...bookingData }), [bookingData]);
+
+  // Persist currentStep for OTP step
   useEffect(() => {
-    if (!user) {
-      toast.error('Please log in to create a booking.');
-      navigate('/login');
+    const otpStepIndex = steps.findIndex((step) => step.id === OTP_STEP_ID);
+    if (user && steps[currentStep].id !== OTP_STEP_ID && currentStep === steps.length - 2) {
+      // console.log('BookingWizard: Setting currentStep to OTP step', otpStepIndex);
+      setCurrentStep(otpStepIndex);
     }
-  }, [user, navigate]);
+  }, [user, currentStep]);
+
+  // Sync bookingData with user changes and reset email when user is null
+  useEffect(() => {
+    if (user) {
+      // console.log('BookingWizard: Syncing bookingData with user', { name: user.name, email: user.email });
+      setBookingData((prev) => ({
+        ...prev,
+        name: user.name || prev.name,
+        email: user.email || prev.email,
+      }));
+    } else {
+      // console.log('BookingWizard: Resetting bookingData.email as user is null');
+      setBookingData((prev) => ({
+        ...prev,
+        email: initialUserData.email, // Reset to empty string
+      }));
+    }
+  }, [user, initialUserData.email, bookingData.name, bookingData.email]);
+
+  // Debug state changes
+  useEffect(() => {
+    console.log('BookingWizard: state:', {
+      user: user ? { id: user.id, email: user.email, name: user.name } : null,
+      currentStep,
+      stepId: steps[currentStep].id,
+      bookingData: { email: bookingData.email, name: bookingData.name },
+    });
+  }, [user, currentStep, bookingData.email, bookingData.name]);
 
   const updateBookingData = useCallback((key, value) => {
     setBookingData((prev) => {
+      console.log('BookingWizard: Updating bookingData', { key, value });
       const newData = { ...prev, [key]: value };
       if (key === 'venueId' || key === 'shiftId') {
         setIsAvailable(false);
@@ -105,7 +151,7 @@ const BookingWizard = () => {
   const checkAvailability = useCallback(async () => {
     const { date, venueId, shiftId, event_id, guestCount } = bookingData;
     if (!date || !venueId || !shiftId || !event_id || !guestCount) {
-      toast.error('Please select all required fields.');
+      showToast('Please select all required fields.', { type: 'error' });
       return;
     }
     setIsCheckingAvailability(true);
@@ -119,9 +165,11 @@ const BookingWizard = () => {
         guest_count: guestCount,
       });
       setIsAvailable(true);
-      toast.success('Slot is available!');
+      showToast('Slot is available!', { type: 'success' });
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Selected slot is not available.');
+      showToast(error.response?.data?.message || 'Selected slot is not available.', {
+        type: 'error',
+      });
       throw error;
     } finally {
       setIsCheckingAvailability(false);
@@ -131,7 +179,7 @@ const BookingWizard = () => {
   const calculateFare = useCallback(async () => {
     const { packageId, selectedMenus, guestCount } = bookingData;
     if (!packageId || !guestCount) {
-      toast.error('Please select a package and guest count.');
+      showToast('Please select a package and guest count.', { type: 'error' });
       return;
     }
     setIsCalculating(true);
@@ -149,7 +197,7 @@ const BookingWizard = () => {
         totalFare: total_fare,
       }));
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to calculate fare.');
+      showToast(error.response?.data?.message || 'Failed to calculate fare.', { type: 'error' });
       throw error;
     } finally {
       setIsCalculating(false);
@@ -206,7 +254,7 @@ const BookingWizard = () => {
           error.response?.data?.message ||
           error.message ||
           'Failed to store booking.';
-        toast.error(errorMessage);
+        showToast(errorMessage, { type: 'error' });
         throw error;
       } finally {
         setSubmitting(false);
@@ -215,36 +263,46 @@ const BookingWizard = () => {
     [verifyOtp, user, bookingData, sendConfirmation]
   );
 
-  const sendOtpCallback = useCallback(async (email) => {
-    return await sendOtp(email);
-  }, [sendOtp]);
+  const sendOtpCallback = useCallback(
+    async (email) => {
+      // console.log('BookingWizard: Sending OTP for email:', email);
+      return await sendOtp(email);
+    },
+    [sendOtp]
+  );
 
-  const handleNext = () => {
-    if (currentStep === steps.length - 2 && !isComplete) return;
+  const handleNext = useCallback(() => {
+    if (currentStep === steps.length - 2 && !isComplete) {
+      // console.log('BookingWizard: Cannot proceed from OTP step until complete');
+      return;
+    }
     if (steps[currentStep].id === 'venue' && !bookingData.venueId) {
-      toast.error('Please select a venue.');
+      showToast('Please select a venue.', { type: 'error' });
       return;
     }
     if (steps[currentStep].id === 'shift' && !isAvailable) {
-      toast.error('Please check shift availability.');
+      showToast('Please check shift availability.', { type: 'error' });
       return;
     }
     if (steps[currentStep].id === 'fare' && bookingData.totalFare === 0) {
-      toast.error('Please calculate fare.');
+      showToast('Please calculate fare.', { type: 'error' });
       return;
     }
     if (currentStep < steps.length - 1) {
+      // console.log('BookingWizard: Moving to next step', currentStep + 1);
       setCurrentStep(currentStep + 1);
     }
-  };
+  }, [currentStep, isComplete, bookingData, isAvailable]);
 
-  const handleBack = () => {
+  const handleBack = useCallback(() => {
     if (currentStep > 0 && currentStep < steps.length - 1) {
+      // console.log('BookingWizard: Moving to previous step', currentStep - 1);
       setCurrentStep(currentStep - 1);
     } else {
+      // console.log('BookingWizard: Navigating to home');
       navigate('/');
     }
-  };
+  }, [currentStep, navigate]);
 
   const CurrentStepComponent = MemoizedComponents[steps[currentStep].id];
 
@@ -291,7 +349,18 @@ const BookingWizard = () => {
         className="bg-white rounded-lg shadow-lg p-6"
       >
         <CurrentStepComponent
-          {...bookingData}
+          email={memoizedBookingData.email}
+          name={memoizedBookingData.name}
+          date={memoizedBookingData.date}
+          event_id={memoizedBookingData.event_id}
+          guestCount={memoizedBookingData.guestCount}
+          venueId={memoizedBookingData.venueId}
+          shiftId={memoizedBookingData.shiftId}
+          packageId={memoizedBookingData.packageId}
+          selectedMenus={memoizedBookingData.selectedMenus}
+          baseFare={memoizedBookingData.baseFare}
+          extraCharges={memoizedBookingData.extraCharges}
+          totalFare={memoizedBookingData.totalFare}
           updateBookingData={updateBookingData}
           checkAvailability={checkAvailability}
           isAvailable={isAvailable}
@@ -331,4 +400,4 @@ const BookingWizard = () => {
   );
 };
 
-export default BookingWizard;
+export default memo(BookingWizard);
