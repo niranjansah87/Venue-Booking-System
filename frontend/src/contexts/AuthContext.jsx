@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }) => {
       } else {
         setUser(null);
       }
-      console.log('AuthContext: Initial user state:', { user, storedUser });
+      // console.log('AuthContext: Initial user state:', { user, storedUser });
       setLoading(false);
     };
     checkUser();
@@ -76,7 +76,7 @@ export const AuthProvider = ({ children }) => {
     try {
       console.log(`Sending OTP request for email: ${email}`);
       const response = await api.post('/api/admin/book/send-otp', { email });
-      console.log('OTP sent to:', email, 'Response:', response.data);
+      // console.log('OTP sent to:', email, 'Response:', response.data);
       toast.success('OTP sent to your email!', { toastId: 'otp-sent' });
       return response.data;
     } catch (error) {
