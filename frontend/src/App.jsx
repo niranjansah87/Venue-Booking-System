@@ -82,7 +82,7 @@ function App() {
             />
             
             <Route
-              path="forget-password"
+              path="forgot-password"
               element={
                 <PublicRoute>
                   <ForgotPasswordPage />

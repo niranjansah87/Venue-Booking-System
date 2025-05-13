@@ -8,7 +8,7 @@ function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -16,7 +16,7 @@ function ForgotPasswordPage() {
     setError('');
 
     try {
-      const response = await axios.post('/api/auth/forgot-password', { email });
+      const response = await axios.post(`${backendUrl}/api/forgot-password`, { email });
       setMessage(response.data.message);
       toast.success(response.data.message);
     } catch (err) {

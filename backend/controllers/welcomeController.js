@@ -130,18 +130,28 @@ exports.sendOTP = async (req, res) => {
 
     // Send OTP via email
     const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #1a202c;">Your OTP Code</h2>
-        <p style="color: #4a5568;">Hello ${user.name || 'User'},</p>
-        <p style="color: #4a5568;">
-          Your One-Time Password (OTP) for A One Cafe booking verification is:
-        </p>
-        <h3 style="color: #2b6cb0; font-size: 24px; margin: 20px 0;">${otp}</h3>
-        <p style="color: #4a5568;">
-          This OTP is valid for 5 minutes. Please do not share it with anyone.
-        </p>
-        <p style="color: #4a5568;">Thank you,<br />A One Cafe Team</p>
-      </div>
+      <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 30px; border-radius: 10px; max-width: 600px; margin: auto;">
+  <h2 style="color: #4CAF50;">Your OTP Code</h2>
+  <p style="font-size: 16px; color: #333;">
+    Hello ${user.name || 'User'},
+  </p>
+  <p style="font-size: 16px; color: #333;">
+    Your One-Time Password (OTP) for A One Cafe booking verification is:
+  </p>
+  <h3 style="color: #4CAF50; font-size: 24px; text-align: center; margin: 20px 0;">
+    ${otp}
+  </h3>
+  <p style="font-size: 16px; color: #333;">
+    This OTP is valid for 5 minutes. Please do not share it with anyone.
+  </p>
+  <hr style="margin: 30px 0;">
+  <p style="font-size: 12px; color: #999;">
+    If you didn’t request this OTP, please ignore this email or contact our support.
+  </p>
+  <p style="font-size: 12px; color: #999;">
+    Thank you,<br>A One Cafe Team
+  </p>
+</div>
     `;
 
     const emailSent = await sendEmail({
