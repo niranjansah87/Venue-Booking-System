@@ -428,7 +428,7 @@ exports.forgotPassword = async (req, res) => {
 exports.renderResetPassword = async (req, res) => {
   const { token } = req.params;
   const hash = crypto.createHash('sha256').update(token).digest('hex');
-
+const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
   try {
     const user = await User.findOne({
       where: {
@@ -452,7 +452,7 @@ exports.resetPassword = async (req, res) => {
   const { token } = req.params;
   const { password, confirmPassword } = req.body;
   const hash = crypto.createHash('sha256').update(token).digest('hex');
-
+const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
   try {
     if (password !== confirmPassword) {
       return res.render('resetPassword', {

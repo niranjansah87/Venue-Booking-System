@@ -164,6 +164,7 @@ exports.forgotPassword = async (req, res) => {
 exports.renderAdminResetPassword = async (req, res) => {
   const { token } = req.params;
   const hash = crypto.createHash('sha256').update(token).digest('hex');
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
 
   try {
     const user = await Admin.findOne({
@@ -174,13 +175,13 @@ exports.renderAdminResetPassword = async (req, res) => {
     });
 
     if (!user) {
-      return res.render('adminResetPassword', { error: 'Invalid or expired token.', message: null, token });
+      return res.render('adminResetPassword', { error: 'Invalid or expired token.', message: null, token, frontendUrl });
     }
 
-    res.render('adminResetPassword', { error: null, message: null, token });
+    res.render('adminResetPassword', { error: null, message: null, token, frontendUrl });
   } catch (err) {
     console.error('Render reset password error:', err);
-    res.render('adminResetPassword', { error: 'Error loading reset page.', message: null, token });
+    res.render('adminResetPassword', { error: 'Error loading reset page.', message: null, token, frontendUrl });
   }
 };
 
@@ -188,6 +189,7 @@ exports.resetAdminPassword = async (req, res) => {
   const { token } = req.params;
   const { password, confirmPassword } = req.body;
   const hash = crypto.createHash('sha256').update(token).digest('hex');
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
 
   try {
     if (password !== confirmPassword) {
@@ -195,6 +197,7 @@ exports.resetAdminPassword = async (req, res) => {
         error: 'Passwords do not match.',
         message: null,
         token,
+        frontendUrl,
       });
     }
 
@@ -210,6 +213,7 @@ exports.resetAdminPassword = async (req, res) => {
         error: 'Invalid or expired token.',
         message: null,
         token,
+        frontendUrl,
       });
     }
 
@@ -222,6 +226,7 @@ exports.resetAdminPassword = async (req, res) => {
       error: null,
       message: 'Password has been reset. You can now sign in.',
       token,
+      frontendUrl,
     });
   } catch (err) {
     console.error('Reset password error:', err);
@@ -229,13 +234,10 @@ exports.resetAdminPassword = async (req, res) => {
       error: 'Error resetting password.',
       message: null,
       token,
+      frontendUrl,
     });
   }
 };
-
-
-
-
 
 
 

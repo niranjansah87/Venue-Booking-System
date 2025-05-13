@@ -12,6 +12,30 @@ dotenv.config(); // Load environment variables
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Define allowed origins
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000', // If another frontend port is used
+  process.env.FRONTEND_URL,
+].filter(Boolean); // Remove undefined values
+
+// CORS configuration
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (e.g., mobile apps or curl)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      callback(null, origin); // Reflect the requesting origin
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  optionsSuccessStatus: 200, // For legacy browsers
+}));
+
 // Middlewares
 app.use(cookieParser());
 app.use(express.json());
@@ -19,23 +43,17 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/public', express.static('public'));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-// CORS
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-  methods: ['GET', 'POST', 'PUT', 'DELETE','PATCH'],
-  credentials: true
-}));
 
 // Session
 app.use(session({
-  secret: process.env.SESSION_SECRET,
+  secret: process.env.SESSION_SECRET || 'your-secret-key',
   resave: false,
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
     maxAge: Number(process.env.SESSION_MAX_AGE) || 30 * 60 * 1000,
     secure: process.env.NODE_ENV === 'production',
-  }
+  },
 }));
 
 // DB connection check
@@ -51,24 +69,23 @@ db.sync()
 // Routes
 const adminRoutes = require('./routes/admin');
 const welcomeRoutes = require('./routes/welcomeRoutes');
+const adminuserRoutes = require('./routes/adminUsersRoutes');
+const userRoutes = require('./routes/users');
 
 app.get('/', (req, res) => {
   res.send('🎉 Welcome to the API!');
 });
 
 app.use('/api/admin', adminRoutes);
-app.use('/api/admin/book', welcomeRoutes); // Updated path for consistency (see note below)
+app.use('/api/admin/book', welcomeRoutes);
+app.use('/admin/auth', adminuserRoutes);
+app.use('/api', userRoutes);
 
 // Session test route
 app.get('/session', (req, res) => {
   res.send(req.session.user ? '✅ Session active' : '⚠️ No active session');
 });
 
-const adminuserRoutes = require('./routes/adminUsersRoutes');
-app.use('/admin/auth', adminuserRoutes); 
-
-const userRoutes = require('./routes/users');
-app.use('/api', userRoutes); 
 // 404 fallback
 app.use((req, res) => {
   res.status(404).send('🚫 Page not found');
