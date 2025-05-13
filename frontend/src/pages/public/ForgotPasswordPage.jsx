@@ -1,25 +1,27 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
+import axios from 'axios';
 
-function LoginPage() {
+function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setMessage('');
     setError('');
 
     try {
-      await login(email, password);
+      const response = await axios.post('/api/auth/forgot-password', { email });
+      setMessage(response.data.message);
+      toast.success(response.data.message);
     } catch (err) {
-      console.error('Login error:', err);
-      const errorMessage = err.response?.data?.message || 'Login failed. Please try again.';
+      console.error('Forgot password error:', err);
+      const errorMessage = err.response?.data?.message || 'Failed to send reset link. Please try again.';
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -32,11 +34,19 @@ function LoginPage() {
       <div className="max-w-md w-full p-8 bg-white/10 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20">
         <div>
           <h2 className="mt-6 text-center text-3xl font-bold text-white tracking-tight">
-            Sign in to your account
+            Reset Your Password
           </h2>
+          <p className="mt-2 text-center text-sm text-gray-300">
+            Enter your email address and we'll send you a link to reset your password.
+          </p>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          {message && (
+            <div className="text-green-400 text-sm text-center bg-white/10 p-3 rounded-lg">
+              {message}
+            </div>
+          )}
           {error && (
             <div className="text-red-400 text-sm text-center bg-white/10 p-3 rounded-lg">
               {error}
@@ -60,31 +70,6 @@ function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                className="appearance-none rounded-lg relative block w-full px-4 py-3 bg-white/10 border border-white/30 placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 sm:text-sm transition-all"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="text-sm text-center">
-            <Link
-              to="/forgot-password"
-              className="font-medium text-indigo-300 hover:text-indigo-200 transition-all"
-            >
-              Forgot Password?
-            </Link>
           </div>
 
           <div>
@@ -93,16 +78,16 @@ function LoginPage() {
               disabled={loading}
               className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all disabled:opacity-50"
             >
-              {loading ? 'Signing in...' : 'Sign in'}
+              {loading ? 'Sending...' : 'Send Reset Link'}
             </button>
           </div>
 
           <div className="text-sm text-center">
             <Link
-              to="/register"
+              to="/login"
               className="font-medium text-indigo-300 hover:text-indigo-200 transition-all"
             >
-              Don't have an account? Sign up
+              Back to Sign in
             </Link>
           </div>
         </form>
@@ -111,4 +96,4 @@ function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default ForgotPasswordPage;

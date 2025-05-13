@@ -367,7 +367,7 @@ exports.requestReset = async (req, res) => {
 };
 
 exports.resetPassword = async (req, res) => {
-  const { token, email, newPassword } = req.body;
+  const { email, newPassword } = req.body;
   const hash = crypto.createHash('sha256').update(token).digest('hex');
 
   try {

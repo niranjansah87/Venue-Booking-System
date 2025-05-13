@@ -30,6 +30,7 @@ import MenusManagement from './pages/admin/MenusManagement';
 import UsersManagement from './pages/admin/UsersManagement';
 import AdminProfilePage from './pages/Admin/AdminProfilePage';
 import AdminSettings from './pages/Admin/Settings';
+import ForgotPasswordPage from './pages/public/ForgotPasswordPage';
 // Error Boundary Component
 class ErrorBoundary extends React.Component {
   state = { error: null };
@@ -76,6 +77,15 @@ function App() {
               element={
                 <PublicRoute>
                   <LoginPage />
+                </PublicRoute>
+              }
+            />
+            
+            <Route
+              path="forget-password"
+              element={
+                <PublicRoute>
+                  <ForgotPasswordPage />
                 </PublicRoute>
               }
             />
