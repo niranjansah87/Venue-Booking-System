@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import api from '../../services/api';
 
 function AdminLogin() {
@@ -15,12 +15,10 @@ function AdminLogin() {
     setError('');
 
     try {
-      // Call to your API for login
       const response = await api.post('/api/admin/login', { email, password }, {
         withCredentials: true,
       });
 
-      // Storing the admin info in localStorage
       const { admin } = response.data;
       localStorage.setItem('user', JSON.stringify(admin));
 
@@ -75,6 +73,15 @@ function AdminLogin() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+          </div>
+
+          <div className="text-sm text-center">
+            <Link
+              to="/admin/forgot-password"
+              className="font-medium text-teal-300 hover:text-teal-200 transition-all duration-300"
+            >
+              Forgot Password?
+            </Link>
           </div>
 
           <button

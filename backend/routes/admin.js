@@ -115,4 +115,10 @@ router.post('/signup', AuthController.signup);
 router.post('/login', AuthController.login);
 router.post('/logout', AuthController.logout);
 router.put('/update/:id', AuthController.updateAdmin);
+
+router.post('/forgot-password', AuthController.forgotPassword);
+router.get('/reset-password/:token', AuthController.renderAdminResetPassword);
+router.post('/reset-password/:token', AuthController.resetAdminPassword);
+
+
 module.exports = router;

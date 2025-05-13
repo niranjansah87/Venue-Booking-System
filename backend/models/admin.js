@@ -1,5 +1,3 @@
-// models/admin.js
-
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
@@ -20,7 +18,14 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false
     },
-   
+    reset_password_token: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    reset_password_expires: {
+      type: DataTypes.BIGINT,
+      allowNull: true
+    }
   }, {
     tableName: 'admins',
     timestamps: true

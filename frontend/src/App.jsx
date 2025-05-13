@@ -31,6 +31,7 @@ import UsersManagement from './pages/admin/UsersManagement';
 import AdminProfilePage from './pages/Admin/AdminProfilePage';
 import AdminSettings from './pages/Admin/Settings';
 import ForgotPasswordPage from './pages/public/ForgotPasswordPage';
+import AdminForgotPassword from './pages/admin/AdminForgotPassword';
 // Error Boundary Component
 class ErrorBoundary extends React.Component {
   state = { error: null };
@@ -113,6 +114,7 @@ function App() {
 
           {/* ---------------- Admin Login Route (Unprotected) ---------------- */}
           <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/forgot-password" element={<AdminForgotPassword/>} />
 
           {/* ---------------- Admin Routes (Protected) ---------------- */}
           <Route
