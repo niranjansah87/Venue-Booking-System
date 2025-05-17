@@ -4,6 +4,14 @@ import { motion } from 'framer-motion';
 import { getMenusByPackageId } from '../../../services/menuService';
 import { toast } from 'react-toastify';
 
+// Format price in NPR
+const formatNPR = (value) =>
+  new Intl.NumberFormat('en-NP', {
+    style: 'currency',
+    currency: 'NPR',
+    minimumFractionDigits: 0,
+  }).format(value);
+
 const MenuSelection = ({ packageId, selectedMenus, updateBookingData }) => {
   const [menus, setMenus] = useState([]);
   const [activeMenu, setActiveMenu] = useState(null);
@@ -33,7 +41,12 @@ const MenuSelection = ({ packageId, selectedMenus, updateBookingData }) => {
           id: menu.id || null,
           name: menu.name || 'Unnamed Menu',
           free_limit: menu.free_limit || 0,
-          items: Array.isArray(menu.items) ? menu.items : [],
+          items: Array.isArray(menu.items)
+            ? menu.items.map((item) => ({
+                name: item.name || 'Unnamed Item',
+                price: Number(item.price) || 0,
+              }))
+            : [],
         }));
 
         if (validatedMenus.length === 0) {
@@ -67,7 +80,7 @@ const MenuSelection = ({ packageId, selectedMenus, updateBookingData }) => {
       [menuId]: updatedMenuItems,
     };
 
-    console.log('Updated selectedMenus:', updatedSelectedMenus); // Debug
+    console.log('Updated selectedMenus:', updatedSelectedMenus);
     updateBookingData('selectedMenus', updatedSelectedMenus);
   };
 
@@ -79,7 +92,7 @@ const MenuSelection = ({ packageId, selectedMenus, updateBookingData }) => {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
       </div>
     );
   }
@@ -87,9 +100,9 @@ const MenuSelection = ({ packageId, selectedMenus, updateBookingData }) => {
   if (error) {
     return (
       <div className="py-8 text-center">
-        <p className="text-red-500 mb-4">{error}</p>
+        <p className="text-red-500 mb-4 text-lg font-medium">{error}</p>
         <button
-          className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
+          className="px-5 py-2.5 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
           onClick={() => window.location.reload()}
         >
           Try Again
@@ -101,9 +114,9 @@ const MenuSelection = ({ packageId, selectedMenus, updateBookingData }) => {
   if (menus.length === 0) {
     return (
       <div className="py-8 text-center">
-        <p className="text-gray-600 mb-4">No menus available for the selected package.</p>
+        <p className="text-gray-600 mb-4 text-lg">No menus available for the selected package.</p>
         <button
-          className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
+          className="px-5 py-2.5 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
           onClick={() => window.location.reload()}
         >
           Try Again
@@ -112,105 +125,123 @@ const MenuSelection = ({ packageId, selectedMenus, updateBookingData }) => {
     );
   }
 
-  // Log menus before rendering
   console.log('Rendering menus:', menus);
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-heading font-semibold text-gray-800 mb-6">Select Menu Options</h2>
-      <p className="text-gray-600 mb-8">
-        Customize your event menu by selecting items.
-      </p>
+    <div className="p-8 bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 min-h-screen" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=20 height=20 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Ccircle cx=2 cy=2 r=1 fill=%22%23e2e8f0%22/%3E%3C/svg%3E")' }}>
+      <div className="max-w-7xl mx-auto">
+        <h2 className="text-3xl font-extrabold text-gray-900 mb-8 flex items-center">
+          <Utensils className="h-8 w-8 text-indigo-600 mr-3" />
+          Select Menu Options
+        </h2>
+        <p className="text-gray-600 mb-10 text-lg">
+          Customize your event menu by selecting items.
+        </p>
 
-      <div className="flex flex-col lg:flex-row gap-8">
-        {/* Left - Menu Categories */}
-        <div className="w-full lg:w-1/3">
-          <h3 className="text-lg font-medium text-gray-800 mb-4">Menu Categories</h3>
-          <div className="space-y-2">
-            {menus.map((menu) => (
-              <motion.button
-                key={menu.id}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setActiveMenu(menu.id)}
-                className={`w-full text-left px-4 py-3 rounded-md transition-colors ${
-                  activeMenu === menu.id
-                    ? 'bg-primary-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-primary-100 hover:text-primary-600'
-                }`}
-              >
-                {menu.name}
-                <span className="ml-2 text-sm">
-                  ({getSelectedItemsCount(menu.id)}/{menu.free_limit || 0} selected)
-                </span>
-              </motion.button>
-            ))}
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Left - Menu Categories */}
+          <div className="w-full lg:w-1/3">
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">Menu Categories</h3>
+            <div className="space-y-3">
+              {menus.map((menu, index) => (
+                <motion.button
+                  key={menu.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                  whileHover={{ scale: 1.02, boxShadow: '0 0 8px rgba(79, 70, 229, 0.3)' }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setActiveMenu(menu.id)}
+                  className={`w-full text-left px-5 py-3 rounded-lg shadow-sm transition-all duration-300 ${
+                    activeMenu === menu.id
+                      ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-indigo-100 hover:text-indigo-600'
+                  }`}
+                >
+                  <div className="flex justify-between items-center">
+                    <span>{menu.name}</span>
+                    <span className="text-sm">
+                      ({getSelectedItemsCount(menu.id)}/{menu.free_limit || 0})
+                    </span>
+                  </div>
+                </motion.button>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Right - Menu Items */}
-        <div className="w-full lg:w-2/3">
-          {activeMenu && (
-            <div>
-              <h3 className="text-lg font-medium text-gray-800 mb-4">
-                {menus.find((m) => m.id === activeMenu)?.name || 'Menu'} Options
-              </h3>
-              <p className="text-sm text-gray-600 mb-4">
-                Select up to {menus.find((m) => m.id === activeMenu)?.free_limit || 0} items at no extra charge.
-              </p>
+          {/* Right - Menu Items */}
+          <div className="w-full lg:w-2/3">
+            {activeMenu && (
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                  {menus.find((m) => m.id === activeMenu)?.name || 'Menu'} Options
+                </h3>
+                <p className="text-sm text-gray-600 mb-6">
+                  Select up to {menus.find((m) => m.id === activeMenu)?.free_limit || 0} items at no extra charge.
+                </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {(menus.find((m) => m.id === activeMenu)?.items || []).map((item, index) => (
-                  <motion.div
-                    key={item.name || index} // Use name as key for uniqueness
-                    whileHover={{ y: -3 }}
-                    className={`p-4 border rounded-md flex items-center justify-between transition-all ${
-                      isItemSelected(activeMenu, item.name)
-                        ? 'border-primary-500 bg-primary-50'
-                        : 'border-gray-200 hover:border-primary-200'
-                    }`}
-                  >
-                    <div>
-                      <h4 className="text-gray-800 font-medium">{item.name || 'Unnamed Item'}</h4>
-                    </div>
-                    <button
-                      onClick={() => handleMenuItemToggle(activeMenu, item.name)}
-                      className={`p-2 rounded-full transition-colors ${
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {(menus.find((m) => m.id === activeMenu)?.items || []).map((item, index) => (
+                    <motion.div
+                      key={item.name || index}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: index * 0.1 }}
+                      whileHover={{ y: -5, scale: 1.02, shadow: '0 0 8px rgba(0, 0, 0, 0.1)' }}
+                      className={`p-4 border rounded-lg shadow-md flex flex-col justify-between transition-all duration-300 min-h-[120px] ${
                         isItemSelected(activeMenu, item.name)
-                          ? 'bg-primary-600 text-white'
-                          : 'bg-gray-200 text-gray-600 hover:bg-primary-200 hover:text-primary-600'
+                          ? 'border-indigo-500 bg-indigo-50'
+                          : 'border-gray-200 hover:border-indigo-200 hover:shadow-lg'
                       }`}
                     >
-                      {isItemSelected(activeMenu, item.name) ? (
-                        <MinusCircle className="h-5 w-5" />
-                      ) : (
-                        <PlusCircle className="h-5 w-5" />
-                      )}
-                    </button>
-                  </motion.div>
-                ))}
+                      <div>
+                        <h4 className="text-base font-semibold text-gray-900">{item.name || 'Unnamed Item'}</h4>
+                        <p className="mt-1.5 text-indigo-600 text-xs bg-gradient-to-r from-indigo-100 to-purple-100 px-1.5 py-0.5 rounded-full inline-block">
+                          {formatNPR(item.price)}
+                        </p>
+                      </div>
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => handleMenuItemToggle(activeMenu, item.name)}
+                        className={`mt-2 p-2 rounded-full transition-all duration-300 self-end ${
+                          isItemSelected(activeMenu, item.name)
+                            ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white'
+                            : 'bg-gray-200 text-gray-600 hover:bg-indigo-200 hover:text-indigo-600'
+                        }`}
+                      >
+                        {isItemSelected(activeMenu, item.name) ? (
+                          <MinusCircle className="h-5 w-5" />
+                        ) : (
+                          <PlusCircle className="h-5 w-5" />
+                        )}
+                      </motion.button>
+                    </motion.div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Summary */}
-      {Object.keys(selectedMenus).length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-8 p-5 bg-primary-50 border border-primary-100 rounded-md flex items-center"
-        >
-          <Utensils className="h-8 w-8 text-primary-500 mr-4" />
-          <div>
-            <p className="text-lg font-medium text-primary-800">Menu Items Selected</p>
-            <p className="text-primary-600 mt-1">
-              Proceed to review fare summary.
-            </p>
+            )}
           </div>
-        </motion.div>
-      )}
+        </div>
+
+        {/* Summary */}
+        {Object.keys(selectedMenus).length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="mt-10 p-6 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg shadow-md flex items-center"
+          >
+            <Utensils className="h-10 w-10 text-indigo-600 mr-4" />
+            <div>
+              <p className="text-xl font-semibold text-gray-900">Menu Items Selected</p>
+              <p className="text-gray-600 mt-1">
+                Proceed to review fare summary.
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </div>
     </div>
   );
 };

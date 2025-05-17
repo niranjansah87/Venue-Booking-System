@@ -42,15 +42,15 @@ const FareSummary = ({ baseFare, extraCharges, totalFare, calculateFare, isCalcu
         <div className="space-y-4">
           <div className="flex justify-between text-gray-600">
             <span>Base Package Price</span>
-            <span>${baseFare.toLocaleString()}</span>
+            <span>NPR {baseFare.toLocaleString()}</span>
           </div>
           <div className="flex justify-between text-gray-600">
             <span>Additional Menu Items</span>
-            <span>${extraCharges.toLocaleString()}</span>
+            <span>NPR {extraCharges.toLocaleString()}</span>
           </div>
           <div className="border-t border-gray-200 pt-4 flex justify-between font-semibold text-gray-800">
             <span>Total Estimated Cost</span>
-            <span>${totalFare.toLocaleString()}</span>
+            <span>NPR {totalFare.toLocaleString()}</span>
           </div>
         </div>
       </div>
@@ -64,7 +64,7 @@ const FareSummary = ({ baseFare, extraCharges, totalFare, calculateFare, isCalcu
         <div>
           <p className="text-lg font-medium text-primary-800">Fare Summary</p>
           <p className="text-primary-600 mt-1">
-            Your total estimated cost is ${totalFare.toLocaleString()}.
+            Your total estimated cost is NPR {totalFare.toLocaleString()}.
           </p>
         </div>
       </motion.div>

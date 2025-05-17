@@ -35,8 +35,8 @@ exports.getBookingsByUserId = async (req, res) => {
         { model: Event, as: 'event', required: false },
         { model: Venue, as: 'venue', required: false },
         { model: Shift, as: 'shift', required: false },
-        { model: Package, as: 'package', required: false }
-      ]
+        { model: Package, as: 'package', required: false },
+      ],
     });
 
     if (!bookings || bookings.length === 0) {
@@ -146,7 +146,7 @@ exports.getPackageMenus = async (req, res) => {
           price: item.price,
           index,
         })),
-      }))
+      })),
     );
   } catch (error) {
     console.error('Error fetching menus:', error);
@@ -210,7 +210,7 @@ exports.calculateFare = [
 
 // Store booking
 exports.storeBooking = [
-  body('user_id').isInt().withMessage('Valid user ID is required'),
+  body('user_id').isInt().withMessage('Valid'),
   body('event_date').isDate().withMessage('Invalid event date'),
   body('event_id').isInt().withMessage('Invalid event ID'),
   body('guest_count').isInt({ min: 1 }).withMessage('Guest count must be a number'),
@@ -240,7 +240,7 @@ exports.storeBooking = [
       base_fare,
       extra_charges,
       total_fare,
-      customer_phone
+      customer_phone,
     } = req.body;
 
     try {
@@ -266,8 +266,10 @@ exports.storeBooking = [
       if (existingBooking) {
         return res.status(400).json({ error: 'Venue is already booked for this date and shift' });
       }
-      // Format phone number with +977 prefix if not already present
-      const formattedPhone = customer_phone.startsWith('+977') ? customer_phone : `+977${customer_phone.replace(/^\+?977/, '')}`;
+      // Format phone number with +977 prefix
+      const formattedPhone = customer_phone.startsWith('+977')
+        ? customer_phone
+        : `+977 ${customer_phone.replace(/^\+?977/, '')}`;
       const booking = await Booking.create({
         user_id,
         event_date,
@@ -292,6 +294,463 @@ exports.storeBooking = [
   },
 ];
 
+// Update booking status
+exports.updateBookingStatus = [
+  body('status').notEmpty().withMessage('Status is required'),
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    try {
+      const { bookingId } = req.params;
+      const { status } = req.body;
+      // Normalize status
+      const normalizedStatus = status.toLowerCase().trim();
+      // Allow 'pending', 'confirmed', 'rejected', 'cancelled' statuses
+      if (!['pending', 'confirmed', 'rejected', 'cancelled'].includes(normalizedStatus)) {
+        console.warn(`Invalid status received: ${status}`);
+        return res.status(400).json({ error: 'Status must be pending, confirmed, rejected, or cancelled' });
+      }
+
+      const booking = await Booking.findByPk(bookingId, {
+        include: [
+          { model: Event, as: 'event' },
+          { model: Venue, as: 'venue' },
+          { model: Shift, as: 'shift' },
+          { model: Package, as: 'package' },
+          { model: User, as: 'user' },
+        ],
+      });
+      if (!booking) {
+        console.error(`Booking not found for ID: ${bookingId}`);
+        return res.status(404).json({ message: 'Booking not found' });
+      }
+
+      // Optional: Add status transition validation
+      const currentStatus = booking.status.toLowerCase();
+      if (currentStatus === 'cancelled' && !['pending', 'confirmed'].includes(normalizedStatus)) {
+        return res.status(400).json({ error: 'Cancelled bookings can only be set to pending or confirmed' });
+      }
+      if (currentStatus === 'rejected' && !['pending', 'cancelled'].includes(normalizedStatus)) {
+        return res.status(400).json({ error: 'Rejected bookings can only be set to pending or cancelled' });
+      }
+
+      booking.status = normalizedStatus;
+      await booking.save();
+
+      // Send email only for confirmed or rejected statuses
+      if (['confirmed', 'rejected'].includes(normalizedStatus)) {
+        console.log(`Preparing to send email for booking ${bookingId}, status: ${normalizedStatus}`);
+        const email = booking.user?.email || 'default@example.com'; // Fallback email
+        console.log(`Email recipient: ${email}`);
+        // Use customer_phone from Booking, fallback to user.phone
+        let displayPhone = booking.customer_phone || booking.user?.phone || 'N/A';
+        // Format user.phone to +977 if needed
+        if (displayPhone !== 'N/A' && !displayPhone.startsWith('+977') && displayPhone.length === 10) {
+          displayPhone = `+977 ${displayPhone}`;
+        }
+        const formattedDate = new Date(booking.event_date).toLocaleDateString('en-US', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        });
+        // Customize email based on status
+        const isConfirmed = normalizedStatus === 'confirmed';
+        const emailTitle = isConfirmed ? 'Booking Confirmed!' : 'Booking Status Update';
+        const emailSubject = isConfirmed ? 'Your Booking is Confirmed!' : 'Update on Your Booking Request';
+        const emailMessage = isConfirmed
+          ? 'We are thrilled to confirm your booking. Below are the details of your event:'
+          : 'We regret to inform you that your booking request has been rejected. Below are the details of your request:';
+        const emailClosing = isConfirmed
+          ? 'Thank you for choosing our services! We look forward to making your event unforgettable.'
+          : 'We apologize for any inconvenience. Please contact our support team if you have any questions or wish to explore other options.';
+
+        const html = `
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>${emailTitle}</title>
+            <style>
+              body {
+                font-family: 'Helvetica Neue', Arial, sans-serif;
+                background-color: #f4f4f9;
+                margin: 0;
+                padding: 0;
+                color: #333333;
+              }
+              .container {
+                max-width: 600px;
+                margin: 20px auto;
+                background-color: #ffffff;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+              }
+              .header {
+                background-color: #4CAF50;
+                padding: 20px;
+                text-align: center;
+                color: #ffffff;
+              }
+              .header img {
+                max-width: 150px;
+                height: auto;
+              }
+              .content {
+                padding: 30px;
+                font-size: 16px;
+                line-height: 1.6;
+                color: #555555;
+              }
+              .content h1 {
+                font-size: 24px;
+                color: #333333;
+                margin-bottom: 20px;
+                text-align: center;
+              }
+              .content p {
+                margin: 10px 0;
+              }
+              .content table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+              }
+              .content table td {
+                padding: 10px;
+                border-bottom: 1px solid #eeeeee;
+              }
+              .content table td.label {
+                font-weight: bold;
+                color: #333333;
+                width: 40%;
+              }
+              .highlight {
+                color: #4CAF50;
+                font-weight: bold;
+              }
+              .cta-button {
+                display: inline-block;
+                padding: 12px 24px;
+                margin: 20px 0;
+                background-color: #4CAF50;
+                color: #ffffff;
+                text-decoration: none;
+                border-radius: 4px;
+                font-size: 16px;
+                text-align: center;
+              }
+              .footer {
+                background-color: #f4f4f9;
+                padding: 20px;
+                text-align: center;
+                font-size: 14px;
+                color: #777777;
+              }
+              .footer a {
+                color: #4CAF50;
+                text-decoration: none;
+              }
+              @media only screen and (max-width: 600px) {
+                .container {
+                  margin: 10px;
+                  padding: 10px;
+                }
+                .content {
+                  padding: 20px;
+                }
+                .header img {
+                  max-width: 120px;
+                }
+                .content table td {
+                  display: block;
+                  width: 100%;
+                  box-sizing: border-box;
+                }
+                .content table td.label {
+                  width: 100%;
+                  margin-bottom: 5px;
+                }
+              }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <h2 style="margin: 10px 0; font-size: 20px;">A One Cafe</h2>
+              </div>
+              <div class="content">
+                <h1>${emailTitle}</h1>
+                <p>Dear <span class="highlight">${booking.user?.dataValues?.name || 'Customer'}</span>,</p>
+                <p>${emailMessage}</p>
+                <table>
+                  <tr>
+                    <td class="label">Booking ID</td>
+                    <td><span class="highlight">${booking.id}</span></td>
+                  </tr>
+                  <tr>
+                    <td class="label">Event</td>
+                    <td><span class="highlight">${booking.event?.dataValues?.name || 'N/A'}</span></td>
+                  </tr>
+                  <tr>
+                    <td class="label">Date</td>
+                    <td><span class="highlight">${formattedDate}</span></td>
+                  </tr>
+                  <tr>
+                    <td class="label">Venue</td>
+                    <td><span class="highlight">${booking.venue?.dataValues?.name || 'N/A'}</span></td>
+                  </tr>
+                  <tr>
+                    <td class="label">Shift</td>
+                    <td><span class="highlight">${booking.shift?.dataValues?.name || 'N/A'}</span></td>
+                  </tr>
+                  <tr>
+                    <td class="label">Guests</td>
+                    <td><span class="highlight">${booking.guest_count}</span></td>
+                  </tr>
+                  <tr>
+                    <td class="label">Package</td>
+                    <td><span class="highlight">${booking.package?.dataValues?.name || 'N/A'}</span></td>
+                  </tr>
+                  <tr>
+                    <td class="label">Phone</td>
+                    <td><span class="highlight">🇳🇵 ${displayPhone}</span></td>
+                  </tr>
+                  <tr>
+                    <td class="label">Total Fare</td>
+                    <td><span class="highlight">NPR ${booking.total_fare.toLocaleString('en-NP')}</span></td>
+                  </tr>
+                </table>
+                <p>${emailClosing}</p>
+              </div>
+              <div class="footer">
+                <p>A One Cafe © ${new Date().getFullYear()}</p>
+              </div>
+            </div>
+          </body>
+          </html>
+        `;
+
+        try {
+          console.log(`Sending email for booking ${bookingId} to ${email}, subject: ${emailSubject}`);
+          await sendEmail({
+            to: email,
+            subject: emailSubject,
+            html,
+          });
+          console.log(`Email sent successfully for booking ${bookingId}, status: ${normalizedStatus}`);
+        } catch (emailError) {
+          console.error(`Failed to send email for booking ${bookingId}, status: ${normalizedStatus}`, emailError);
+          // Continue to respond, don't fail the request
+        }
+      } else if (normalizedStatus === 'cancelled') {
+        // Optional: Send cancellation email
+        console.log(`Preparing to send cancellation email for booking ${bookingId}`);
+        const email = booking.user?.email || 'default@example.com';
+        const formattedDate = new Date(booking.event_date).toLocaleDateString('en-US', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        });
+        let displayPhone = booking.customer_phone || booking.user?.phone || 'N/A';
+        if (displayPhone !== 'N/A' && !displayPhone.startsWith('+977') && displayPhone.length === 10) {
+          displayPhone = `+977 ${displayPhone}`;
+        }
+        const html = `
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Booking Cancelled</title>
+            <style>
+              body {
+                font-family: 'Helvetica Neue', Arial, sans-serif;
+                background-color: #f4f4f9;
+                margin: 0;
+                padding: 0;
+                color: #333333;
+              }
+              .container {
+                max-width: 600px;
+                margin: 20px auto;
+                background-color: #ffffff;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+              }
+              .header {
+                background-color: #ff4444;
+                padding: 20px;
+                text-align: center;
+                color: #ffffff;
+              }
+              .header img {
+                max-width: 150px;
+                height: auto;
+              }
+              .content {
+                padding: 30px;
+                font-size: 16px;
+                line-height: 1.6;
+                color: #555555;
+              }
+              .content h1 {
+                font-size: 24px;
+                color: #333333;
+                margin-bottom: 20px;
+                text-align: center;
+              }
+              .content p {
+                margin: 10px 0;
+              }
+              .content table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+              }
+              .content table td {
+                padding: 10px;
+                border-bottom: 1px solid #eeeeee;
+              }
+              .content table td.label {
+                font-weight: bold;
+                color: #333333;
+                width: 40%;
+              }
+              .highlight {
+                color: #ff4444;
+                font-weight: bold;
+              }
+              .cta-button {
+                display: inline-block;
+                padding: 12px 24px;
+                margin: 20px 0;
+                background-color: #ff4444;
+                color: #ffffff;
+                text-decoration: none;
+                border-radius: 4px;
+                font-size: 16px;
+                text-align: center;
+              }
+              .footer {
+                background-color: #f4f4f9;
+                padding: 20px;
+                text-align: center;
+                font-size: 14px;
+                color: #777777;
+              }
+              .footer a {
+                color: #ff4444;
+                text-decoration: none;
+              }
+              @media only screen and (max-width: 600px) {
+                .container {
+                  margin: 10px;
+                  padding: 10px;
+                }
+                .content {
+                  padding: 20px;
+                }
+                .header img {
+                  max-width: 120px;
+                }
+                .content table td {
+                  display: block;
+                  width: 100%;
+                  box-sizing: border-box;
+                }
+                .content table td.label {
+                  width: 100%;
+                  margin-bottom: 5px;
+                }
+              }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <h2 style="margin: 10px 0; font-size: 20px;">A One Cafe</h2>
+              </div>
+              <div class="content">
+                <h1>Booking Cancelled</h1>
+                <p>Dear <span class="highlight">${booking.user?.dataValues?.name || 'Customer'}</span>,</p>
+                <p>We regret to inform you that your booking has been cancelled. Below are the details of the cancelled booking:</p>
+                <table>
+                  <tr>
+                    <td class="label">Booking ID</td>
+                    <td><span class="highlight">${booking.id}</span></td>
+                  </tr>
+                  <tr>
+                    <td class="label">Event</td>
+                    <td><span class="highlight">${booking.event?.dataValues?.name || 'N/A'}</span></td>
+                  </tr>
+                  <tr>
+                    <td class="label">Date</td>
+                    <td><span class="highlight">${formattedDate}</span></td>
+                  </tr>
+                  <tr>
+                    <td class="label">Venue</td>
+                    <td><span class="highlight">${booking.venue?.dataValues?.name || 'N/A'}</span></td>
+                  </tr>
+                  <tr>
+                    <td class="label">Shift</td>
+                    <td><span class="highlight">${booking.shift?.dataValues?.name || 'N/A'}</span></td>
+                  </tr>
+                  <tr>
+                    <td class="label">Guests</td>
+                    <td><span class="highlight">${booking.guest_count}</span></td>
+                  </tr>
+                  <tr>
+                    <td class="label">Package</td>
+                    <td><span class="highlight">${booking.package?.dataValues?.name || 'N/A'}</span></td>
+                  </tr>
+                  <tr>
+                    <td class="label">Phone</td>
+                    <td><span class="highlight">🇳🇵 ${displayPhone}</span></td>
+                  </tr>
+                  <tr>
+                    <td class="label">Total Fare</td>
+                    <td><span class="highlight">NPR ${booking.total_fare.toLocaleString('en-NP')}</span></td>
+                  </tr>
+                </table>
+                <p>We apologize for any inconvenience. Please contact our support team if you have any questions or wish to make a new booking.</p>
+              </div>
+              <div class="footer">
+                <p>A One Cafe © ${new Date().getFullYear()}</p>
+              </div>
+            </div>
+          </body>
+          </html>
+        `;
+
+        try {
+          console.log(`Sending cancellation email for booking ${bookingId} to ${email}`);
+          await sendEmail({
+            to: email,
+            subject: 'Your Booking Has Been Cancelled',
+            html,
+          });
+          console.log(`Cancellation email sent successfully for booking ${bookingId}`);
+        } catch (emailError) {
+          console.error(`Failed to send cancellation email for booking ${bookingId}`, emailError);
+          // Continue to respond, don't fail the request
+        }
+      }
+
+      res.json({ message: 'Booking status updated', booking });
+    } catch (error) {
+      console.error('Error updating booking status:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  },
+];
+
 // Send confirmation email
 exports.sendConfirmation = async (req, res) => {
   const { bookingId, email } = req.body;
@@ -302,7 +761,7 @@ exports.sendConfirmation = async (req, res) => {
         { model: Venue, as: 'venue' },
         { model: Shift, as: 'shift' },
         { model: Package, as: 'package' },
-        { model: User, as: 'user' }
+        { model: User, as: 'user' },
       ],
     });
 
@@ -310,8 +769,12 @@ exports.sendConfirmation = async (req, res) => {
       return res.status(404).json({ error: 'Booking not found' });
     }
 
-    // Format phone number for display
-    const displayPhone = booking.customer_phone || 'N/A';
+    // Use customer_phone from Booking, fallback to user.phone
+    let displayPhone = booking.customer_phone || booking.user?.phone || 'N/A';
+    // Format user.phone to +977 if needed
+    if (displayPhone !== 'N/A' && !displayPhone.startsWith('+977') && displayPhone.length === 10) {
+      displayPhone = `+977 ${displayPhone}`;
+    }
     const html = `
       <html>
         <head>
@@ -367,7 +830,6 @@ exports.sendConfirmation = async (req, res) => {
             <div class="content">
               <p>Dear <span class="highlight">${booking.user?.dataValues?.name || 'Customer'}</span>,</p>
               <p>Your booking has been successfully submitted. Below are the details:</p>
-
               <p><strong>Booking ID:</strong> <span class="highlight">${booking.id}</span></p>
               <p><strong>Event:</strong> <span class="highlight">${booking.event?.dataValues?.name || 'N/A'}</span></p>
               <p><strong>Date:</strong> <span class="highlight">${booking.event_date}</span></p>
@@ -376,14 +838,11 @@ exports.sendConfirmation = async (req, res) => {
               <p><strong>Guests:</strong> <span class="highlight">${booking.guest_count}</span></p>
               <p><strong>Package:</strong> <span class="highlight">${booking.package?.dataValues?.name || 'N/A'}</span></p>
               <p><strong>Phone:</strong> <span class="highlight">🇳🇵 ${displayPhone}</span></p>
-              <p><strong>Total Fare:</strong> <span class="highlight">$${booking.total_fare}</span></p>
-
+              <p><strong>Total Fare:</strong> <span class="highlight">NPR ${booking.total_fare.toLocaleString('en-NP')}</span></p>
               <p>We'll contact you soon to confirm availability. If you have any questions, feel free to reach out to us.</p>
             </div>
-
             <div class="footer">
               <p>Thank you for choosing us!</p>
-              <p>Need help? <a href="mailto:support@example.com">Contact Support</a></p>
             </div>
           </div>
         </body>
@@ -456,7 +915,7 @@ exports.listBookings = async (req, res) => {
         { model: Venue, as: 'venue' },
         { model: Shift, as: 'shift' },
         { model: Package, as: 'package' },
-        { model: User, as: 'user' }
+        { model: User, as: 'user' },
       ],
     });
     res.json(bookings);
@@ -465,31 +924,6 @@ exports.listBookings = async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
-
-// Update booking status
-exports.updateBookingStatus = [
-  body('status').notEmpty().withMessage('Status is required'),
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-    try {
-      const { bookingId } = req.params;
-      const { status } = req.body;
-      const booking = await Booking.findByPk(bookingId);
-      if (!booking) {
-        return res.status(404).json({ message: 'Booking not found' });
-      }
-      booking.status = status;
-      await booking.save();
-      res.json({ message: 'Booking status updated', booking });
-    } catch (error) {
-      console.error('Error updating booking status:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
-  },
-];
 
 // Delete a booking
 exports.deleteBooking = async (req, res) => {
@@ -506,4 +940,3 @@ exports.deleteBooking = async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
-
