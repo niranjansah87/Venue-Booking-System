@@ -14,21 +14,32 @@ import OtpVerification from './steps/OtpVerification';
 import BookingConfirmation from './steps/BookingConfirmation';
 import api from '../../services/api';
 import { showToast } from '../../utils/toastUtils';
+import { CheckCircle } from 'lucide-react';
 
 const steps = [
-  { id: 'date', title: 'Select Date', component: DateSelection },
-  { id: 'event', title: 'Event Type', component: EventTypeSelection },
-  { id: 'guests', title: 'Guest Count', component: GuestCount },
-  { id: 'venue', title: 'Venue', component: VenueSelection },
-  { id: 'shift', title: 'Time Slot', component: ShiftSelection },
-  { id: 'package', title: 'Package', component: PackageSelection },
-  { id: 'menu', title: 'Menu', component: MenuSelection },
-  { id: 'fare', title: 'Fare Summary', component: FareSummary },
-  { id: 'otp', title: 'Verify Email', component: OtpVerification },
-  { id: 'confirmation', title: 'Confirmation', component: BookingConfirmation },
+  {
+    id: 'event-details',
+    title: 'Event Details',
+    components: [DateSelection, EventTypeSelection, GuestCount, VenueSelection, ShiftSelection],
+  },
+  {
+    id: 'package-menu',
+    title: 'Package & Menu',
+    components: [PackageSelection, MenuSelection],
+  },
+  {
+    id: 'fare',
+    title: 'Fare Summary',
+    components: [FareSummary],
+  },
+  {
+    id: 'verification-confirmation',
+    title: 'Verification & Confirmation',
+    components: [OtpVerification, BookingConfirmation],
+  },
 ];
 
-const OTP_STEP_ID = 'otp';
+const OTP_STEP_ID = 'verification-confirmation';
 
 const BookingWizard = () => {
   const navigate = useNavigate();
@@ -38,7 +49,9 @@ const BookingWizard = () => {
   const MemoizedComponents = useMemo(
     () =>
       steps.reduce((acc, step) => {
-        acc[step.id] = memo(step.component);
+        step.components.forEach((Component) => {
+          acc[Component.name] = memo(Component);
+        });
         return acc;
       }, {}),
     []
@@ -56,21 +69,17 @@ const BookingWizard = () => {
           id: parsedUser.id || null,
           name: parsedUser.name || '',
           email: parsedUser.email || '',
+          phone: parsedUser.phone || '',
         };
       } catch (error) {
-        // console.error('Error parsing user from local storage:', error);
-        localStorage.removeItem('user'); // Clear invalid data
-        return { id: null, name: '', email: '' };
+        localStorage.removeItem('user');
+        return { id: null, name: '', email: '', phone: '' };
       }
     }
-    return { id: null, name: '', email: '' };
+    return { id: null, name: '', email: '', phone: '' };
   }, []);
 
-  const initialUserData = useMemo(() => {
-    const data = getInitialUserData();
-    // console.log('BookingWizard: initialUserData:', data);
-    return data;
-  }, [getInitialUserData]);
+  const initialUserData = useMemo(() => getInitialUserData(), [getInitialUserData]);
 
   const [currentStep, setCurrentStep] = useState(0);
   const [bookingData, setBookingData] = useState({
@@ -86,6 +95,7 @@ const BookingWizard = () => {
     totalFare: 0,
     name: user?.name || initialUserData.name,
     email: user?.email || initialUserData.email,
+    phone: user?.phone || initialUserData.phone,
   });
   const [isAvailable, setIsAvailable] = useState(false);
   const [isCheckingAvailability, setIsCheckingAvailability] = useState(false);
@@ -94,49 +104,54 @@ const BookingWizard = () => {
   const [isComplete, setIsComplete] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  // Memoize bookingData to prevent prop changes
+  // Memoize bookingData
   const memoizedBookingData = useMemo(() => ({ ...bookingData }), [bookingData]);
 
-  // Persist currentStep for OTP step
-  useEffect(() => {
-    const otpStepIndex = steps.findIndex((step) => step.id === OTP_STEP_ID);
-    if (user && steps[currentStep].id !== OTP_STEP_ID && currentStep === steps.length - 2) {
-      // console.log('BookingWizard: Setting currentStep to OTP step', otpStepIndex);
-      setCurrentStep(otpStepIndex);
+  // Check if current step is complete
+  const isStepComplete = useCallback(() => {
+    const stepId = steps[currentStep].id;
+    if (stepId === 'event-details') {
+      return (
+        bookingData.date &&
+        bookingData.event_id &&
+        bookingData.guestCount &&
+        bookingData.shiftId &&
+        bookingData.venueId &&
+        isAvailable
+      );
     }
-  }, [user, currentStep]);
+    if (stepId === 'package-menu') {
+      return bookingData.packageId && Object.keys(bookingData.selectedMenus).length > 0;
+    }
+    if (stepId === 'fare') {
+      return bookingData.totalFare > 0;
+    }
+    if (stepId === 'verification-confirmation') {
+      return isComplete;
+    }
+    return false;
+  }, [currentStep, bookingData, isAvailable, isComplete]);
 
-  // Sync bookingData with user changes and reset email when user is null
+  // Sync bookingData with user changes
   useEffect(() => {
     if (user) {
-      // console.log('BookingWizard: Syncing bookingData with user', { name: user.name, email: user.email });
       setBookingData((prev) => ({
         ...prev,
         name: user.name || prev.name,
         email: user.email || prev.email,
+        phone: user.phone || prev.phone,
       }));
     } else {
-      // console.log('BookingWizard: Resetting bookingData.email as user is null');
       setBookingData((prev) => ({
         ...prev,
-        email: initialUserData.email, // Reset to empty string
+        email: initialUserData.email,
+        phone: initialUserData.phone,
       }));
     }
-  }, [user, initialUserData.email, bookingData.name, bookingData.email]);
-
-  // Debug state changes
-  useEffect(() => {
-    console.log('BookingWizard: state:', {
-      user: user ? { id: user.id, email: user.email, name: user.name } : null,
-      currentStep,
-      stepId: steps[currentStep].id,
-      bookingData: { email: bookingData.email, name: bookingData.name },
-    });
-  }, [user, currentStep, bookingData.email, bookingData.name]);
+  }, [user, initialUserData]);
 
   const updateBookingData = useCallback((key, value) => {
     setBookingData((prev) => {
-      console.log('BookingWizard: Updating bookingData', { key, value });
       const newData = { ...prev, [key]: value };
       if (key === 'venueId' || key === 'shiftId') {
         setIsAvailable(false);
@@ -218,6 +233,7 @@ const BookingWizard = () => {
           'guestCount',
           'name',
           'email',
+          'phone',
         ];
         const missingFields = requiredFields.filter(
           (field) => !bookingData[field] || bookingData[field] === null
@@ -239,6 +255,7 @@ const BookingWizard = () => {
           selected_menus: bookingData.selectedMenus,
           customer_name: bookingData.name,
           customer_email: bookingData.email,
+          customer_phone: bookingData.phone,
           base_fare: bookingData.baseFare,
           extra_charges: bookingData.extraCharges,
           total_fare: bookingData.totalFare,
@@ -247,7 +264,7 @@ const BookingWizard = () => {
         setBookingId(response.data.bookingId);
         await sendConfirmation(response.data.bookingId, bookingData.email);
         setIsComplete(true);
-        setCurrentStep(steps.length - 1);
+        setCurrentStep(currentStep);
       } catch (error) {
         const errorMessage =
           error.response?.data?.errors?.map((err) => err.msg).join(', ') ||
@@ -260,69 +277,51 @@ const BookingWizard = () => {
         setSubmitting(false);
       }
     },
-    [verifyOtp, user, bookingData, sendConfirmation]
+    [verifyOtp, user, bookingData, sendConfirmation, currentStep]
   );
 
   const sendOtpCallback = useCallback(
     async (email) => {
-      // console.log('BookingWizard: Sending OTP for email:', email);
       return await sendOtp(email);
     },
     [sendOtp]
   );
 
   const handleNext = useCallback(() => {
-    if (currentStep === steps.length - 2 && !isComplete) {
-      // console.log('BookingWizard: Cannot proceed from OTP step until complete');
-      return;
-    }
-    if (steps[currentStep].id === 'venue' && !bookingData.venueId) {
-      showToast('Please select a venue.', { type: 'error' });
-      return;
-    }
-    if (steps[currentStep].id === 'shift' && !isAvailable) {
-      showToast('Please check shift availability.', { type: 'error' });
-      return;
-    }
-    if (steps[currentStep].id === 'fare' && bookingData.totalFare === 0) {
-      showToast('Please calculate fare.', { type: 'error' });
+    if (!isStepComplete()) {
+      showToast('Please complete all required fields.', { type: 'error' });
       return;
     }
     if (currentStep < steps.length - 1) {
-      // console.log('BookingWizard: Moving to next step', currentStep + 1);
       setCurrentStep(currentStep + 1);
     }
-  }, [currentStep, isComplete, bookingData, isAvailable]);
+  }, [currentStep, isStepComplete]);
 
   const handleBack = useCallback(() => {
-    if (currentStep > 0 && currentStep < steps.length - 1) {
-      // console.log('BookingWizard: Moving to previous step', currentStep - 1);
+    if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     } else {
-      // console.log('BookingWizard: Navigating to home');
       navigate('/');
     }
   }, [currentStep, navigate]);
 
-  const CurrentStepComponent = MemoizedComponents[steps[currentStep].id];
-
   return (
-    <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-heading font-bold text-gray-800 mb-8">Book Your Event</h1>
+    <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <h1 className="text-3xl font-heading font-bold text-gray-900 mb-10 text-center">Plan Your Event</h1>
 
       <div className="mb-12">
         <div className="flex justify-between items-center">
-          {steps.slice(0, -1).map((step, index) => (
+          {steps.map((step, index) => (
             <div key={step.id} className="flex-1 text-center">
               <div
-                className={`mx-auto w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                className={`mx-auto w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold ${
                   index <= currentStep ? 'bg-primary-600 text-white' : 'bg-gray-200 text-gray-600'
                 }`}
               >
                 {index + 1}
               </div>
               <p
-                className={`mt-2 text-sm font-medium ${
+                className={`mt-3 text-sm font-medium ${
                   index <= currentStep ? 'text-primary-600' : 'text-gray-500'
                 }`}
               >
@@ -331,69 +330,210 @@ const BookingWizard = () => {
             </div>
           ))}
         </div>
-        <div className="mt-2 relative">
-          <div className="absolute top-4 w-full h-1 bg-gray-200"></div>
+        <div className="mt-4 relative">
+          <div className="absolute top-1/2 w-full h-1 bg-gray-200 transform -translate-y-1/2"></div>
           <div
-            className="absolute top-4 h-1 bg-primary-600 transition-all duration-300"
-            style={{ width: `${(currentStep / (steps.length - 2)) * 100}%` }}
+            className="absolute top-1/2 h-1 bg-primary-600 transition-all duration-300 transform -translate-y-1/2"
+            style={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
           ></div>
         </div>
       </div>
 
       <motion.div
-        key="booking-wizard-content"
-        initial={{ opacity: 0, x: 50 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -50 }}
-        transition={{ duration: 0.3 }}
-        className="bg-white rounded-lg shadow-lg p-6"
+        key={`step-${currentStep}`}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.4 }}
+        className="bg-white rounded-xl shadow-lg p-8"
       >
-        <CurrentStepComponent
-          email={memoizedBookingData.email}
-          name={memoizedBookingData.name}
-          date={memoizedBookingData.date}
-          event_id={memoizedBookingData.event_id}
-          guestCount={memoizedBookingData.guestCount}
-          venueId={memoizedBookingData.venueId}
-          shiftId={memoizedBookingData.shiftId}
-          packageId={memoizedBookingData.packageId}
-          selectedMenus={memoizedBookingData.selectedMenus}
-          baseFare={memoizedBookingData.baseFare}
-          extraCharges={memoizedBookingData.extraCharges}
-          totalFare={memoizedBookingData.totalFare}
-          updateBookingData={updateBookingData}
-          checkAvailability={checkAvailability}
-          isAvailable={isAvailable}
-          isCheckingAvailability={isCheckingAvailability}
-          calculateFare={calculateFare}
-          isCalculating={isCalculating}
-          verifyOtp={handleVerifyOtp}
-          sendOtp={sendOtpCallback}
-          submitting={submitting}
+        {steps[currentStep].id === 'event-details' && (
+          <div className="flex flex-col gap-8">
+            {steps[currentStep].components.map((Component) => {
+              const ComponentMemo = MemoizedComponents[Component.name];
+              return (
+                <motion.div
+                  key={Component.name}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="relative bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+                >
+                  <ComponentMemo
+                    date={memoizedBookingData.date}
+                    event_id={memoizedBookingData.event_id}
+                    guestCount={memoizedBookingData.guestCount}
+                    venueId={memoizedBookingData.venueId}
+                    shiftId={memoizedBookingData.shiftId}
+                    updateBookingData={updateBookingData}
+                    isAvailable={isAvailable}
+                    checkAvailability={checkAvailability}
+                    isCheckingAvailability={isCheckingAvailability}
+                  />
+                  {Component.name === 'DateSelection' && bookingData.date && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute top-4 right-4"
+                    >
+                      <CheckCircle className="h-6 w-6 text-green-500" />
+                    </motion.div>
+                  )}
+                  {Component.name === 'EventTypeSelection' && bookingData.event_id && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute top-4 right-4"
+                    >
+                      <CheckCircle className="h-6 w-6 text-green-500" />
+                    </motion.div>
+                  )}
+                  {Component.name === 'GuestCount' && bookingData.guestCount && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute top-4 right-4"
+                    >
+                      <CheckCircle className="h-6 w-6 text-green-500" />
+                    </motion.div>
+                  )}
+                  {Component.name === 'VenueSelection' && bookingData.venueId && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute top-4 right-4"
+                    >
+                      <CheckCircle className="h-6 w-6 text-green-500" />
+                    </motion.div>
+                  )}
+                  {Component.name === 'ShiftSelection' && bookingData.shiftId && isAvailable && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute top-4 right-4"
+                    >
+                      <CheckCircle className="h-6 w-6 text-green-500" />
+                    </motion.div>
+                  )}
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
+        {steps[currentStep].id === 'package-menu' && (
+          <div className="flex flex-col gap-8">
+            {steps[currentStep].components.map((Component) => {
+              const ComponentMemo = MemoizedComponents[Component.name];
+              return (
+                <motion.div
+                  key={Component.name}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="relative bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+                >
+                  <ComponentMemo
+                    packageId={memoizedBookingData.packageId}
+                    selectedMenus={memoizedBookingData.selectedMenus}
+                    updateBookingData={updateBookingData}
+                  />
+                  {Component.name === 'PackageSelection' && bookingData.packageId && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute top-4 right-4"
+                    >
+                      <CheckCircle className="h-6 w-6 text-green-500" />
+                    </motion.div>
+                  )}
+                  {Component.name === 'MenuSelection' && Object.keys(bookingData.selectedMenus).length > 0 && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute top-4 right-4"
+                    >
+                      <CheckCircle className="h-6 w-6 text-green-500" />
+                    </motion.div>
+                  )}
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
+        {steps[currentStep].id === 'fare' && (
+          <div>
+            {steps[currentStep].components.map((Component) => {
+              const ComponentMemo = MemoizedComponents[Component.name];
+              return (
+                <ComponentMemo
+                  key={Component.name}
+                  baseFare={memoizedBookingData.baseFare}
+                  extraCharges={memoizedBookingData.extraCharges}
+                  totalFare={memoizedBookingData.totalFare}
+                  calculateFare={calculateFare}
+                  isCalculating={isCalculating}
+                />
+              );
+            })}
+          </div>
+        )}
+       {steps[currentStep].id === 'verification-confirmation' && (
+  <div>
+    {isComplete ? (() => {
+      const ConfirmationComponent = MemoizedComponents[BookingConfirmation.name];
+      return (
+        <ConfirmationComponent
           bookingId={bookingId}
-          isComplete={isComplete}
+          date={memoizedBookingData.date}
+          guestCount={memoizedBookingData.guestCount}
+          totalFare={memoizedBookingData.totalFare}
+          email={memoizedBookingData.email}
         />
+      );
+    })() : (() => {
+      const OtpComponent = MemoizedComponents[OtpVerification.name];
+      return (
+        <OtpComponent
+          email={memoizedBookingData.email}
+          verifyOtp={handleVerifyOtp}
+          submitting={submitting}
+          updateBookingData={updateBookingData}
+          sendOtp={sendOtpCallback}
+        />
+      );
+    })()}
+  </div>
+)}
+
       </motion.div>
 
       {currentStep < steps.length - 1 && (
-        <div className="mt-8 flex justify-between">
-          <button
+        <div className="mt-10 flex justify-between">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={handleBack}
-            className="px-6 py-3 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+            className="px-6 py-3 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors font-medium"
           >
             Back
-          </button>
-          <button
-            onClick={handleNext}
-            disabled={
-              (steps[currentStep].id === 'venue' && !bookingData.venueId) ||
-              (steps[currentStep].id === 'shift' && !isAvailable) ||
-              (steps[currentStep].id === 'fare' && bookingData.totalFare === 0)
-            }
-            className="px-6 py-3 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-          >
-            Next
-          </button>
+          </motion.button>
+          {isStepComplete() && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleNext}
+              className="px-6 py-3 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors font-medium"
+            >
+              Next
+            </motion.button>
+          )}
         </div>
       )}
     </div>

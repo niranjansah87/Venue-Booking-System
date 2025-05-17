@@ -1,5 +1,3 @@
-// models/booking.js
-
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
@@ -47,6 +45,10 @@ module.exports = (sequelize) => {
     status: {
       type: DataTypes.STRING,
       defaultValue: 'pending'
+    },
+    customer_phone: {
+      type: DataTypes.STRING,
+      allowNull: true // Nullable to avoid issues with existing records
     }
   }, {
     tableName: 'bookings',

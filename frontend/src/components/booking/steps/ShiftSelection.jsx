@@ -33,16 +33,16 @@ const ShiftSelection = ({ shiftId, updateBookingData, isAvailable, isCheckingAva
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
+      <div className="flex justify-center items-center py-4">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-600"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="py-8 text-center">
-        <p className="text-red-500 mb-4">{error}</p>
+      <div className="py-4 text-center">
+        <p className="text-red-500 mb-2">{error}</p>
         <button
           className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
           onClick={() => window.location.reload()}
@@ -54,13 +54,9 @@ const ShiftSelection = ({ shiftId, updateBookingData, isAvailable, isCheckingAva
   }
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-heading font-semibold text-gray-800 mb-6">Select a Time Slot</h2>
-      <p className="text-gray-600 mb-8">
-        Choose a time slot for your event and check availability.
-      </p>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+    <div>
+      <h3 className="text-lg font-heading font-semibold text-gray-800 mb-4">Select a Time Slot</h3>
+      <div className="grid grid-cols-1 gap-4 mb-6">
         {shifts.map((shift) => (
           <motion.div
             key={shift.id}
@@ -74,24 +70,23 @@ const ShiftSelection = ({ shiftId, updateBookingData, isAvailable, isCheckingAva
             <div className="flex items-start">
               <Clock className={`h-5 w-5 mt-0.5 mr-3 ${selectedShift === shift.id ? 'text-primary-600' : 'text-gray-400'}`} />
               <div>
-                <h3 className="text-lg font-medium text-gray-800">{shift.name}</h3>
+                <h4 className="text-md font-medium text-gray-800">{shift.name}</h4>
                 <p className="text-sm text-gray-500 mt-1">Duration: 4 hours</p>
               </div>
             </div>
           </motion.div>
         ))}
       </div>
-
       {selectedShift && (
-        <div className="mt-8 p-5 bg-gray-50 border border-gray-200 rounded-md">
-          <h3 className="text-lg font-medium text-gray-800 mb-4">Check Availability</h3>
-          <p className="text-gray-600 mb-4">
-            Verify if your selected date, venue, and time slot are available.
-          </p>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="p-4 bg-gray-50 border border-gray-200 rounded-md"
+        >
           <button
             onClick={checkAvailability}
             disabled={isCheckingAvailability || isAvailable}
-            className={`px-6 py-3 rounded-md transition-colors flex items-center justify-center w-full sm:w-auto ${
+            className={`w-full py-2 rounded-md transition-colors flex items-center justify-center ${
               isAvailable
                 ? 'bg-green-500 text-white cursor-default'
                 : isCheckingAvailability
@@ -113,7 +108,7 @@ const ShiftSelection = ({ shiftId, updateBookingData, isAvailable, isCheckingAva
               'Check Availability'
             )}
           </button>
-        </div>
+        </motion.div>
       )}
     </div>
   );
