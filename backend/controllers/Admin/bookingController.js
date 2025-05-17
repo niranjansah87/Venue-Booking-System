@@ -17,26 +17,20 @@ exports.initiateBooking = async (req, res) => {
   }
 };
 
-
-
-
-// Get booking by ID
-
+// Get bookings by user ID
 exports.getBookingsByUserId = async (req, res) => {
   try {
-    const { user_id } = req.params; // Get the user_id from the URL parameter
-    console.log('Fetching bookings for user ID:', user_id);  // Debugging: log the user ID
+    const { user_id } = req.params;
+    console.log('Fetching bookings for user ID:', user_id);
 
-    // Check if the user exists
     const user = await User.findByPk(user_id);
     if (!user) {
       console.error('User not found with ID:', user_id);
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Attempt to fetch all bookings for the specified user
     const bookings = await Booking.findAll({
-      where: { user_id }, // Fetch bookings where the user_id matches the parameter
+      where: { user_id },
       include: [
         { model: Event, as: 'event', required: false },
         { model: Venue, as: 'venue', required: false },
@@ -45,26 +39,18 @@ exports.getBookingsByUserId = async (req, res) => {
       ]
     });
 
-    // If no bookings are found for the user
     if (!bookings || bookings.length === 0) {
       console.error('No bookings found for user ID:', user_id);
       return res.status(404).json({ message: 'No bookings found for this user' });
     }
 
-    // Log bookings data for debugging
     console.log('User bookings data:', bookings);
-
-    // Send the bookings data as a JSON response
     res.json(bookings);
   } catch (error) {
-    // Log any error encountered during the process
     console.error('Error fetching bookings by user ID:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
-
-
-
 
 // Check date availability
 exports.checkDate = [
@@ -77,7 +63,7 @@ exports.checkDate = [
     const { event_date } = req.body;
     try {
       const bookings = await Booking.count({ where: { event_date } });
-      const available = bookings < 10; // Limit to 10 bookings per date
+      const available = bookings < 10;
       res.json({ available });
     } catch (error) {
       console.error('Error checking date:', error);
@@ -130,7 +116,6 @@ exports.checkBookingAvailability = [
 
 // Fetch packages
 exports.selectPackage = async (req, res) => {
-
   try {
     const packages = await Package.findAll({
       attributes: ['id', 'name', 'base_price'],
@@ -192,7 +177,7 @@ exports.calculateFare = [
         if (!menu) continue;
         const free_limit = menu.free_limit || 0;
         if (itemIndexes.length > free_limit) {
-          extra_charges += (itemIndexes.length - free_limit) * 100 * guest_count; // $100 per extra item per guest
+          extra_charges += (itemIndexes.length - free_limit) * 100 * guest_count;
         }
       }
       const base_fare = pkg.base_price * guest_count;
@@ -227,6 +212,7 @@ exports.storeBooking = [
   body('base_fare').isFloat({ min: 0 }).withMessage('Invalid base fare'),
   body('extra_charges').isFloat({ min: 0 }).withMessage('Invalid extra charges'),
   body('total_fare').isFloat({ min: 0 }).withMessage('Invalid total fare'),
+  body('customer_phone').isMobilePhone('any').withMessage('Invalid phone number'),
 
   async (req, res) => {
     const errors = validationResult(req);
@@ -245,7 +231,7 @@ exports.storeBooking = [
       base_fare,
       extra_charges,
       total_fare,
-      
+      customer_phone
     } = req.body;
 
     try {
@@ -271,6 +257,8 @@ exports.storeBooking = [
       if (existingBooking) {
         return res.status(400).json({ error: 'Venue is already booked for this date and shift' });
       }
+      // Format phone number with +977 prefix if not already present
+      const formattedPhone = customer_phone.startsWith('+977') ? customer_phone : `+977${customer_phone.replace(/^\+?977/, '')}`;
       const booking = await Booking.create({
         user_id,
         event_date,
@@ -283,9 +271,10 @@ exports.storeBooking = [
         base_fare,
         extra_charges,
         total_fare,
+        customer_phone: formattedPhone,
         status: 'pending',
       });
-      req.session.bookingData = null; // Clear session
+      req.session.bookingData = null;
       res.json({ bookingId: booking.id });
     } catch (error) {
       console.error('Error storing booking:', error);
@@ -300,11 +289,11 @@ exports.sendConfirmation = async (req, res) => {
   try {
     const booking = await Booking.findByPk(bookingId, {
       include: [
-        { model: Event, as: 'event' },      // Use alias 'event' here
-        { model: Venue, as: 'venue' },      // Use alias 'venue' here
-        { model: Shift, as: 'shift' },      // Use alias 'shift' here
-        { model: Package, as: 'package' },  // Use alias 'package' here
-        { model: User, as: 'user' }         // Use alias 'user' here
+        { model: Event, as: 'event' },
+        { model: Venue, as: 'venue' },
+        { model: Shift, as: 'shift' },
+        { model: Package, as: 'package' },
+        { model: User, as: 'user' }
       ],
     });
 
@@ -312,8 +301,9 @@ exports.sendConfirmation = async (req, res) => {
       return res.status(404).json({ error: 'Booking not found' });
     }
 
-    // console.log(booking);
-        const html = `
+    // Format phone number for display
+    const displayPhone = booking.customer_phone || 'N/A';
+    const html = `
       <html>
         <head>
           <style>
@@ -376,6 +366,7 @@ exports.sendConfirmation = async (req, res) => {
               <p><strong>Shift:</strong> <span class="highlight">${booking.shift?.dataValues?.name || 'N/A'}</span></p>
               <p><strong>Guests:</strong> <span class="highlight">${booking.guest_count}</span></p>
               <p><strong>Package:</strong> <span class="highlight">${booking.package?.dataValues?.name || 'N/A'}</span></p>
+              <p><strong>Phone:</strong> <span class="highlight">🇳🇵 ${displayPhone}</span></p>
               <p><strong>Total Fare:</strong> <span class="highlight">$${booking.total_fare}</span></p>
 
               <p>We'll contact you soon to confirm availability. If you have any questions, feel free to reach out to us.</p>
@@ -390,7 +381,6 @@ exports.sendConfirmation = async (req, res) => {
       </html>
     `;
 
-
     await sendEmail({
       to: email,
       subject: 'Booking Confirmation',
@@ -402,7 +392,6 @@ exports.sendConfirmation = async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
-
 
 // Get venue details
 exports.getVenueDetails = async (req, res) => {
@@ -450,20 +439,15 @@ exports.getPackageDetails = async (req, res) => {
 };
 
 // List all bookings
-
-
-
-
-
 exports.listBookings = async (req, res) => {
   try {
     const bookings = await Booking.findAll({
       include: [
-        { model: Event, as: 'event' },  // Use the alias 'event' here
-        { model: Venue, as: 'venue' },  // Use the alias 'venue' here
-        { model: Shift, as: 'shift' },  // Use the alias 'shift' here
-        { model: Package, as: 'package' },  // Use the alias 'package' here
-        { model: User, as: 'user' }  // Use the alias 'user' here
+        { model: Event, as: 'event' },
+        { model: Venue, as: 'venue' },
+        { model: Shift, as: 'shift' },
+        { model: Package, as: 'package' },
+        { model: User, as: 'user' }
       ],
     });
     res.json(bookings);
@@ -472,8 +456,6 @@ exports.listBookings = async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
-
-
 
 // Update booking status
 exports.updateBookingStatus = [
