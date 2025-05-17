@@ -12,7 +12,16 @@ module.exports = (sequelize) => {
     },
     items: {
       type: DataTypes.JSON,
-      allowNull: false
+      allowNull: false,
+      defaultValue: [], // Array of objects: [{ name: string, price: number }, ...]
+      get() {
+        const items = this.getDataValue('items');
+        // Ensure items have price; default to 10 if missing
+        return items.map(item => ({
+          name: item.name || item,
+          price: item.price != null ? item.price : 10
+        }));
+      }
     },
     free_limit: {
       type: DataTypes.INTEGER,
