@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -12,11 +11,10 @@ function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({ name: '', email: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '' });
   const [formError, setFormError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
-  // Get and memoize user from localStorage
   const user = useMemo(() => {
     try {
       const storedUser = localStorage.getItem('user');
@@ -27,7 +25,6 @@ function ProfilePage() {
     }
   }, []);
 
-  // Check authentication and load user data
   useEffect(() => {
     if (!user?.id) {
       navigate('/login', { state: { from: '/profile' } });
@@ -35,27 +32,24 @@ function ProfilePage() {
     }
 
     setProfile(user);
-    setFormData({ name: user.name || '', email: user.email || '' });
+    setFormData({ name: user.name || '', email: user.email || '', phone: user.phone || '' });
     setLoading(false);
   }, [user, navigate]);
 
-  // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setFormError('');
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFormError('');
     setSuccessMessage('');
 
-    // Basic validation
-    if (!formData.name.trim() || !formData.email.trim()) {
-      setFormError('Name and email are required.');
-      toast.error('Name and email are required.');
+    if (!formData.name.trim() || !formData.email.trim() || !formData.phone.trim()) {
+      setFormError('Name, email, and phone are required.');
+      toast.error('Name, email, and phone are required.');
       return;
     }
     if (!/\S+@\S+\.\S+/.test(formData.email)) {
@@ -63,21 +57,26 @@ function ProfilePage() {
       toast.error('Please enter a valid email address.');
       return;
     }
+    if (!/^\d{10}$/.test(formData.phone)) {
+      setFormError('Phone number must be exactly 10 digits.');
+      toast.error('Phone number must be exactly 10 digits.');
+      return;
+    }
 
     try {
       const response = await api.put(`/api/user/update/${user.id}`, {
         name: formData.name,
         email: formData.email,
+        phone: formData.phone,
       });
       const updatedUser = {
         ...user,
         name: response.data.user.name,
         email: response.data.user.email,
+        phone: response.data.user.phone,
         role: response.data.user.role || user.role,
       };
-      // Update localStorage
       localStorage.setItem('user', JSON.stringify(updatedUser));
-      // Trigger storage event to notify AdminHeader
       window.dispatchEvent(
         new StorageEvent('storage', {
           key: 'user',
@@ -99,14 +98,12 @@ function ProfilePage() {
     }
   };
 
-  // Handle logout
   const handleLogout = () => {
     localStorage.removeItem('user');
     toast.info('Logged out successfully');
     navigate('/login');
   };
 
-  // Toggle edit mode
   const toggleEdit = () => {
     setIsEditing(!isEditing);
     setFormError('');
@@ -115,7 +112,6 @@ function ProfilePage() {
 
   return (
     <div className="h-screen bg-white flex flex-col overflow-hidden">
-      {/* Header with Glassmorphism */}
       <header className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-lg shadow-lg z-20 h-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
           <Link to="/" className="flex items-center space-x-2 group">
@@ -134,9 +130,7 @@ function ProfilePage() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="flex-1 h-[calc(100vh-7rem)] flex items-center justify-center px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Subtle Background Pattern */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(94,234,212,0.05)_0%,_transparent_50%)] z-0" />
 
         <motion.div
@@ -145,7 +139,6 @@ function ProfilePage() {
           transition={{ duration: 0.5, ease: 'easeOut' }}
           className="max-w-md w-full bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-8 border border-teal-100/50 relative overflow-hidden"
         >
-          {/* Decorative Gradient Border */}
           <div className="absolute inset-0 border-2 border-transparent rounded-2xl bg-gradient-to-r from-teal-400 to-cyan-500 opacity-10" />
 
           {loading ? (
@@ -160,7 +153,6 @@ function ProfilePage() {
             <p className="text-red-600 text-center font-medium text-sm">{error}</p>
           ) : (
             <div className="space-y-4 relative z-10">
-              {/* Avatar */}
               <motion.div
                 className="flex justify-center"
                 initial={{ y: -10, opacity: 0 }}
@@ -181,7 +173,6 @@ function ProfilePage() {
                 </div>
               </motion.div>
 
-              {/* Title */}
               <motion.h2
                 className="text-2xl font-extrabold text-gray-900 text-center mb-4"
                 initial={{ opacity: 0 }}
@@ -191,7 +182,6 @@ function ProfilePage() {
                 {isEditing ? 'Edit Profile' : 'Your Profile'}
               </motion.h2>
 
-              {/* Success Message */}
               <AnimatePresence>
                 {successMessage && (
                   <motion.div
@@ -222,6 +212,12 @@ function ProfilePage() {
                     <div>
                       <p className="text-xs font-medium text-teal-600">Email</p>
                       <p className="text-sm font-semibold">{profile?.email}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between bg-gray-50/50 p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                    <div>
+                      <p className="text-xs font-medium text-teal-600">Phone</p>
+                      <p className="text-sm font-semibold">+977 {profile?.phone}</p>
                     </div>
                   </div>
                   <div className="flex items-center justify-between bg-gray-50/50 p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200">
@@ -295,12 +291,40 @@ function ProfilePage() {
                       whileFocus={{ scale: 1.02 }}
                     />
                   </div>
+                  <div>
+                    <label
+                      htmlFor="phone"
+                      className="block text-xs font-medium text-gray-700"
+                    >
+                      Phone
+                    </label>
+                    <div className="mt-1 flex rounded-lg shadow-sm">
+                      <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-200 bg-gray-50 text-gray-500 text-sm">
+                        <img
+                          src="https://flagcdn.com/16x12/np.png"
+                          alt="Nepal Flag"
+                          className="mr-2"
+                        />
+                        +977
+                      </span>
+                      <motion.input
+                        id="phone"
+                        name="phone"
+                        type="text"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        className="flex-1 block w-full px-3 py-2 border border-gray-200 rounded-r-lg text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-teal-400 focus:border-teal-400 text-sm transition-all shadow-sm"
+                        placeholder="Enter 10-digit phone number"
+                        whileFocus={{ scale: 1.02 }}
+                      />
+                    </div>
+                  </div>
                   <div className="flex space-x-3">
                     <motion.button
                       whileHover={{ scale: 1.05, boxShadow: '0 6px 20px rgba(20, 184, 166, 0.2)' }}
                       whileTap={{ scale: 0.95 }}
                       type="submit"
-                      className="flex-1 py-2 px-4 bg-teal-500 text-white font-semibold rounded-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-300 transition-all shadow-sm text-sm"
+                      className="flex-1 py-2 px-4 Bg-teal-500 text-white font-semibold rounded-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-300 transition-all shadow-sm text-sm"
                     >
                       Save Changes
                     </motion.button>
@@ -321,7 +345,6 @@ function ProfilePage() {
         </motion.div>
       </main>
 
-      {/* Footer */}
       <footer className="fixed bottom-0 left-0 right-0 bg-gray-800 text-white h-12 z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-center items-center">
           <p className="text-sm">

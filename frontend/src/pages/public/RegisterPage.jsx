@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -8,6 +7,7 @@ function RegisterPage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phone: '',
     password: '',
     confirmPassword: '',
   });
@@ -15,25 +15,28 @@ function RegisterPage() {
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
-  // Allow more special characters
   const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&^#_\-+])[A-Za-z\d@$!%*?&^#_\-+]{8,}$/;
+  const phoneRegex = /^\d{10}$/;
 
   const validateForm = () => {
     const newErrors = {};
 
-    // Name validation
     if (!formData.name.trim()) {
       newErrors.name = 'Full name is required';
     }
 
-    // Email validation (basic)
     if (!formData.email) {
       newErrors.email = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Invalid email format';
     }
 
-    // Password validation
+    if (!formData.phone) {
+      newErrors.phone = 'Phone number is required';
+    } else if (!phoneRegex.test(formData.phone)) {
+      newErrors.phone = 'Phone number must be exactly 10 digits';
+    }
+
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (!passwordRegex.test(formData.password)) {
@@ -41,7 +44,6 @@ function RegisterPage() {
         'Password must be at least 8 characters long, include one uppercase letter, one number, and one special character (@$!%*?&^#_-+).';
     }
 
-    // Confirm password
     if (formData.password && formData.confirmPassword !== formData.password) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
@@ -62,6 +64,7 @@ function RegisterPage() {
       const response = await api.post('/api/signup', {
         name: formData.name,
         email: formData.email,
+        phone: formData.phone,
         password: formData.password,
       });
 
@@ -82,7 +85,6 @@ function RegisterPage() {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    // Real-time validation for the changed field
     const newErrors = { ...errors };
     if (name === 'name') {
       if (!value.trim()) {
@@ -100,6 +102,15 @@ function RegisterPage() {
         delete newErrors.email;
       }
     }
+    if (name === 'phone') {
+      if (!value) {
+        newErrors.phone = 'Phone number is required';
+      } else if (!phoneRegex.test(value)) {
+        newErrors.phone = 'Phone number must be exactly 10 digits';
+      } else {
+        delete newErrors.phone;
+      }
+    }
     if (name === 'password') {
       if (!value) {
         newErrors.password = 'Password is required';
@@ -109,7 +120,6 @@ function RegisterPage() {
       } else {
         delete newErrors.password;
       }
-      // Re-validate confirmPassword if password changes
       if (formData.confirmPassword && value !== formData.confirmPassword) {
         newErrors.confirmPassword = 'Passwords do not match';
       } else {
@@ -172,6 +182,33 @@ function RegisterPage() {
               />
               {errors.email && (
                 <p className="mt-1 text-sm text-red-400">{errors.email}</p>
+              )}
+            </div>
+            <div>
+              <div className="flex rounded-lg">
+                <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-white/30 bg-white/10 text-white text-sm">
+                  <img
+                    src="https://flagcdn.com/16x12/np.png"
+                    alt="Nepal Flag"
+                    className="mr-2"
+                  />
+                  +977
+                </span>
+                <input
+                  id="phone"
+                  name="phone"
+                  type="text"
+                  required
+                  placeholder="10-digit phone number"
+                  className={`appearance-none rounded-r-lg relative block w-full px-4 py-3 bg-white/10 border ${
+                    errors.phone ? 'border-red-400' : 'border-white/30'
+                  } placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 sm:text-sm transition-all`}
+                  value={formData.phone}
+                  onChange={handleChange}
+                />
+              </div>
+              {errors.phone && (
+                <p className="mt-1 text-sm text-red-400">{errors.phone}</p>
               )}
             </div>
             <div>

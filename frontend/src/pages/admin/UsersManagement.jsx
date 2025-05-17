@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { User, Edit, Trash2, XCircle, AlertCircle } from 'lucide-react';
+import { User, Edit, Trash2, XCircle, AlertCircle, Phone } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { getAllUsers, updateUser, deleteUser } from '../../services/userService';
 
@@ -10,7 +9,7 @@ const UsersManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ id: null, name: '', email: '' });
+  const [formData, setFormData] = useState({ id: null, name: '', email: '', phone: '' });
   const [formErrors, setFormErrors] = useState({});
   const [deleteConfirm, setDeleteConfirm] = useState(null);
 
@@ -45,6 +44,11 @@ const UsersManagement = () => {
     } else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(formData.email)) {
       errors.email = 'Invalid email address';
     }
+    if (!formData.phone.trim()) {
+      errors.phone = 'Phone number is required';
+    } else if (!/^\d{10}$/.test(formData.phone)) {
+      errors.phone = 'Phone number must be exactly 10 digits';
+    }
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -55,9 +59,9 @@ const UsersManagement = () => {
 
     setLoading(true);
     try {
-      const userPayload = { name: formData.name, email: formData.email };
+      const userPayload = { name: formData.name, email: formData.email, phone: formData.phone };
       const updatedUser = await updateUser(formData.id, userPayload);
-      setUsers((prev) => prev.map((u) => (u.id === formData.id ? { ...u, ...updatedUser } : u)));
+      setUses((prev) => prev.map((u) => (u.id === formData.id ? { ...u, ...updatedUser } : u)));
       resetForm();
       toast.success('User updated successfully');
     } catch (err) {
@@ -70,7 +74,7 @@ const UsersManagement = () => {
   };
 
   const handleEdit = (user) => {
-    setFormData({ id: user.id, name: user.name || '', email: user.email || '' });
+    setFormData({ id: user.id, name: user.name || '', email: user.email || '', phone: user.phone || '' });
     setShowForm(true);
   };
 
@@ -91,7 +95,7 @@ const UsersManagement = () => {
   };
 
   const resetForm = () => {
-    setFormData({ id: null, name: '', email: '' });
+    setFormData({ id: null, name: '', email: '', phone: '' });
     setFormErrors({});
     setShowForm(false);
   };
@@ -99,16 +103,39 @@ const UsersManagement = () => {
   const renderFormInput = (label, name, type = 'text', placeholder = '') => (
     <div>
       <label className="block text-sm font-medium text-gray-700">{label}</label>
-      <input
-        type={type}
-        name={name}
-        value={formData[name]}
-        onChange={handleInputChange}
-        placeholder={placeholder}
-        className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-600 focus:border-indigo-600 sm:text-sm ${
-          formErrors[name] ? 'border-red-500' : ''
-        }`}
-      />
+      {name === 'phone' ? (
+        <div className="mt-1 flex rounded-md shadow-sm">
+          <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+            <img
+              src="https://flagcdn.com/16x12/np.png"
+              alt="Nepal Flag"
+              className="mr-2"
+            />
+            +977
+          </span>
+          <input
+            type={type}
+            name={name}
+            value={formData[name]}
+            onChange={handleInputChange}
+            placeholder={placeholder}
+            className={`flex-1 block w-full rounded-r-md border-gray-300 shadow-sm focus:ring-indigo-600 focus:border-indigo-600 sm:text-sm ${
+              formErrors[name] ? 'border-red-500' : ''
+            }`}
+          />
+        </div>
+      ) : (
+        <input
+          type={type}
+          name={name}
+          value={formData[name]}
+          onChange={handleInputChange}
+          placeholder={placeholder}
+          className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-600 focus:border-indigo-600 sm:text-sm ${
+            formErrors[name] ? 'border-red-500' : ''
+          }`}
+        />
+      )}
       {formErrors[name] && (
         <motion.p
           initial={{ opacity: 0 }}
@@ -132,7 +159,6 @@ const UsersManagement = () => {
   return (
     <div className="p-6 bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 flex items-center">
             <User className="h-8 w-8 text-indigo-600 mr-2" />
@@ -141,7 +167,6 @@ const UsersManagement = () => {
           <p className="text-gray-600 mt-2">Manage existing users (edit or delete).</p>
         </div>
 
-        {/* Error Message */}
         {error && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -159,7 +184,6 @@ const UsersManagement = () => {
           </motion.div>
         )}
 
-        {/* Table */}
         {users.length === 0 && !loading ? (
           <div className="bg-white rounded-xl shadow p-8 text-center">
             <AlertCircle className="h-16 w-16 text-gray-400 mx-auto mb-4" />
@@ -172,7 +196,7 @@ const UsersManagement = () => {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    {['Serial No', 'Name', 'Email', 'Actions'].map((heading) => (
+                    {['Serial No', 'Name', 'Email', 'Phone', 'Actions'].map((heading) => (
                       <th
                         key={heading}
                         className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
@@ -188,6 +212,14 @@ const UsersManagement = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm">{index + 1}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">{user.name || 'N/A'}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">{user.email || 'N/A'}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <img
+                          src="https://flagcdn.com/16x12/np.png"
+                          alt="Nepal Flag"
+                          className="inline mr-1"
+                        />
+                        +977 {user.phone || 'N/A'}
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <div className="flex space-x-2">
                           <motion.button
@@ -218,7 +250,6 @@ const UsersManagement = () => {
           </div>
         )}
 
-        {/* Edit Form Modal */}
         {showForm && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -233,6 +264,7 @@ const UsersManagement = () => {
               <form onSubmit={handleSubmit} className="space-y-6">
                 {renderFormInput('Name', 'name', 'text', 'e.g., John Doe')}
                 {renderFormInput('Email', 'email', 'email', 'e.g., john@example.com')}
+                {renderFormInput('Phone', 'phone', 'text', 'e.g., 9841234567')}
                 <div className="flex justify-end space-x-3">
                   <button
                     type="button"
@@ -269,7 +301,6 @@ const UsersManagement = () => {
           </motion.div>
         )}
 
-        {/* Delete Confirmation Modal */}
         {deleteConfirm && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
