@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Clock, Plus, Edit, Trash2, XCircle } from 'lucide-react';
+import { Clock, Plus, Edit, Trash2, XCircle, AlertCircle } from 'lucide-react';
 import { getAllShifts, createShift, updateShift, deleteShift } from '../../services/shiftService';
 
 const ShiftsManagement = () => {
@@ -11,60 +11,23 @@ const ShiftsManagement = () => {
   const [formData, setFormData] = useState({
     id: null,
     name: '',
-    start_time: '',
-    end_time: '',
     description: '',
-    shift_type: '',
   });
   const [formErrors, setFormErrors] = useState({});
   const [deleteConfirm, setDeleteConfirm] = useState(null);
 
-  const shiftTypes = [
-    { value: 'morning', label: 'Morning 🌅', emoji: '🌅' },
-    { value: 'afternoon', label: 'Afternoon ☀️', emoji: '☀️' },
-    { value: 'evening', label: 'Evening 🌙', emoji: '🌙' },
-  ];
-
-  const mockShifts = [
-    {
-      id: 1,
-      name: 'Morning Shift',
-      start_time: '09:00',
-      end_time: '12:00',
-      description: 'Morning event shift',
-      shift_type: 'morning',
-    },
-    {
-      id: 2,
-      name: 'Afternoon Shift',
-      start_time: '13:00',
-      end_time: '16:00',
-      description: 'Afternoon event shift',
-      shift_type: 'afternoon',
-    },
-    {
-      id: 3,
-      name: 'Evening Shift',
-      start_time: '18:00',
-      end_time: '21:00',
-      description: 'Evening event shift',
-      shift_type: 'evening',
-    },
-  ];
-
+  // Fetch shifts
   useEffect(() => {
     const fetchShifts = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
         const data = await getAllShifts();
-        if (!data || !data.shifts || data.shifts.length === 0) {
-          setShifts(data);
-        } else {
-          setShifts(mockShifts);
-        }
+        console.log('Fetched shifts:', JSON.stringify(data, null, 2));
+        setShifts(Array.isArray(data.shifts) ? data.shifts : data || []);
       } catch (error) {
-        setError('Failed to load shifts');
-        setShifts(mockShifts);
+        console.error('Error fetching shifts:', error.message);
+        setError('Failed to load shifts. Please try again.');
+        setShifts([]);
       } finally {
         setLoading(false);
       }
@@ -72,50 +35,22 @@ const ShiftsManagement = () => {
     fetchShifts();
   }, []);
 
+  // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
-    if (name === 'shift_type') {
-      let start = '';
-      let end = '';
-
-      if (value === 'morning') {
-        start = '06:00';
-        end = '12:00';
-      } else if (value === 'afternoon') {
-        start = '12:00';
-        end = '18:00';
-      } else if (value === 'evening') {
-        start = '18:00';
-        end = '23:00';
-      }
-
-      setFormData((prev) => ({
-        ...prev,
-        shift_type: value,
-        start_time: start,
-        end_time: end,
-      }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
-
+    setFormData((prev) => ({ ...prev, [name]: value }));
     setFormErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
+  // Validate form
   const validateForm = () => {
     const errors = {};
     if (!formData.name.trim()) errors.name = 'Shift name is required';
-    if (!formData.start_time) errors.start_time = 'Start time is required';
-    if (!formData.end_time) errors.end_time = 'End time is required';
-    if (!formData.shift_type) errors.shift_type = 'Shift type is required';
-    if (formData.start_time && formData.end_time && formData.start_time >= formData.end_time) {
-      errors.end_time = 'End time must be after start time';
-    }
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -123,45 +58,60 @@ const ShiftsManagement = () => {
     setLoading(true);
     try {
       const shiftData = {
-        name: formData.name,
-        start_time: formData.start_time,
-        end_time: formData.end_time,
-        description: formData.description,
-        shift_type: formData.shift_type,
+        name: formData.name.trim(),
+        description: formData.description.trim(),
       };
+      console.log('Submitting shift:', JSON.stringify(shiftData, null, 2));
 
       if (formData.id) {
         const response = await updateShift(formData.id, shiftData);
-        setShifts((prev) =>
-          prev.map((shift) =>
-            shift.id === formData.id ? { ...shift, ...response } : shift
-          )
-        );
+        console.log('Update response:', JSON.stringify(response, null, 2));
+        // Fallback: Refetch if response is incomplete
+        if (!response.id) {
+          console.warn('Incomplete update response, refetching shifts');
+          const updatedShifts = await getAllShifts();
+          setShifts(Array.isArray(updatedShifts.shifts) ? updatedShifts.shifts : updatedShifts || []);
+        } else {
+          setShifts((prev) =>
+            prev.map((shift) =>
+              shift.id === formData.id ? { ...shift, ...response } : shift
+            )
+          );
+        }
       } else {
         const response = await createShift(shiftData);
-        setShifts((prev) => [...prev, response]);
+        console.log('Create response:', JSON.stringify(response, null, 2));
+        // Fallback: Refetch if response is incomplete
+        if (!response.id) {
+          console.warn('Incomplete create response, refetching shifts');
+          const updatedShifts = await getAllShifts();
+          setShifts(Array.isArray(updatedShifts.shifts) ? updatedShifts.shifts : updatedShifts || []);
+        } else {
+          setShifts((prev) => [...prev, response]);
+        }
       }
 
       resetForm();
     } catch (error) {
-      setError('Failed to save shift');
+      console.error('Error saving shift:', error.message);
+      setError('Failed to save shift. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
+  // Handle edit shift
   const handleEdit = (shift) => {
+    console.log('Editing shift:', JSON.stringify(shift, null, 2));
     setFormData({
       id: shift.id,
-      name: shift.name,
-      start_time: shift.start_time,
-      end_time: shift.end_time,
+      name: shift.name || '',
       description: shift.description || '',
-      shift_type: shift.shift_type,
     });
     setShowForm(true);
   };
 
+  // Handle delete shift
   const handleDelete = async (id) => {
     setLoading(true);
     try {
@@ -169,23 +119,29 @@ const ShiftsManagement = () => {
       setShifts((prev) => prev.filter((shift) => shift.id !== id));
       setDeleteConfirm(null);
     } catch (error) {
-      setError('Failed to delete shift');
+      console.error('Error deleting shift:', error.message);
+      setError('Failed to delete shift. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
+  // Reset form
   const resetForm = () => {
     setFormData({
       id: null,
       name: '',
-      start_time: '',
-      end_time: '',
       description: '',
-      shift_type: '',
     });
     setFormErrors({});
     setShowForm(false);
+  };
+
+  // Handle click outside to close form
+  const handleClickOutside = (e) => {
+    if (showForm && e.target.className.includes('bg-black')) {
+      resetForm();
+    }
   };
 
   if (loading && shifts.length === 0) {
@@ -197,7 +153,7 @@ const ShiftsManagement = () => {
   }
 
   return (
-    <div className="p-6 bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen">
+    <div className="p-6 bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen" onClick={handleClickOutside}>
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 flex items-center">
@@ -208,7 +164,7 @@ const ShiftsManagement = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowForm(true)}
-            className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
+            className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-lg shadow-md hover:from-primary-700 hover:to-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-300"
           >
             <Plus className="h-5 w-5 mr-2" />
             Add Shift
@@ -219,138 +175,226 @@ const ShiftsManagement = () => {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6 bg-red-100 p-4 rounded-lg flex items-center"
+            transition={{ duration: 0.3 }}
+            className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg flex items-center shadow-md"
           >
             <XCircle className="h-5 w-5 text-red-500 mr-2" />
             <p className="text-sm text-red-700">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="ml-auto px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+            >
+              Retry
+            </button>
           </motion.div>
         )}
 
+        {/* Empty State */}
+        {shifts.length === 0 && !loading && (
+          <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+            <AlertCircle className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No Shifts Found</h3>
+            <p className="text-gray-500">Create a new shift to get started.</p>
+          </div>
+        )}
+
         {/* Shift Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {shifts.length > 0 ? (
-            shifts.map((shift) => (
+        {shifts.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {shifts.map((shift) => (
               <motion.div
                 key={shift.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
-                className="bg-white rounded-xl shadow-md p-4"
+                className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300"
               >
-                <h3 className="text-lg font-semibold flex items-center">
-                  {shiftTypes.find((t) => t.value === shift.shift_type)?.emoji || '⏰'} {shift.name}
+                <h3 className="text-lg font-semibold text-gray-900 flex items-center mb-2">
+                  <Clock className="h-5 w-5 text-primary-600 mr-2" />
+                  {shift.name || 'Unnamed Shift'}
                 </h3>
-                <p className="text-sm text-gray-500">
-                  {shift.start_time} - {shift.end_time}
-                </p>
-                <p className="text-sm mt-1 text-gray-600 line-clamp-2">{shift.description}</p>
+                {/* <p className="text-sm text-gray-600 line-clamp-2">
+                  {shift.description || 'No description provided'}
+                </p> */}
                 <div className="mt-4 flex space-x-2">
-                  <button onClick={() => handleEdit(shift)} className="text-primary-600">
-                    <Edit className="w-5 h-5" />
-                  </button>
-                  <button onClick={() => setDeleteConfirm(shift.id)} className="text-red-600">
-                    <Trash2 className="w-5 h-5" />
-                  </button>
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => handleEdit(shift)}
+                    className="p-2 bg-primary-600 text-white rounded-full hover:bg-primary-700 transition-colors"
+                    title="Edit Shift"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => setDeleteConfirm(shift.id)}
+                    className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
+                    title="Delete Shift"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </motion.button>
                 </div>
               </motion.div>
-            ))
-          ) : (
-            <p className="text-center text-gray-500 col-span-full">No shifts available</p>
-          )}
-        </div>
-
-        {/* Delete Confirmation */}
-        {deleteConfirm && (
-          <div className="fixed inset-0 bg-black bg-opacity-40 z-50 flex justify-center items-center">
-            <div className="bg-white p-6 rounded-md shadow-md">
-              <h3 className="font-semibold text-lg">Delete this shift?</h3>
-              <div className="flex mt-4 gap-4">
-                <button onClick={() => setDeleteConfirm(null)} className="bg-gray-300 px-4 py-2 rounded">
-                  Cancel
-                </button>
-                <button onClick={() => handleDelete(deleteConfirm)} className="bg-red-600 text-white px-4 py-2 rounded">
-                  Confirm
-                </button>
-              </div>
-            </div>
+            ))}
           </div>
         )}
 
         {/* Shift Form Modal */}
         {showForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-            <div className="bg-white p-6 rounded-md shadow-md w-full max-w-lg">
-              <h2 className="text-xl font-semibold mb-4">{formData.id ? 'Edit Shift' : 'Create Shift'}</h2>
-              <form onSubmit={handleSubmit}>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium">Shift Name</label>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-50"
+          >
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 relative">
+              <button
+                onClick={resetForm}
+                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <XCircle className="h-6 w-6" />
+              </button>
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                {formData.id ? 'Edit Shift' : 'Create Shift'}
+              </h2>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Shift Name</label>
                   <input
                     type="text"
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    className="w-full mt-1 p-2 border rounded"
+                    className={`block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-600 focus:ring-primary-600 sm:text-sm transition-all duration-300 hover:border-gray-400 ${formErrors.name ? 'border-red-500' : ''}`}
+                    placeholder="e.g., Morning Shift"
                   />
-                  {formErrors.name && <p className="text-sm text-red-600">{formErrors.name}</p>}
-                </div>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium">Start Time</label>
-                  <input
-                    type="time"
-                    name="start_time"
-                    value={formData.start_time}
-                    onChange={handleInputChange}
-                    className="w-full mt-1 p-2 border rounded"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium">End Time</label>
-                  <input
-                    type="time"
-                    name="end_time"
-                    value={formData.end_time}
-                    onChange={handleInputChange}
-                    className="w-full mt-1 p-2 border rounded"
-                  />
-                  {formErrors.end_time && <p className="text-sm text-red-600">{formErrors.end_time}</p>}
-                </div>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium">Shift Type</label>
-                  <select
-                    name="shift_type"
-                    value={formData.shift_type}
-                    onChange={handleInputChange}
-                    className="w-full mt-1 p-2 border rounded"
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: formErrors.name ? 1 : 0 }}
+                    className="mt-1 text-sm text-red-500 flex items-center"
                   >
-                    <option value="">Select Shift Type</option>
-                    {shiftTypes.map((type) => (
-                      <option key={type.value} value={type.value}>
-                        {type.label}
-                      </option>
-                    ))}
-                  </select>
-                  {formErrors.shift_type && <p className="text-sm text-red-600">{formErrors.shift_type}</p>}
+                    {formErrors.name && <AlertCircle className="h-4 w-4 mr-1" />}
+                    {formErrors.name}
+                  </motion.p>
                 </div>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium">Description (optional)</label>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Description (optional)</label>
                   <textarea
                     name="description"
                     value={formData.description}
                     onChange={handleInputChange}
-                    className="w-full mt-1 p-2 border rounded"
+                    className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-600 focus:ring-primary-600 sm:text-sm transition-all duration-300 hover:border-gray-400"
+                    placeholder="e.g., Shift for morning events"
+                    rows="4"
                   />
                 </div>
-                <div className="flex justify-between">
-                  <button type="button" onClick={resetForm} className="bg-gray-300 px-4 py-2 rounded">
+                <div className="flex justify-end space-x-3">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    type="button"
+                    onClick={resetForm}
+                    className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                  >
                     Cancel
-                  </button>
-                  <button type="submit" className="bg-primary-600 text-white px-4 py-2 rounded">
-                    Save Shift
-                  </button>
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    type="submit"
+                    disabled={loading}
+                    className="px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-lg shadow-md hover:from-primary-700 hover:to-primary-800 disabled:bg-primary-400 disabled:cursor-not-allowed flex items-center transition-all duration-300"
+                  >
+                    {loading && (
+                      <svg
+                        className="animate-spin h-5 w-5 mr-2 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                        />
+                      </svg>
+                    )}
+                    {loading ? 'Saving...' : formData.id ? 'Update Shift' : 'Create Shift'}
+                  </motion.button>
                 </div>
               </form>
             </div>
-          </div>
+          </motion.div>
+        )}
+
+        {/* Delete Confirmation */}
+        {deleteConfirm && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-50"
+          >
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                <AlertCircle className="h-6 w-6 text-red-500 mr-2" />
+                Confirm Deletion
+              </h2>
+              <p className="text-sm text-gray-600 mb-6">
+                Are you sure you want to delete this shift? This action cannot be undone.
+              </p>
+              <div className="flex justify-end space-x-3">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setDeleteConfirm(null)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleDelete(deleteConfirm)}
+                  className="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 flex items-center transition-colors"
+                >
+                  {loading && (
+                    <svg
+                      className="animate-spin h-5 w-5 mr-2 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                      />
+                    </svg>
+                  )}
+                  {loading ? 'Deleting...' : 'Delete Shift'}
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
         )}
       </div>
     </div>

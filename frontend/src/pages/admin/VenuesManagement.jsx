@@ -28,7 +28,7 @@ const VenuesManagement = () => {
     try {
       setLoading(true);
       const data = await getAllVenues();
-      console.log('Fetch venues response:', data);
+      // console.log('Fetch venues response:', data);
       const venuesData = data.venues || data.data || data.results || data || [];
       if (!venuesData.length) {
         setVenues(mockVenues);
@@ -91,11 +91,11 @@ const VenuesManagement = () => {
       let response;
       if (formData.id) {
         response = await updateVenue(formData.id, venueData);
-        console.log('Update venue response:', response);
+        // console.log('Update venue response:', response);
         toast.success('Venue updated successfully');
       } else {
         response = await createVenue(venueData);
-        console.log('Create venue response:', response);
+        // console.log('Create venue response:', response);
         toast.success('Venue created successfully');
       }
 
