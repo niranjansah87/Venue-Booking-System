@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Mail, Loader, User, Lock } from 'lucide-react';
+import { Mail, Loader, User, Lock, Phone } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -138,15 +138,16 @@ const OtpVerification = ({ email, verifyOtp, submitting, updateBookingData }) =>
           name: data.name,
           email: data.email,
           password: data.password,
+          phone: data.phone,
         }),
         credentials: 'include',
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        if (response.status === 409 || errorData.message.includes('email already exists')) {
+        if (response.status === 409 || errorData.message.includes('email already exists') || errorData.message.includes('phone number already registered')) {
           setEmailExists(true);
-          showToast('Email already exists.', {
+          showToast(errorData.message || 'Email or phone number already exists.', {
             toastId: 'email-exists',
             type: 'error',
           });
@@ -160,6 +161,7 @@ const OtpVerification = ({ email, verifyOtp, submitting, updateBookingData }) =>
       setSignupCredentials({ email: data.email, password: data.password });
       // Update booking data and local email
       updateBookingData('name', data.name);
+      updateBookingData('phone', data.phone);
       setLocalEmail(data.email);
       updateBookingData('email', data.email);
       // Reset form and clear errors
@@ -297,7 +299,7 @@ const OtpVerification = ({ email, verifyOtp, submitting, updateBookingData }) =>
             className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md"
           >
             <p className="text-red-600">
-              This email is already registered. Please{' '}
+              This email or phone number is already registered. Please{' '}
               <Link to="/login" className="text-primary-600 hover:underline">
                 log in
               </Link>{' '}
@@ -379,6 +381,44 @@ const OtpVerification = ({ email, verifyOtp, submitting, updateBookingData }) =>
                 className="mt-1 text-sm text-red-600"
               >
                 {signupErrors.email.message}
+              </motion.p>
+            )}
+          </div>
+
+          {/* Phone Number Field */}
+          <div>
+            <label htmlFor="signup-phone" className="block text-sm font-medium text-gray-700 mb-1">
+              Phone Number
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Phone className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                id="signup-phone"
+                type="tel"
+                {...register('phone', {
+                  required: 'Phone number is required',
+                  pattern: {
+                    value: /^\d{10}$/,
+                    message: 'Phone number must be exactly 10 digits',
+                  },
+                })}
+                className={`pl-10 w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
+                  signupErrors.phone
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-200'
+                    : 'border-gray-300 focus:border-primary-500 focus:ring-primary-200'
+                }`}
+                placeholder="Enter your phone number"
+              />
+            </div>
+            {signupErrors.phone && (
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-1 text-sm text-red-600"
+              >
+                {signupErrors.phone.message}
               </motion.p>
             )}
           </div>

@@ -15,13 +15,43 @@ function LoginPage() {
     setLoading(true);
     setError('');
 
+    // Trim inputs and convert email to lowercase
+    const trimmedEmail = email.trim().toLowerCase();
+    const trimmedPassword = password.trim();
+
+    // Log the payload for debugging
+    console.log('Login payload:', { email: trimmedEmail, password: trimmedPassword });
+
     try {
-      await login(email, password);
+      await login(trimmedEmail, trimmedPassword);
     } catch (err) {
       console.error('Login error:', err);
-      const errorMessage = err.response?.data?.message || 'Login failed. Please try again.';
+      let errorMessage = 'Login failed. Please try again.';
+      if (err.message === 'Email not registered') {
+        errorMessage = (
+          <>
+            No account found with this email.{' '}
+            <Link to="/register" className="underline text-indigo-200 hover:text-indigo-100">
+              Sign up here
+            </Link>.
+          </>
+        );
+      } else if (err.message === 'Incorrect password') {
+        errorMessage = (
+          <>
+            Incorrect password.{' '}
+            <Link to="/forgot-password" className="underline text-indigo-200 hover:text-indigo-100">
+              Reset password
+            </Link>.
+          </>
+        );
+      } else if (err.message === 'Please verify your email address') {
+        errorMessage = 'Please verify your email address to log in.';
+      } else {
+        errorMessage = err.message || 'Invalid credentials';
+      }
       setError(errorMessage);
-      toast.error(errorMessage);
+      toast.error(typeof errorMessage === 'string' ? errorMessage : 'Login failed');
     } finally {
       setLoading(false);
     }
@@ -93,7 +123,26 @@ function LoginPage() {
               disabled={loading}
               className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all disabled:opacity-50"
             >
-              {loading ? 'Signing in...' : 'Sign in'}
+              {loading ? (
+                <>
+                  <svg
+                    className="animate-spin h-5 w-5 mr-2 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    />
+                  </svg>
+                  Signing in...
+                </>
+              ) : (
+                'Sign in'
+              )}
             </button>
           </div>
 

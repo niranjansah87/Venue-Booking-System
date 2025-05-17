@@ -31,7 +31,6 @@ export const AuthProvider = ({ children }) => {
       } else {
         setUser(null);
       }
-      // console.log('AuthContext: Initial user state:', { user, storedUser });
       setLoading(false);
     };
     checkUser();
@@ -74,9 +73,7 @@ export const AuthProvider = ({ children }) => {
 
   const sendOtp = async (email) => {
     try {
-      console.log(`Sending OTP request for email: ${email}`);
       const response = await api.post('/api/admin/book/send-otp', { email });
-      // console.log('OTP sent to:', email, 'Response:', response.data);
       toast.success('OTP sent to your email!', { toastId: 'otp-sent' });
       return response.data;
     } catch (error) {
@@ -90,7 +87,6 @@ export const AuthProvider = ({ children }) => {
   const verifyOtp = async (otp) => {
     try {
       const response = await api.post('/api/admin/book/verify-otp', { otp });
-      console.log('OTP verified:', otp);
       toast.success('OTP verified successfully!', { toastId: 'otp-verified' });
       return response.data;
     } catch (error) {
