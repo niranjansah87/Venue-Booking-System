@@ -16,6 +16,8 @@ const PORT = process.env.PORT || 5000;
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000', // If another frontend port is used
+  undefined,
+  
   process.env.FRONTEND_URL,
 ].filter(Boolean); // Remove undefined values
 
