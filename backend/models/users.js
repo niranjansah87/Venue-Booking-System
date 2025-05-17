@@ -19,6 +19,22 @@ module.exports = (sequelize) => {
             type: DataTypes.STRING,
             allowNull: false
         },
+        phone: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            validate: {
+                notNull: {
+                    msg: 'Phone number is required'
+                },
+                len: {
+                    args: [10, 10],
+                    msg: 'Phone number must be exactly 10 digits'
+                },
+                isNumeric: {
+                    msg: 'Phone number must contain only digits'
+                }
+            }
+        },
         email_verified: {
             type: DataTypes.BOOLEAN,
             defaultValue: false
