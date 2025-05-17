@@ -4,3 +4,4 @@ backend/.env
 backend/sequelize-logs.log
 backend/logs/sequelize-logs.log
 backend/logs/sequelize-logs.log
+node_modules
